@@ -8,52 +8,99 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-      background: #f0f2f5;
-      color: #333;
-      min-height: 100vh;
+      background: #f0f2f5; color: #333; min-height: 100vh;
     }
     .header {
       background: linear-gradient(135deg, #1a3a5c, #2d5f8a);
-      color: #fff;
-      padding: 24px 0;
-      text-align: center;
+      color: #fff; padding: 24px 0; text-align: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .header h1 { font-size: 24px; font-weight: 600; letter-spacing: 1px; }
     .header p { font-size: 13px; opacity: 0.8; margin-top: 6px; }
-    .container { max-width: 640px; margin: 32px auto; padding: 0 16px; }
+    .container { max-width: 680px; margin: 32px auto; padding: 0 16px; }
     .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      padding: 32px;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 32px;
     }
-    .section-title {
-      font-size: 18px; font-weight: 600; color: #1a3a5c;
-      margin-bottom: 24px; padding-bottom: 12px;
-      border-bottom: 2px solid #e8ecf0;
+
+    /* ===== Step indicator ===== */
+    .steps { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+    .step-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #999; }
+    .step-item.active { color: #1a3a5c; font-weight: 600; }
+    .step-num {
+      width: 28px; height: 28px; line-height: 28px; border-radius: 50%;
+      background: #ddd; color: #fff; text-align: center; font-size: 13px; font-weight: 600;
     }
+    .step-item.active .step-num { background: #1a3a5c; }
+    .step-arrow { color: #ccc; font-size: 16px; }
+
+    /* ===== Notice box ===== */
+    .notice-box {
+      background: #fff8e1; border: 2px solid #f9a825; border-radius: 10px;
+      padding: 16px 20px; margin-bottom: 28px;
+    }
+    .notice-box p { font-size: 13px; line-height: 1.7; color: #5d4037; }
+    .notice-box strong { color: #000; font-size: 14px; }
+
+    /* ===== Section title with ? button ===== */
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #e8ecf0;
+    }
+    .section-title { font-size: 18px; font-weight: 700; color: #1a3a5c; }
+    .help-btn {
+      width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2d5f8a;
+      background: #fff; color: #2d5f8a; font-size: 14px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .help-btn:hover { background: #2d5f8a; color: #fff; }
+
+    /* ===== Modal ===== */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+      background: #fff; border-radius: 12px; max-width: 600px; width: 90%;
+      max-height: 85vh; overflow-y: auto; padding: 28px; position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 16px; font-size: 24px;
+      background: none; border: none; cursor: pointer; color: #888;
+    }
+    .modal-close:hover { color: #333; }
+    .modal-content h3 { font-size: 16px; color: #1a3a5c; margin-bottom: 16px; }
+    .modal-content .modal-screenshot {
+      border: 1px solid #ddd; border-radius: 8px; padding: 16px;
+      background: #f9fafb; margin-bottom: 16px;
+    }
+    .modal-content .modal-screenshot img { width: 100%; border-radius: 6px; }
+    .modal-content .modal-text { font-size: 13px; line-height: 1.8; color: #444; }
+    .modal-content .modal-text p { margin-bottom: 12px; }
+
+    /* ===== Form ===== */
     .form-group { margin-bottom: 24px; }
-    .form-group label {
+    .form-group > label {
       display: block; font-size: 14px; font-weight: 600;
       color: #444; margin-bottom: 8px;
     }
-    .form-group label .en { font-weight: 400; color: #888; font-size: 13px; margin-left: 4px; }
-    .form-group label .required {
+    .form-group > label .en { font-weight: 400; color: #888; font-size: 13px; margin-left: 4px; }
+    .form-group > label .required {
       background: #e74c3c; color: #fff; font-size: 11px;
       padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 500;
     }
     .form-group input[type="text"],
     .form-group select {
-      width: 100%; padding: 12px 16px;
-      border: 1.5px solid #d0d5dd; border-radius: 8px;
-      font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none; background: #fff;
+      width: 100%; padding: 12px 16px; border: 1.5px solid #d0d5dd;
+      border-radius: 8px; font-size: 15px;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none; background: #fff;
     }
     .form-group input[type="text"]:focus,
     .form-group select:focus {
-      border-color: #2d5f8a;
-      box-shadow: 0 0 0 3px rgba(45, 95, 138, 0.12);
+      border-color: #2d5f8a; box-shadow: 0 0 0 3px rgba(45,95,138,0.12);
     }
     .form-group input[type="text"]::placeholder { color: #b0b8c1; }
     .form-group .hint { font-size: 12px; color: #888; margin-top: 6px; }
@@ -61,20 +108,18 @@
 
     /* Toggle tabs */
     .toggle-group {
-      display: flex; gap: 0; border-radius: 8px;
-      overflow: hidden; border: 1.5px solid #d0d5dd;
+      display: flex; border-radius: 8px; overflow: hidden; border: 1.5px solid #d0d5dd;
     }
     .toggle-group label {
-      flex: 1; text-align: center; padding: 12px 16px;
-      font-size: 14px; font-weight: 500; cursor: pointer;
-      background: #f8f9fa; color: #555; transition: all 0.2s;
-      margin-bottom: 0; border-right: 1px solid #d0d5dd;
+      flex: 1; text-align: center; padding: 12px 16px; font-size: 14px;
+      font-weight: 500; cursor: pointer; background: #f8f9fa; color: #555;
+      transition: all 0.2s; margin-bottom: 0; border-right: 1px solid #d0d5dd;
     }
     .toggle-group label:last-child { border-right: none; }
     .toggle-group input { display: none; }
     .toggle-group input:checked + label { background: #1a3a5c; color: #fff; }
 
-    /* Collapsible fields */
+    /* Alias fields */
     .alias-fields {
       max-height: 0; overflow: hidden; opacity: 0;
       transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
@@ -82,7 +127,7 @@
     }
     .alias-fields.show { max-height: 300px; opacity: 1; margin-top: 24px; }
 
-    /* Date selects row */
+    /* Date row */
     .date-row { display: flex; gap: 12px; }
     .date-row select { flex: 1; }
 
@@ -97,30 +142,44 @@
     .btn-submit:hover { opacity: 0.9; }
     .btn-submit:active { transform: scale(0.99); }
 
-    .step-indicator {
-      text-align: center; margin-bottom: 24px; font-size: 13px; color: #888;
-    }
-    .step-indicator span {
-      display: inline-block; width: 32px; height: 32px; line-height: 32px;
-      border-radius: 50%; background: #1a3a5c; color: #fff;
-      font-weight: 600; font-size: 14px;
-    }
     .footer { text-align: center; padding: 24px; font-size: 12px; color: #aaa; }
   </style>
 </head>
 <body>
+
   <div class="header">
     <h1>申請者情報入力</h1>
     <p>Enter Applicant Information</p>
   </div>
 
   <div class="container">
-    <div class="step-indicator">
-      <span>1</span> ページ 1 / Step 1
+
+    <!-- ===== Step indicator ===== -->
+    <div class="steps">
+      <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div>
+      <span class="step-arrow">→</span>
+      <div class="step-item"><span class="step-num">②</span> 選択項目の入力</div>
+      <span class="step-arrow">→</span>
+      <div class="step-item"><span class="step-num">③</span> 入力内容の確認</div>
+      <span class="step-arrow">→</span>
+      <div class="step-item"><span class="step-num">④</span> 申請料お支払い</div>
+      <span class="step-arrow">→</span>
+      <div class="step-item"><span class="step-num">⑤</span> 申請完了</div>
+    </div>
+
+    <!-- ===== Notice box ===== -->
+    <div class="notice-box">
+      <p><strong>注意事項：</strong>すべての項目は英語(ローマ字)で入力してください。</p>
+      <p>申請方法に関する詳細は「<strong>？</strong>」ボタンをクリックしてください。</p>
     </div>
 
     <div class="card">
-      <div class="section-title">申請者情報 / Applicant Information</div>
+
+      <!-- ===== Section header with ? ===== -->
+      <div class="section-header">
+        <span class="section-title">申請者情報</span>
+        <button class="help-btn" id="helpBtn" title="申請者情報の入力方法">？</button>
+      </div>
 
       <form id="applicationForm">
         <!-- Surname -->
@@ -174,27 +233,17 @@
         <div class="form-group">
           <label>生年月日 <span class="en">/ Date of birth</span><span class="required">必須</span></label>
           <div class="date-row">
-            <select id="dobYear" name="dobYear" required>
-              <option value="">年</option>
-            </select>
+            <select id="dobYear" name="dobYear" required><option value="">年</option></select>
             <select id="dobMonth" name="dobMonth" required>
               <option value="">月</option>
-              <option value="1">1 (Jan)</option>
-              <option value="2">2 (Feb)</option>
-              <option value="3">3 (Mar)</option>
-              <option value="4">4 (Apr)</option>
-              <option value="5">5 (May)</option>
-              <option value="6">6 (Jun)</option>
-              <option value="7">7 (Jul)</option>
-              <option value="8">8 (Aug)</option>
-              <option value="9">9 (Sep)</option>
-              <option value="10">10 (Oct)</option>
-              <option value="11">11 (Nov)</option>
-              <option value="12">12 (Dec)</option>
+              <option value="1">1 (Jan)</option><option value="2">2 (Feb)</option>
+              <option value="3">3 (Mar)</option><option value="4">4 (Apr)</option>
+              <option value="5">5 (May)</option><option value="6">6 (Jun)</option>
+              <option value="7">7 (Jul)</option><option value="8">8 (Aug)</option>
+              <option value="9">9 (Sep)</option><option value="10">10 (Oct)</option>
+              <option value="11">11 (Nov)</option><option value="12">12 (Dec)</option>
             </select>
-            <select id="dobDay" name="dobDay" required>
-              <option value="">日</option>
-            </select>
+            <select id="dobDay" name="dobDay" required><option value="">日</option></select>
           </div>
         </div>
 
@@ -246,12 +295,74 @@
     <div class="footer">© 2026 Application Form</div>
   </div>
 
+  <!-- ===== Help Modal ===== -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">×</button>
+      <h3>申請者情報の入力方法</h3>
+
+      <div class="modal-screenshot" id="modalScreenshot">
+        <!-- Screenshot placeholder - will be replaced with actual screenshot -->
+        <div style="background:#f0f2f5;border-radius:8px;padding:20px;">
+          <div style="background:#fff;border-radius:8px;padding:20px;border:1px solid #e0e0e0;">
+            <p style="font-weight:700;color:#1a3a5c;font-size:15px;margin-bottom:12px;">申請者情報 / Applicant Information</p>
+            <div style="margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;">姓 / Surname <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">(例) YAMADA</div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;">名 / Given name <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">(例) TARO</div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;">別名の有無 / Aliases <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="display:flex;margin-top:4px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden;">
+                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">別名があります</span>
+                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#1a3a5c;color:#fff;">別名はありません</span>
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;">性別 / Gender <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="display:flex;margin-top:4px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden;">
+                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">男性</span>
+                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">女性</span>
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;">生年月日 / Date of birth <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="display:flex;gap:6px;margin-top:4px;">
+                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">年</div>
+                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">月</div>
+                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">日</div>
+              </div>
+            </div>
+            <div>
+              <span style="font-size:12px;font-weight:600;">国籍 / Nationality <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
+              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">選択してください</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-text">
+        <p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p>
+        <p>姓/名を逆に入力する、スペルの間違いにご注意ください。別名・別称がある方は「別名があります」にチェックを入れて当該の名前を入力してください。</p>
+        <p>TSU、SHO、JO、CHOなどの入力はスペルの間違いにご注意ください。<br>
+        （例）姓 : TUDA → TSUDA　名 : SYOTA → SHOTA</p>
+        <p>以下の国籍に該当する方は「個人識別番号」の入力欄が表示されます。任意のため空欄でも構いませんが、台湾市民は個人識別番号(パスポート記載の英語1文字と数字9桁)の入力が必要です。</p>
+        <p style="font-size:12px;color:#666;line-height:1.6;">
+          Belgium(BEL)、Brunei(BRN)、Chile(CHL)、Czech republic(CZE)、Estonia(EST)、Germany(DEU)、Greece(GRC)、Hungary(HUN)、Israel(ISR)、Luxembourg(LUX)、Malta(MLT)、Monaco(MCO)、Netherlands(NLD)、Portugal(PRT)、Singapore(SGP)、Slovakia(SVK)、Slovenia(SVN)、South Korea(KOR)、Spain(ESP)、Taiwan(TWN)、Croatia(HRV)
+        </p>
+        <p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Alias toggle
     const aliasYes = document.getElementById('aliasYes');
     const aliasNo = document.getElementById('aliasNo');
     const aliasFields = document.getElementById('aliasFields');
-
     function toggleAlias() {
       const show = aliasYes.checked;
       aliasFields.classList.toggle('show', show);
@@ -264,18 +375,21 @@
     // Populate year (1900-2026, descending)
     const yearSel = document.getElementById('dobYear');
     for (let y = 2026; y >= 1900; y--) {
-      const opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      yearSel.appendChild(opt);
+      const o = document.createElement('option'); o.value = y; o.textContent = y;
+      yearSel.appendChild(o);
     }
-
     // Populate day (1-31)
     const daySel = document.getElementById('dobDay');
     for (let d = 1; d <= 31; d++) {
-      const opt = document.createElement('option');
-      opt.value = d; opt.textContent = d;
-      daySel.appendChild(opt);
+      const o = document.createElement('option'); o.value = d; o.textContent = d;
+      daySel.appendChild(o);
     }
+
+    // Help modal
+    const helpModal = document.getElementById('helpModal');
+    document.getElementById('helpBtn').addEventListener('click', () => helpModal.classList.add('show'));
+    document.getElementById('modalClose').addEventListener('click', () => helpModal.classList.remove('show'));
+    helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('show'); });
 
     // Form submit
     document.getElementById('applicationForm').addEventListener('submit', function(e) {
@@ -283,7 +397,6 @@
       const fd = new FormData(this);
       const data = Object.fromEntries(fd.entries());
       if (!aliasYes.checked) { delete data.aliasSurname; delete data.aliasGivenName; }
-      console.log('Form data:', data);
       alert('送信完了 / Submitted!\n\n' + JSON.stringify(data, null, 2));
     });
   </script>
