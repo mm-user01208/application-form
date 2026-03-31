@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>申請フォーム | Application Form</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a3a5c, #2d5f8a);
+      color: #fff;
+      padding: 24px 0;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header h1 { font-size: 24px; font-weight: 600; letter-spacing: 1px; }
+    .header p { font-size: 13px; opacity: 0.8; margin-top: 6px; }
+    .container { max-width: 640px; margin: 32px auto; padding: 0 16px; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 32px;
+    }
+    .section-title {
+      font-size: 18px; font-weight: 600; color: #1a3a5c;
+      margin-bottom: 24px; padding-bottom: 12px;
+      border-bottom: 2px solid #e8ecf0;
+    }
+    .form-group { margin-bottom: 24px; }
+    .form-group label {
+      display: block; font-size: 14px; font-weight: 600;
+      color: #444; margin-bottom: 8px;
+    }
+    .form-group label .en { font-weight: 400; color: #888; font-size: 13px; margin-left: 4px; }
+    .form-group label .required {
+      background: #e74c3c; color: #fff; font-size: 11px;
+      padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 500;
+    }
+    .form-group input[type="text"],
+    .form-group select {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid #d0d5dd; border-radius: 8px;
+      font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none; background: #fff;
+    }
+    .form-group input[type="text"]:focus,
+    .form-group select:focus {
+      border-color: #2d5f8a;
+      box-shadow: 0 0 0 3px rgba(45, 95, 138, 0.12);
+    }
+    .form-group input[type="text"]::placeholder { color: #b0b8c1; }
+    .form-group .hint { font-size: 12px; color: #888; margin-top: 6px; }
+    .form-group .note { font-size: 12px; color: #e67e22; margin-top: 6px; }
+
+    /* Toggle tabs */
+    .toggle-group {
+      display: flex; gap: 0; border-radius: 8px;
+      overflow: hidden; border: 1.5px solid #d0d5dd;
+    }
+    .toggle-group label {
+      flex: 1; text-align: center; padding: 12px 16px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      background: #f8f9fa; color: #555; transition: all 0.2s;
+      margin-bottom: 0; border-right: 1px solid #d0d5dd;
+    }
+    .toggle-group label:last-child { border-right: none; }
+    .toggle-group input { display: none; }
+    .toggle-group input:checked + label { background: #1a3a5c; color: #fff; }
+
+    /* Collapsible fields */
+    .alias-fields {
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+      margin-top: 0;
+    }
+    .alias-fields.show { max-height: 300px; opacity: 1; margin-top: 24px; }
+
+    /* Date selects row */
+    .date-row { display: flex; gap: 12px; }
+    .date-row select { flex: 1; }
+
+    /* Submit */
+    .btn-submit {
+      display: block; width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #1a3a5c, #2d5f8a);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s; margin-top: 32px;
+    }
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:active { transform: scale(0.99); }
+
+    .step-indicator {
+      text-align: center; margin-bottom: 24px; font-size: 13px; color: #888;
+    }
+    .step-indicator span {
+      display: inline-block; width: 32px; height: 32px; line-height: 32px;
+      border-radius: 50%; background: #1a3a5c; color: #fff;
+      font-weight: 600; font-size: 14px;
+    }
+    .footer { text-align: center; padding: 24px; font-size: 12px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>申請者情報入力</h1>
+    <p>Enter Applicant Information</p>
+  </div>
+
+  <div class="container">
+    <div class="step-indicator">
+      <span>1</span> ページ 1 / Step 1
+    </div>
+
+    <div class="card">
+      <div class="section-title">申請者情報 / Applicant Information</div>
+
+      <form id="applicationForm">
+        <!-- Surname -->
+        <div class="form-group">
+          <label>姓 <span class="en">/ Surname</span><span class="required">必須</span></label>
+          <input type="text" id="surname" name="surname" placeholder="(例) YAMADA" required>
+        </div>
+
+        <!-- Given name -->
+        <div class="form-group">
+          <label>名 <span class="en">/ Given name</span><span class="required">必須</span></label>
+          <input type="text" id="givenName" name="givenName" placeholder="(例) TARO" required>
+        </div>
+
+        <!-- Alias toggle -->
+        <div class="form-group">
+          <label>別名の有無 <span class="en">/ Aliases</span><span class="required">必須</span></label>
+          <div class="toggle-group">
+            <input type="radio" id="aliasYes" name="hasAlias" value="yes">
+            <label for="aliasYes">別名があります</label>
+            <input type="radio" id="aliasNo" name="hasAlias" value="no" checked>
+            <label for="aliasNo">別名はありません</label>
+          </div>
+          <div class="note">※上記以外の名前(別名・別称)はありますか？</div>
+        </div>
+
+        <!-- Alias fields -->
+        <div class="alias-fields" id="aliasFields">
+          <div class="form-group">
+            <label>姓 <span class="en">/ Surname (別名)</span><span class="required">必須</span></label>
+            <input type="text" id="aliasSurname" name="aliasSurname" placeholder="(例) YAMADA">
+          </div>
+          <div class="form-group">
+            <label>名 <span class="en">/ Given name (別名)</span><span class="required">必須</span></label>
+            <input type="text" id="aliasGivenName" name="aliasGivenName" placeholder="(例) HIROSHI">
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+          <label>性別 <span class="en">/ Gender</span><span class="required">必須</span></label>
+          <div class="toggle-group">
+            <input type="radio" id="genderMale" name="gender" value="male">
+            <label for="genderMale">男性</label>
+            <input type="radio" id="genderFemale" name="gender" value="female">
+            <label for="genderFemale">女性</label>
+          </div>
+        </div>
+
+        <!-- Date of birth -->
+        <div class="form-group">
+          <label>生年月日 <span class="en">/ Date of birth</span><span class="required">必須</span></label>
+          <div class="date-row">
+            <select id="dobYear" name="dobYear" required>
+              <option value="">年</option>
+            </select>
+            <select id="dobMonth" name="dobMonth" required>
+              <option value="">月</option>
+              <option value="1">1 (Jan)</option>
+              <option value="2">2 (Feb)</option>
+              <option value="3">3 (Mar)</option>
+              <option value="4">4 (Apr)</option>
+              <option value="5">5 (May)</option>
+              <option value="6">6 (Jun)</option>
+              <option value="7">7 (Jul)</option>
+              <option value="8">8 (Aug)</option>
+              <option value="9">9 (Sep)</option>
+              <option value="10">10 (Oct)</option>
+              <option value="11">11 (Nov)</option>
+              <option value="12">12 (Dec)</option>
+            </select>
+            <select id="dobDay" name="dobDay" required>
+              <option value="">日</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Nationality -->
+        <div class="form-group">
+          <label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label>
+          <select id="nationality" name="nationality" required>
+            <option value="">選択してください</option>
+            <option value="JPN">JAPAN (JPN)</option>
+            <option value="AND">ANDORRA (AND)</option>
+            <option value="AUS">AUSTRALIA (AUS)</option>
+            <option value="AUT">AUSTRIA (AUT)</option>
+            <option value="BEL">BELGIUM (BEL)</option>
+            <option value="BRN">BRUNEI (BRN)</option>
+            <option value="CHL">CHILE (CHL)</option>
+            <option value="HRV">CROATIA (HRV)</option>
+            <option value="CZE">CZECH REPUBLIC (CZE)</option>
+            <option value="DNK">DENMARK (DNK)</option>
+            <option value="EST">ESTONIA (EST)</option>
+            <option value="FIN">FINLAND (FIN)</option>
+            <option value="FRA">FRANCE (FRA)</option>
+            <option value="DEU">GERMANY (DEU)</option>
+            <option value="GRC">GREECE (GRC)</option>
+            <option value="HUN">HUNGARY (HUN)</option>
+            <option value="ISL">ICELAND (ISL)</option>
+            <option value="IRL">IRELAND (IRL)</option>
+            <option value="ISR">ISRAEL (ISR)</option>
+            <option value="ITA">ITALY (ITA)</option>
+            <option value="LVA">LATVIA (LVA)</option>
+            <option value="LIE">LIECHTENSTEIN (LIE)</option>
+            <option value="LTU">LITHUANIA (LTU)</option>
+            <option value="LUX">LUXEMBOURG (LUX)</option>
+            <option value="MLT">MALTA (MLT)</option>
+            <option value="MCO">MONACO (MCO)</option>
+            <option value="NLD">NETHERLANDS (NLD)</option>
+            <option value="NZL">NEW ZEALAND (NZL)</option>
+            <option value="NOR">NORWAY (NOR)</option>
+            <option value="POL">POLAND (POL)</option>
+            <option value="PRT">PORTUGAL (PRT)</option>
+            <option value="QAT">QATAR (QAT)</option>
+            <option value="SMR">SAN MARINO (SMR)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit">次へ進む / Next</button>
+      </form>
+    </div>
+
+    <div class="footer">© 2026 Application Form</div>
+  </div>
+
+  <script>
+    // Alias toggle
+    const aliasYes = document.getElementById('aliasYes');
+    const aliasNo = document.getElementById('aliasNo');
+    const aliasFields = document.getElementById('aliasFields');
+
+    function toggleAlias() {
+      const show = aliasYes.checked;
+      aliasFields.classList.toggle('show', show);
+      document.getElementById('aliasSurname').required = show;
+      document.getElementById('aliasGivenName').required = show;
+    }
+    aliasYes.addEventListener('change', toggleAlias);
+    aliasNo.addEventListener('change', toggleAlias);
+
+    // Populate year (1900-2026, descending)
+    const yearSel = document.getElementById('dobYear');
+    for (let y = 2026; y >= 1900; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      yearSel.appendChild(opt);
+    }
+
+    // Populate day (1-31)
+    const daySel = document.getElementById('dobDay');
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      daySel.appendChild(opt);
+    }
+
+    // Form submit
+    document.getElementById('applicationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const fd = new FormData(this);
+      const data = Object.fromEntries(fd.entries());
+      if (!aliasYes.checked) { delete data.aliasSurname; delete data.aliasGivenName; }
+      console.log('Form data:', data);
+      alert('送信完了 / Submitted!\n\n' + JSON.stringify(data, null, 2));
+    });
+  </script>
+</body>
+</html>
