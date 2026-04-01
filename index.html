@@ -26,7 +26,7 @@
     .modal-overlay.show{display:flex}
     .modal-content{background:#fff;border-radius:12px;max-width:920px;width:95%;max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.2)}
     .modal-row{display:flex;gap:20px;align-items:flex-start;margin-bottom:8px}
-    .modal-row .modal-screenshot{flex:0 0 280px;min-width:280px}
+    .modal-row .modal-screenshot{flex:0 0 400px;min-width:400px}
     .modal-row .modal-text{flex:1}
     @media(max-width:700px){.modal-row{flex-direction:column}.modal-row .modal-screenshot{flex:none;min-width:auto}}
     .modal-close{position:absolute;top:12px;right:16px;font-size:24px;background:none;border:none;cursor:pointer;color:#888}.modal-close:hover{color:#333}
@@ -135,11 +135,12 @@
       <div class="custom-select" id="nationalityWrap"><button type="button" class="cs-btn" id="nationalityBtn">選択してください</button><div class="cs-list" id="nationalityList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
     </div>
     <div class="collapsible" id="personalIdFields">
-      <div class="form-group"><label>個人識別番号 <span class="optional">任意</span></label>
+      <div class="form-group"><label id="personalIdLabel">個人識別番号 <span class="optional" id="personalIdReq">任意</span></label>
         <input type="text" id="personalId" placeholder="空欄でも可">
-        <div class="hint">パスポートを除く国家発行の身分証明書に割り当てられた個人識別番号を入力してください。ご不明な場合は空欄のままで構いません。</div>
-        <div class="hint" id="twnNote" style="display:none">※パスポート記載の英字1文字と数字9桁を入力してください。</div>
-        <div class="error" id="errPersonalId">半角英数字で入力してください</div>
+        <div class="hint" id="personalIdHint">パスポートを除く国家発行の身分証明書に割り当てられた個人識別番号を入力してください。ご不明な場合は空欄のままで構いません。</div>
+        <div class="hint" id="personalIdNote" style="display:none"></div>
+        <label style="display:none;margin-top:6px;font-size:13px;color:#666;cursor:pointer" id="personalIdDna"><input type="checkbox" id="personalIdDnaCheck" style="margin-right:6px">Does Not Apply（該当なし）</label>
+        <div class="error" id="errPersonalId">入力形式に誤りがあります</div>
       </div>
     </div>
   </div>
@@ -231,6 +232,7 @@
     </div>
     <div class="form-group"><label>パスポート番号 <span class="en">/ Passport Number</span><span class="required">必須</span></label>
       <input type="text" id="passportNum" placeholder="(例) TH1234567">
+      <div class="hint">※「O（オー）」と「0（ゼロ）」の混同にご注意ください。</div>
       <div class="error" id="errPassportNum">パスポート番号に誤りがあります</div>
     </div>
     <div class="form-group"><label>パスポート発行年月日 <span class="en">/ Issue Date</span><span class="required">必須</span></label>
@@ -394,7 +396,56 @@
 const ESTA_NATIONS=[
 {v:'AND',t:'ANDORRA (AND)'},{v:'AUS',t:'AUSTRALIA (AUS)'},{v:'AUT',t:'AUSTRIA (AUT)'},{v:'BEL',t:'BELGIUM (BEL)'},{v:'BRN',t:'BRUNEI (BRN)'},{v:'CHL',t:'CHILE (CHL)'},{v:'HRV',t:'CROATIA (HRV)'},{v:'CZE',t:'CZECH REPUBLIC (CZE)'},{v:'DNK',t:'DENMARK (DNK)'},{v:'EST',t:'ESTONIA (EST)'},{v:'FIN',t:'FINLAND (FIN)'},{v:'FRA',t:'FRANCE (FRA)'},{v:'DEU',t:'GERMANY (DEU)'},{v:'GRC',t:'GREECE (GRC)'},{v:'HUN',t:'HUNGARY (HUN)'},{v:'ISL',t:'ICELAND (ISL)'},{v:'IRL',t:'IRELAND (IRL)'},{v:'ISR',t:'ISRAEL (ISR)'},{v:'ITA',t:'ITALY (ITA)'},{v:'JPN',t:'JAPAN (JPN)'},{v:'LVA',t:'LATVIA (LVA)'},{v:'LIE',t:'LIECHTENSTEIN (LIE)'},{v:'LTU',t:'LITHUANIA (LTU)'},{v:'LUX',t:'LUXEMBOURG (LUX)'},{v:'MLT',t:'MALTA (MLT)'},{v:'MCO',t:'MONACO (MCO)'},{v:'NLD',t:'NETHERLANDS (NLD)'},{v:'NZL',t:'NEW ZEALAND (NZL)'},{v:'NOR',t:'NORWAY (NOR)'},{v:'POL',t:'POLAND (POL)'},{v:'PRT',t:'PORTUGAL (PRT)'},{v:'QAT',t:'QATAR (QAT)'},{v:'SMR',t:'SAN MARINO (SMR)'},{v:'SGP',t:'SINGAPORE (SGP)'},{v:'SVK',t:'SLOVAKIA (SVK)'},{v:'SVN',t:'SLOVENIA (SVN)'},{v:'KOR',t:'SOUTH KOREA (KOR)'},{v:'ESP',t:'SPAIN (ESP)'},{v:'SWE',t:'SWEDEN (SWE)'},{v:'CHE',t:'SWITZERLAND (CHE)'},{v:'TWN',t:'TAIWAN (TWN)'},{v:'GBR',t:'UK - BRITISH CITIZEN (GBR)'},{v:'GBD',t:'UK - BRITISH DTC (GBD)'},{v:'GBN',t:'UK - BRITISH NATIONAL (O) (GBN)'},{v:'GBO',t:'UK - BRITISH OVERSEAS (GBO)'},{v:'GBS',t:'UK - BRITISH SUBJECT (GBS)'},{v:'GBP',t:'UK - PROTECTED PERSON (GBP)'}];
 
-const ID_REQUIRED_NATIONS=['BEL','BRN','CHL','HRV','CZE','EST','DEU','GRC','HUN','ISR','LUX','MLT','MCO','NLD','PRT','SGP','SVK','SVN','KOR','ESP','TWN'];
+const ID_REQUIRED_NATIONS=['JPN','BEL','BRN','CHL','HRV','CZE','EST','DEU','GRC','HUN','ISR','LUX','MLT','MCO','NLD','PRT','SGP','SVK','SVN','KOR','ESP','TWN','GBR','GBD','GBN','GBO','GBS','GBP','FRA','ITA','AUT','AUS','NZL','POL','FIN','IRL','LVA','LTU','NOR','DNK','SWE','CHE'];
+const ID_REQUIRED_MAP={
+  JPN:{name:'マイナンバー',required:false,regex:/^[0-9]{12}$/,max:12,ph:'(例) 123456789012',note:'※12桁の数字を入力してください。不明な場合は空欄可。',dna:true},
+  KOR:{name:'住民登録番号 (RRN)',required:true,regex:/^[0-9]{6}-?[0-9]{7}$/,max:14,ph:'(例) 990101-1234567'},
+  TWN:{name:'國民身分證統一編號',required:true,regex:/^[A-Z][0-9]{9}$/,max:10,ph:'(例) A123456789',note:'※パスポート記載の英字1文字と数字9桁を入力してください。'},
+  GBR:{name:'National Insurance Number',required:false,regex:/^[A-Z]{2}[0-9]{6}[A-Z]$/,max:9,ph:'(例) AB123456C'},
+  FRA:{name:'Numéro de sécurité sociale',required:false,regex:/^[0-9]{13,15}$/,max:15,ph:'(例) 1234567890123'},
+  DEU:{name:'Personalausweisnummer',required:false,regex:/^[0-9A-Z]{9,10}$/,max:10,ph:'(例) L01X00T471'},
+  ITA:{name:'Codice Fiscale',required:false,regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/,max:16,ph:'(例) RSSMRA85M01H501Z'},
+  ESP:{name:'DNI / NIE',required:false,regex:/^([0-9]{8}[A-Z]|[XYZ][0-9]{7}[A-Z])$/,max:9,ph:'(例) 12345678Z'},
+  NLD:{name:'BSN',required:false,regex:/^[0-9]{9}$/,max:9,ph:'(例) 123456789'},
+  AUS:{name:'Tax File Number',required:false,regex:/^[0-9]{8,9}$/,max:9,ph:'(例) 12345678'},
+  NZL:{name:'IRD Number',required:false,regex:/^[0-9]{8,9}$/,max:9,ph:'(例) 12345678'},
+  SGP:{name:'NRIC',required:true,regex:/^[STFGM][0-9]{7}[A-Z]$/,max:9,ph:'(例) S1234567A'},
+  ISR:{name:'Teudat Zehut',required:true,regex:/^[0-9]{9}$/,max:9,ph:'(例) 123456789'},
+  CHL:{name:'RUN/RUT',required:false,regex:/^[0-9]{7,8}-?[0-9K]$/,max:10,ph:'(例) 12345678-9'},
+  CZE:{name:'Rodné číslo',required:false,regex:/^[0-9]{9,10}$/,max:10,ph:'(例) 9001011234'},
+  POL:{name:'PESEL',required:false,regex:/^[0-9]{11}$/,max:11,ph:'(例) 90010112345'},
+  BEL:{name:'Rijksregisternummer',required:false,regex:/^[0-9]{11}$/,max:11,ph:'(例) 90010112345'},
+  HUN:{name:'Személyi szám',required:false,regex:/^[0-9]{11}$/,max:11,ph:'空欄でも可'},
+  HRV:{name:'OIB',required:false,regex:/^[0-9]{11}$/,max:11,ph:'空欄でも可'},
+  GRC:{name:'ΑΦΜ',required:false,regex:/^[0-9]{9}$/,max:9,ph:'空欄でも可'},
+  EST:{name:'Isikukood',required:false,regex:/^[0-9]{11}$/,max:11,ph:'空欄でも可'},
+  BRN:{name:'IC Number',required:false,regex:/^[0-9]{8}$/,max:8,ph:'空欄でも可'},
+  LUX:{name:'Matricule',required:false,regex:/^[0-9]{13}$/,max:13,ph:'空欄でも可'},
+  MLT:{name:'ID Card Number',required:false,regex:/^[0-9A-Z]{7,8}$/,max:8,ph:'空欄でも可'},
+  MCO:{name:'ID Number',required:false,regex:/^[0-9A-Z]{5,10}$/,max:10,ph:'空欄でも可'},
+  PRT:{name:'NIF',required:false,regex:/^[0-9]{9}$/,max:9,ph:'空欄でも可'},
+  SVK:{name:'Rodné číslo',required:false,regex:/^[0-9]{9,10}$/,max:10,ph:'空欄でも可'},
+  SVN:{name:'EMŠO',required:false,regex:/^[0-9]{13}$/,max:13,ph:'空欄でも可'},
+};
+// Passport regex by country
+const PASS_REGEX={
+  JPN:/^[A-Z]{2}[0-9]{7}$/,KOR:/^[MRSG][0-9]{8}$/,TWN:/^[0-9]{9}$/,
+  GBR:/^[0-9]{9}$/,GBD:/^[0-9]{9}$/,GBN:/^[0-9]{9}$/,GBO:/^[0-9]{9}$/,GBS:/^[0-9]{9}$/,GBP:/^[0-9]{9}$/,
+  FRA:/^[0-9A-Z]{9}$/,DEU:/^[CFGHJK][0-9A-Z]{8}$/,ITA:/^[A-Z]{2}[0-9]{7}$/,
+  ESP:/^[A-Z]{3}[0-9]{6}$/,PRT:/^[A-Z]{2}[0-9]{6}$/,NLD:/^[A-Z]{2}[0-9A-Z]{7}$/,
+  BEL:/^[A-Z]{2}[0-9]{6}$/,AUT:/^[A-Z][0-9]{7}$/,CHE:/^[A-Z][0-9]{7}$/,
+  SWE:/^[0-9]{8}$/,NOR:/^[A-Z]{2}[0-9]{7}$/,DNK:/^[0-9]{9}$/,FIN:/^[A-Z]{2}[0-9]{7}$/,
+  IRL:/^[A-Z]{2}[0-9]{7}$/,AUS:/^[A-Z]{2}[0-9]{7}$/,NZL:/^[A-Z]{2}[0-9]{6}$/,
+  SGP:/^[A-Z][0-9]{7}[A-Z]$/,BRN:/^[A-Z][0-9]{7}$/,CZE:/^[0-9]{8}$/,
+  HUN:/^[A-Z]{2}[0-9]{6,7}$/,POL:/^[A-Z]{2}[0-9]{7}$/,EST:/^[A-Z]{2}[0-9]{7}$/,
+  LVA:/^[A-Z]{2}[0-9]{7}$/,LTU:/^[A-Z]{2}[0-9]{7}$/,MLT:/^[0-9]{7}$/,
+  SVK:/^[A-Z]{2}[0-9]{7}$/,SVN:/^[A-Z]{2}[0-9]{7}$/,HRV:/^[0-9]{9}$/,
+  GRC:/^[A-Z]{2}[0-9]{7}$/,ISL:/^[A-Z][0-9]{6}$/,LUX:/^[A-Z]{2}[0-9]{7}$/,
+  MCO:/^[0-9A-Z]{5,9}$/,LIE:/^[A-Z][0-9]{5}$/,SMR:/^[0-9A-Z]{5,9}$/,
+  AND:/^[A-Z][0-9]{6}$/,ISR:/^[0-9]{7,9}$/,CHL:/^[A-Z]{2}[0-9]{7}$/,
+  QAT:/^[0-9A-Z]{6,9}$/
+};
+const PASS_FALLBACK=/^[A-Z0-9]{6,9}$/;
 
 const WORLD_COUNTRIES="AFGHANISTAN (AFG),ALAND ISLANDS (ALA),ALBANIA (ALB),ALGERIA (DZA),AMERICAN SAMOA (ASM),ANDORRA (AND),ANGOLA (AGO),ANGUILLA (AIA),ANTARCTICA (ATA),ANTIGUA AND BARBUDA (ATG),ARGENTINA (ARG),ARMENIA (ARM),ARUBA (ABW),AUSTRALIA (AUS),AUSTRIA (AUT),AZERBAIJAN (AZE),BAHAMAS (BHS),BAHRAIN (BHR),BANGLADESH (BGD),BARBADOS (BRB),BELARUS (BLR),BELGIUM (BEL),BELIZE (BLZ),BENIN (BEN),BERMUDA (BMU),BHUTAN (BTN),BOLIVIA (BOL),BONAIRE SINT EUSTATIUS AND SABA (BES),BOSNIA AND HERZEGOVINA (BIH),BOTSWANA (BWA),BOUVET ISLAND (BVT),BRAZIL (BRA),BRITISH INDIAN OCEAN TERRITORY (IOT),BRUNEI (BRN),BULGARIA (BGR),BURKINA FASO (BFA),BURMA (BUR),BURUNDI (BDI),CAMBODIA (KHM),CAMEROON (CMR),CANADA (CAN),CAPE VERDE (CPV),CAYMAN ISLANDS (CYM),CENTRAL AFRICAN REPUBLIC (CAF),CHAD (TCD),CHILE (CHL),CHINA (CHN),CHRISTMAS ISLAND (CXR),COCOS KEELING ISLANDS (CCK),COLOMBIA (COL),COMOROS (COM),CONGO DEMOCRATIC REPUBLIC OF (COD),CONGO REPUBLIC OF (COG),COOK ISLANDS (COK),COSTA RICA (CRI),COTE D'IVOIRE (CIV),CROATIA (HRV),CUBA (CUB),CURACAO (CUW),CYPRUS (CYP),CZECH REPUBLIC (CZE),DENMARK (DNK),DJIBOUTI (DJI),DOMINICA (DMA),DOMINICAN REPUBLIC (DOM),EAST TIMOR (TMP),ECUADOR (ECU),EGYPT (EGY),EL SALVADOR (SLV),EQUATORIAL GUINEA (GNQ),ERITREA (ERI),ESTONIA (EST),ETHIOPIA (ETH),FALKLAND ISLANDS (FLK),FAROE ISLANDS (FRO),FIJI (FJI),FINLAND (FIN),FRANCE (FRA),FRENCH GUIANA (GUF),FRENCH POLYNESIA (PYF),GABON (GAB),GAMBIA (GMB),GEORGIA (GEO),GERMANY (DEU),GHANA (GHA),GIBRALTAR (GIB),GREECE (GRC),GREENLAND (GRL),GRENADA (GRD),GUADELOUPE (GLP),GUAM (GUM),GUATEMALA (GTM),GUERNSEY (GGY),GUINEA (GIN),GUINEA-BISSAU (GNB),GUYANA (GUY),HAITI (HTI),HONDURAS (HND),HONG KONG (HKG),HUNGARY (HUN),ICELAND (ISL),INDIA (IND),INDONESIA (IDN),IRAN (IRN),IRAQ (IRQ),IRELAND (IRL),ISLE OF MAN (IMN),ISRAEL (ISR),ITALY (ITA),JAMAICA (JAM),JAPAN (JPN),JERSEY (JEY),JORDAN (JOR),KAZAKHSTAN (KAZ),KENYA (KEN),KIRIBATI (KIR),KOSOVO (KVV),KUWAIT (KWT),KYRGYZSTAN (KGZ),LAOS (LAO),LATVIA (LVA),LEBANON (LBN),LESOTHO (LSO),LIBERIA (LBR),LIBYA (LBY),LIECHTENSTEIN (LIE),LITHUANIA (LTU),LUXEMBOURG (LUX),MACAU (MAC),MACEDONIA (MKD),MADAGASCAR (MDG),MALAWI (MWI),MALAYSIA (MYS),MALDIVES (MDV),MALI (MLI),MALTA (MLT),MARSHALL ISLANDS (MHL),MARTINIQUE (MTQ),MAURITANIA (MRT),MAURITIUS (MUS),MAYOTTE (MYT),MEXICO (MEX),MICRONESIA (FSM),MOLDOVA (MDA),MONACO (MCO),MONGOLIA (MNG),MONTENEGRO (MNE),MONTSERRAT (MSR),MOROCCO (MAR),MOZAMBIQUE (MOZ),MYANMAR (MMR),NAMIBIA (NAM),NAURU (NRU),NEPAL (NPL),NETHERLANDS (NLD),NEW CALEDONIA (NCL),NEW ZEALAND (NZL),NICARAGUA (NIC),NIGER (NER),NIGERIA (NGA),NIUE (NIU),NORFOLK ISLAND (NFK),NORTH KOREA (PRK),NORTHERN MARIANA ISLANDS (MNP),NORWAY (NOR),OMAN (OMN),PAKISTAN (PAK),PALAU (PLW),PALESTINIAN TERRITORIES (PSE),PANAMA (PAN),PAPUA NEW GUINEA (PNG),PARAGUAY (PRY),PERU (PER),PHILIPPINES (PHL),PITCAIRN ISLANDS (PCN),POLAND (POL),PORTUGAL (PRT),PUERTO RICO (PRI),QATAR (QAT),REUNION (REU),ROMANIA (ROM),RUSSIA (RUS),RWANDA (RWA),SAINT BARTHELEMY (BLM),SAINT KITTS AND NEVIS (KNA),SAINT LUCIA (LCA),SAINT MARTIN (MAF),SAINT VINCENT AND THE GRENADINES (VCT),SAMOA (WSM),SAN MARINO (SMR),SAO TOME AND PRINCIPE (STP),SAUDI ARABIA (SAU),SENEGAL (SEN),SERBIA (SRB),SEYCHELLES (SYC),SIERRA LEONE (SLE),SINGAPORE (SGP),SINT MAARTEN (SXM),SLOVAKIA (SVK),SLOVENIA (SVN),SOLOMON ISLANDS (SLB),SOMALIA (SOM),SOUTH AFRICA (ZAF),SOUTH KOREA (KOR),SOUTH SUDAN (SSD),SPAIN (ESP),SRI LANKA (LKA),ST. HELENA (SHN),SUDAN (SDN),SURINAME (SUR),SWAZILAND (SWZ),SWEDEN (SWE),SWITZERLAND (CHE),SYRIA (SYR),TAIWAN (TWN),TAJIKISTAN (TJK),TANZANIA (TZA),THAILAND (THA),TIMOR-LESTE (TLS),TOGO (TGO),TOKELAU (TKL),TONGA (TON),TRINIDAD AND TOBAGO (TTO),TUNISIA (TUN),TURKEY (TUR),TURKMENISTAN (TKM),TURKS AND CAICOS ISLANDS (TCA),TUVALU (TUV),UGANDA (UGA),UKRAINE (UKR),UNITED ARAB EMIRATES (ARE),UNITED KINGDOM (GBR),UNITED STATES (USA),URUGUAY (URY),UZBEKISTAN (UZB),VANUATU (VUT),VATICAN CITY STATE (VAT),VENEZUELA (VEN),VIETNAM (VNM),VIRGIN ISLANDS BRITISH (VGB),VIRGIN ISLANDS US (VIR),WESTERN SAHARA (ESH),YEMEN (YEM),ZAMBIA (ZMB),ZIMBABWE (ZWE)".split(',');
 
@@ -481,8 +532,21 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
   const show=ID_REQUIRED_NATIONS.includes(v);
   $('personalIdFields').classList.toggle('show',show);
   if(!show){$('personalId').value='';showErr('errPersonalId',false)}
-  if(v==='TWN'){$('personalId').placeholder='(例) A123456789';$('twnNote').style.display=''}
-  else{$('personalId').placeholder='空欄でも可';$('twnNote').style.display='none'}
+  const idMap=ID_REQUIRED_MAP[v];
+  if(idMap){
+    $('personalIdLabel').innerHTML=idMap.name+' <span class="'+(idMap.required?'required':'optional')+'" id="personalIdReq">'+(idMap.required?'必須':'任意')+'</span>';
+    $('personalId').placeholder=idMap.ph||'空欄でも可';
+    $('personalId').maxLength=idMap.max||20;
+    $('personalIdNote').style.display=idMap.note?'':'none';
+    $('personalIdNote').textContent=idMap.note||'';
+    $('personalIdDna').style.display=idMap.dna?'':'none';
+    if(!idMap.dna)$('personalIdDnaCheck').checked=false;
+  }else{
+    $('personalIdLabel').innerHTML='個人識別番号 <span class="optional" id="personalIdReq">任意</span>';
+    $('personalId').placeholder='空欄でも可';
+    $('personalIdNote').style.display='none';
+    $('personalIdDna').style.display='none';
+  }
   updateBtn();
 });
 initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN');
@@ -562,26 +626,32 @@ function setupNameField(id){
 }
 ['surname','givenName','aliasSurname','aliasGivenName'].forEach(setupNameField);
 
-// ===== 個人識別番号 =====
+// ===== 個人識別番号 (country-specific) =====
 $('personalId').addEventListener('input',function(){
-  let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
-  const nat=natSel.value;
-  const max=nat==='TWN'?10:14;
+  let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9\-]/g,'').toUpperCase();
+  const idMap=ID_REQUIRED_MAP[natSel.value];
+  const max=idMap?idMap.max:20;
   this.value=v.slice(0,max);
   showErr('errPersonalId',false);
 });
 $('personalId').addEventListener('blur',function(){
-  const v=this.value;
-  const nat=natSel.value;
-  if(v){
-    if(nat==='TWN'&&v.length!==10){
-      $('errPersonalId').textContent='10桁の半角英数字で入力してください';
-      showErr('errPersonalId',true);
-    }else if(/[^A-Z0-9]/.test(v)){
-      $('errPersonalId').textContent='半角英数字で入力してください';
-      showErr('errPersonalId',true);
-    }else showErr('errPersonalId',false);
+  const v=this.value;const nat=natSel.value;
+  const idMap=ID_REQUIRED_MAP[nat];
+  if($('personalIdDnaCheck').checked){showErr('errPersonalId',false);return}
+  if(v&&idMap&&idMap.regex&&!idMap.regex.test(v)){
+    $('errPersonalId').textContent='入力形式に誤りがあります';
+    showErr('errPersonalId',true);
+  }else if(!v&&idMap&&idMap.required){
+    $('errPersonalId').textContent='この項目は必須です';
+    showErr('errPersonalId',true);
+  }else{
+    showErr('errPersonalId',false);
   }
+});
+// Does Not Apply checkbox
+$('personalIdDnaCheck').addEventListener('change',function(){
+  if(this.checked){$('personalId').value='';$('personalId').disabled=true;showErr('errPersonalId',false)}
+  else{$('personalId').disabled=false}
 });
 
 // ===== EMAIL (100 chars, trim, hyphen normalize) =====
@@ -659,22 +729,21 @@ function setupFileUpload(inputId,nameId,errId){
 setupFileUpload('passportFile','passportFileName','errPassportFile');
 setupFileUpload('selfieFile','selfieFileName','errSelfieFile');
 
-// ===== PASSPORT NUMBER =====
+// ===== PASSPORT NUMBER (country-specific regex) =====
 $('passportNum').addEventListener('input',function(){
   let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
-  const nat=natSel.value;
-  const max=nat==='JPN'?9:10;
-  this.value=v.slice(0,max);
+  this.value=v.slice(0,9);
   showErr('errPassportNum',false);
 });
 $('passportNum').addEventListener('blur',function(){
   const v=this.value;const nat=natSel.value;
   if(!v)return;
-  if(/[^\x20-\x7E]/.test(v)||/[\u3000-\u9FFF]/.test(v)){showErr('errPassportNum',true);return}
-  if(nat==='JPN'){
-    if(v.length!==9||!/^[TM][A-Z]\d{7}$/.test(v)){showErr('errPassportNum',true);return}
+  const regex=PASS_REGEX[nat]||PASS_FALLBACK;
+  if(!regex.test(v)){
+    showErr('errPassportNum',true);
+  }else{
+    showErr('errPassportNum',false);
   }
-  showErr('errPassportNum',false);
 });
 
 // ===== DOB future check =====
