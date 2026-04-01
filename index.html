@@ -501,7 +501,7 @@ function setupToggle(yesId,noId,fieldsId,clearIds){
   y.addEventListener('change',()=>f.classList.add('show'));
   n.addEventListener('change',()=>{
     f.classList.remove('show');
-    if(clearIds)clearIds.forEach(cid=>{const el=$(cid);if(el){if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=''}});
+    if(clearIds)clearIds.forEach(cid=>{const el=$(cid);if(el){if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=''}const btn=$(cid+'Btn');if(btn)btn.innerHTML='選択してください'});
     updateBtn();
   });
 }
