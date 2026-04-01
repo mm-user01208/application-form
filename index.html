@@ -593,7 +593,39 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
   }
   updateBtn();
 });
-initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN');
+initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN',function(v){
+  // Country-specific address format
+  const isJP=v==='JPN';
+  // Postal code section
+  document.querySelector('.postal-row a').style.display=isJP?'':'none';
+  // Labels & placeholders by country
+  const ADDR_FORMATS={
+    JPN:{pref:'都道府県',prefEn:'Prefecture',prefPh:'(例) TOKYO',city:'市区町村',cityEn:'Municipality',cityPh:'(例) CHIYODA-KU MARUNOUCHI',st:'丁番地',stEn:'Street',stPh:'(例) 1-1-1',postal:'郵便番号',postalPh:'(例) 1000000'},
+    USA:{pref:'州',prefEn:'State',prefPh:'(e.g.) CALIFORNIA',city:'市',cityEn:'City',cityPh:'(e.g.) LOS ANGELES',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 123 MAIN ST',postal:'ZIPコード',postalPh:'(e.g.) 90001'},
+    CAN:{pref:'州',prefEn:'Province',prefPh:'(e.g.) ONTARIO',city:'市',cityEn:'City',cityPh:'(e.g.) TORONTO',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 123 MAIN ST',postal:'郵便番号',postalPh:'(e.g.) M5V 2T6'},
+    GBR:{pref:'州/カウンティ',prefEn:'County',prefPh:'(e.g.) LONDON',city:'市/町',cityEn:'City/Town',cityPh:'(e.g.) WESTMINSTER',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 10 DOWNING ST',postal:'郵便番号',postalPh:'(e.g.) SW1A 2AA'},
+    AUS:{pref:'州',prefEn:'State',prefPh:'(e.g.) NEW SOUTH WALES',city:'市',cityEn:'City/Suburb',cityPh:'(e.g.) SYDNEY',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 1 GEORGE ST',postal:'郵便番号',postalPh:'(e.g.) 2000'},
+    KOR:{pref:'道/市',prefEn:'Province/City',prefPh:'(e.g.) SEOUL',city:'区/郡',cityEn:'District',cityPh:'(e.g.) GANGNAM-GU',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 123 TEHERAN-RO',postal:'郵便番号',postalPh:'(e.g.) 06130'},
+    DEU:{pref:'州',prefEn:'State',prefPh:'(e.g.) BAYERN',city:'市',cityEn:'City',cityPh:'(e.g.) MUENCHEN',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) MAXIMILIANSTR 1',postal:'郵便番号',postalPh:'(e.g.) 80539'},
+    FRA:{pref:'県/地方',prefEn:'Department',prefPh:'(e.g.) ILE-DE-FRANCE',city:'市',cityEn:'City',cityPh:'(e.g.) PARIS',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 1 RUE DE RIVOLI',postal:'郵便番号',postalPh:'(e.g.) 75001'},
+  };
+  const DEF={pref:'州/県/地方',prefEn:'State/Province',prefPh:'(e.g.) STATE NAME',city:'市/町',cityEn:'City',cityPh:'(e.g.) CITY NAME',st:'番地・通り',stEn:'Street Address',stPh:'(e.g.) 123 MAIN ST',postal:'郵便番号',postalPh:'(e.g.) 000000'};
+  const fmt=ADDR_FORMATS[v]||DEF;
+  if(isJP){fmt.postal='郵便番号';fmt.postalPh='(例) 1000000'}
+  // Update labels
+  function setAddrLabel(inputId,jpLabel,enLabel,req){
+    const fg=$(inputId).closest('.form-group');
+    if(fg){const lb=fg.querySelector('label');if(lb)lb.innerHTML=jpLabel+' <span class="en">/ '+enLabel+'</span><span class="'+(req?'required':'optional')+'">'+(req?'必須':'任意')+'</span>'}
+  }
+  setAddrLabel('postalCode',fmt.postal,'Postal Code',true);
+  $('postalCode').placeholder=fmt.postalPh;
+  setAddrLabel('prefecture',fmt.pref,fmt.prefEn,true);
+  $('prefecture').placeholder=fmt.prefPh;
+  setAddrLabel('municipality',fmt.city,fmt.cityEn,true);
+  $('municipality').placeholder=fmt.cityPh;
+  setAddrLabel('street',fmt.st,fmt.stEn,true);
+  $('street').placeholder=fmt.stPh;
+});
 initCustomSelect('birthCountryWrap','birthCountry','birthCountryBtn',WORLD_ITEMS,'JPN');
 initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS);
 initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS);
