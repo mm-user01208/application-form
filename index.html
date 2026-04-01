@@ -67,6 +67,7 @@
     .btn-back:hover{background:#e8ecf0}
     .btn-next{flex:1;padding:14px;background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s}
     .btn-next:hover{opacity:.9}
+    .btn-next.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
     .top-error{background:#fdeaea;border:2px solid #e74c3c;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:none;color:#c0392b;font-weight:600;font-size:14px}
     .top-error.show{display:block}
     .footer{text-align:center;padding:24px;font-size:12px;color:#aaa}
@@ -112,9 +113,18 @@
       <div class="toggle-group"><input type="radio" id="genderMale" name="gender" value="male"><label for="genderMale">男性</label><input type="radio" id="genderFemale" name="gender" value="female"><label for="genderFemale">女性</label></div>
     </div>
     <div class="form-group"><label>生年月日 <span class="en">/ Date of birth</span><span class="required">必須</span></label>
-      <div class="date-row"><select id="dobYear"><option value="">年</option></select><select id="dobMonth"><option value="">月</option></select><select id="dobDay"><option value="">日</option></select></div>
+      <div class="date-row"><select id="dobYear"><option value="">年</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span><select id="dobMonth"><option value="">月</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="dobDay"><option value="">日</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span></div>
+      <div class="error" id="errDob">正しい年月日を入力してください。</div>
     </div>
     <div class="form-group"><label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label><select id="nationality"></select></div>
+    <div class="collapsible" id="personalIdFields">
+      <div class="form-group"><label>個人識別番号 <span class="optional">任意</span></label>
+        <input type="text" id="personalId" placeholder="空欄でも可">
+        <div class="hint">パスポートを除く国家発行の身分証明書に割り当てられた個人識別番号を入力してください。ご不明な場合は空欄のままで構いません。</div>
+        <div class="hint" id="twnNote" style="display:none">※パスポート記載の英字1文字と数字9桁を入力してください。</div>
+        <div class="error" id="errPersonalId">半角英数字で入力してください</div>
+      </div>
+    </div>
   </div>
 
   <!-- ========== 連絡先情報 ========== -->
@@ -149,6 +159,7 @@
       <div class="postal-row"><input type="text" id="postalCode" placeholder="(例) 1000000"><a href="https://www.post.japanpost.jp/zipcode/index.html" target="_blank">🔍 郵便番号を検索</a></div>
       <div class="hint">※ハイフンを除いた数字のみ入力してください。</div>
       <div class="error" id="errPostal">数字のみ入力してください</div>
+      <div class="error" id="errPostalInvalid">入力いただいた郵便番号に間違いはありませんか？</div>
     </div>
     <div class="form-group"><label>国 <span class="en">/ Country</span><span class="required">必須</span></label><select id="addrCountry"></select></div>
     <div class="form-group"><label>都道府県 <span class="en">/ Prefecture</span><span class="required">必須</span></label>
@@ -182,22 +193,41 @@
       <div class="upload-box" onclick="document.getElementById('passportFile').click()"><span class="upload-text">画像を選択してください</span><input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif"></div>
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
       <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+      <div class="error" id="errPassportFile">ファイルサイズが上限の10MBを超えています</div>
     </div>
     <div class="form-group"><label>顔写真のアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpSelfieUpload')">？</button></label>
       <div class="upload-box" onclick="document.getElementById('selfieFile').click()"><span class="upload-text">写真を選択してください</span><input type="file" id="selfieFile" accept=".jpg,.jpeg,.png,.gif"></div>
       <div class="hint">※肩から頭部までが写っている写真をアップロードしてください。</div>
       <div class="hint" style="color:#e74c3c">※パスポートの顔写真は使用できません。</div>
       <div id="selfieFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+      <div class="error" id="errSelfieFile">ファイルサイズが上限の10MBを超えています</div>
     </div>
     <div class="form-group"><label>パスポート番号 <span class="en">/ Passport Number</span><span class="required">必須</span></label>
       <input type="text" id="passportNum" placeholder="(例) TH1234567">
       <div class="error" id="errPassportNum">パスポート番号に誤りがあります</div>
     </div>
     <div class="form-group"><label>パスポート発行年月日 <span class="en">/ Issue Date</span><span class="required">必須</span></label>
-      <div class="date-row"><select id="passIssuDay"><option value="">Day</option></select><select id="passIssuMonth"><option value="">Month</option></select><select id="passIssuYear"><option value="">Year</option></select></div>
+      <div class="date-row"><select id="passIssuDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span><select id="passIssuMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="passIssuYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span></div>
+      <div class="error" id="errPassIssu">正しい年月日を入力してください</div>
     </div>
     <div class="form-group"><label>パスポート有効期間満了日 <span class="en">/ Expiry Date</span><span class="required">必須</span></label>
-      <div class="date-row"><select id="passExpDay"><option value="">Day</option></select><select id="passExpMonth"><option value="">Month</option></select><select id="passExpYear"><option value="">Year</option></select></div>
+      <div class="date-row"><select id="passExpDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span><select id="passExpMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="passExpYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span></div>
+      <div class="error" id="errPassExp">正しい年月日を入力してください</div>
+      <div class="error" id="errPassExpPeriod">パスポート発行日と有効期限に誤りがあります</div>
+      <div id="correctedPassportNote" style="display:none;font-size:12px;color:#666;margin-top:6px">訂正旅券・公用旅券の方は下記質問にて「該当する」を選択してください。</div>
+    </div>
+    <div class="collapsible" id="correctedPassportFields">
+      <div class="form-group"><label>訂正旅券・公用旅券 <span class="required">必須</span></label>
+        <div class="toggle-group"><input type="radio" id="corrPassYes" name="corrPass" value="yes"><label for="corrPassYes">該当する</label><input type="radio" id="corrPassNo" name="corrPass" value="no"><label for="corrPassNo">該当しない</label></div>
+      </div>
+    </div>
+
+    <!-- 出生国/都市 -->
+    <div class="form-group"><label>出生国 <span class="en">/ Country of Birth</span><span class="required">必須</span></label><select id="birthCountry"></select></div>
+    <div class="form-group"><label>出生都市 <span class="en">/ City of Birth</span><span class="optional">任意</span></label>
+      <input type="text" id="birthCity" placeholder="(例) TOKYO・空欄でも可">
+      <div class="hint">※出生した都道府県または市区町村をローマ字にて入力してください。ご不明な場合は、空欄のままで構いません。</div>
+      <div class="error" id="errBirthCity">半角英数字で入力してください</div>
     </div>
 
     <!-- 他国パスポート -->
@@ -218,14 +248,8 @@
       <div class="form-group"><label>有効期限 <span class="required">必須</span></label>
         <select id="otherDocExpiry"></select>
         <div class="hint">※不明な場合は「UNKNOWN」を選択してください。</div>
+        <div class="error" id="errDocExpiry">正しい有効期限を選択してください</div>
       </div>
-    </div>
-
-    <!-- 出生国/都市 -->
-    <div class="form-group"><label>出生国 <span class="en">/ Country of Birth</span><span class="required">必須</span></label><select id="birthCountry"></select></div>
-    <div class="form-group"><label>出生都市 <span class="en">/ City of Birth</span><span class="optional">任意</span></label>
-      <input type="text" id="birthCity" placeholder="(例) TOKYO・空欄でも可">
-      <div class="hint">※出生した都道府県または市区町村をローマ字にて入力してください。ご不明な場合は、空欄のままで構いません。</div>
     </div>
 
     <!-- 他国籍（現在） -->
@@ -249,12 +273,14 @@
     <div class="collapsible" id="pastNatFields">
       <div class="form-group"><label>他国籍（過去）<span class="required">必須</span></label><select id="pastNatCountry"></select><div class="hint">※過去の国籍を選択してください</div></div>
       <div class="form-group"><label>他国籍（過去）の取得日 <span class="required">必須</span></label>
-        <div class="date-row"><select id="pastNatAcqDay"><option value="">Day</option></select><select id="pastNatAcqMonth"><option value="">Month</option></select><select id="pastNatAcqYear"><option value="">Year</option></select></div>
+        <div class="date-row"><select id="pastNatAcqDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span><select id="pastNatAcqMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="pastNatAcqYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span></div>
         <div class="hint">国籍を得た日付を選択してください。</div>
+        <div class="error" id="errPastNatAcq">正しい年月日を入力してください</div>
       </div>
       <div class="form-group"><label>他国籍（過去）の放棄日 <span class="required">必須</span></label>
-        <div class="date-row"><select id="pastNatRelDay"><option value="">Day</option></select><select id="pastNatRelMonth"><option value="">Month</option></select><select id="pastNatRelYear"><option value="">Year</option></select></div>
+        <div class="date-row"><select id="pastNatRelDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span><select id="pastNatRelMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="pastNatRelYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span></div>
         <div class="hint">国籍を放棄した日付を選択してください。</div>
+        <div class="error" id="errPastNatRel">正しい年月日を入力してください</div>
       </div>
     </div>
 
@@ -296,7 +322,10 @@
 
 <script>
 // ===== DATA =====
-const ESTA_NATIONS=[{v:'JPN',t:'JAPAN (JPN)'},{v:'AND',t:'ANDORRA (AND)'},{v:'AUS',t:'AUSTRALIA (AUS)'},{v:'AUT',t:'AUSTRIA (AUT)'},{v:'BEL',t:'BELGIUM (BEL)'},{v:'BRN',t:'BRUNEI (BRN)'},{v:'CHL',t:'CHILE (CHL)'},{v:'HRV',t:'CROATIA (HRV)'},{v:'CZE',t:'CZECH REPUBLIC (CZE)'},{v:'DNK',t:'DENMARK (DNK)'},{v:'EST',t:'ESTONIA (EST)'},{v:'FIN',t:'FINLAND (FIN)'},{v:'FRA',t:'FRANCE (FRA)'},{v:'DEU',t:'GERMANY (DEU)'},{v:'GRC',t:'GREECE (GRC)'},{v:'HUN',t:'HUNGARY (HUN)'},{v:'ISL',t:'ICELAND (ISL)'},{v:'IRL',t:'IRELAND (IRL)'},{v:'ISR',t:'ISRAEL (ISR)'},{v:'ITA',t:'ITALY (ITA)'},{v:'LVA',t:'LATVIA (LVA)'},{v:'LIE',t:'LIECHTENSTEIN (LIE)'},{v:'LTU',t:'LITHUANIA (LTU)'},{v:'LUX',t:'LUXEMBOURG (LUX)'},{v:'MLT',t:'MALTA (MLT)'},{v:'MCO',t:'MONACO (MCO)'},{v:'NLD',t:'NETHERLANDS (NLD)'},{v:'NZL',t:'NEW ZEALAND (NZL)'},{v:'NOR',t:'NORWAY (NOR)'},{v:'POL',t:'POLAND (POL)'},{v:'PRT',t:'PORTUGAL (PRT)'},{v:'QAT',t:'QATAR (QAT)'},{v:'SMR',t:'SAN MARINO (SMR)'}];
+const ESTA_NATIONS=[
+{v:'AND',t:'ANDORRA (AND)'},{v:'AUS',t:'AUSTRALIA (AUS)'},{v:'AUT',t:'AUSTRIA (AUT)'},{v:'BEL',t:'BELGIUM (BEL)'},{v:'BRN',t:'BRUNEI (BRN)'},{v:'CHL',t:'CHILE (CHL)'},{v:'HRV',t:'CROATIA (HRV)'},{v:'CZE',t:'CZECH REPUBLIC (CZE)'},{v:'DNK',t:'DENMARK (DNK)'},{v:'EST',t:'ESTONIA (EST)'},{v:'FIN',t:'FINLAND (FIN)'},{v:'FRA',t:'FRANCE (FRA)'},{v:'DEU',t:'GERMANY (DEU)'},{v:'GRC',t:'GREECE (GRC)'},{v:'HUN',t:'HUNGARY (HUN)'},{v:'ISL',t:'ICELAND (ISL)'},{v:'IRL',t:'IRELAND (IRL)'},{v:'ISR',t:'ISRAEL (ISR)'},{v:'ITA',t:'ITALY (ITA)'},{v:'JPN',t:'JAPAN (JPN)'},{v:'LVA',t:'LATVIA (LVA)'},{v:'LIE',t:'LIECHTENSTEIN (LIE)'},{v:'LTU',t:'LITHUANIA (LTU)'},{v:'LUX',t:'LUXEMBOURG (LUX)'},{v:'MLT',t:'MALTA (MLT)'},{v:'MCO',t:'MONACO (MCO)'},{v:'NLD',t:'NETHERLANDS (NLD)'},{v:'NZL',t:'NEW ZEALAND (NZL)'},{v:'NOR',t:'NORWAY (NOR)'},{v:'POL',t:'POLAND (POL)'},{v:'PRT',t:'PORTUGAL (PRT)'},{v:'QAT',t:'QATAR (QAT)'},{v:'SMR',t:'SAN MARINO (SMR)'},{v:'SGP',t:'SINGAPORE (SGP)'},{v:'SVK',t:'SLOVAKIA (SVK)'},{v:'SVN',t:'SLOVENIA (SVN)'},{v:'KOR',t:'SOUTH KOREA (KOR)'},{v:'ESP',t:'SPAIN (ESP)'},{v:'SWE',t:'SWEDEN (SWE)'},{v:'CHE',t:'SWITZERLAND (CHE)'},{v:'TWN',t:'TAIWAN (TWN)'},{v:'GBR',t:'UK - BRITISH CITIZEN (GBR)'},{v:'GBD',t:'UK - BRITISH DTC (GBD)'},{v:'GBN',t:'UK - BRITISH NATIONAL (O) (GBN)'},{v:'GBO',t:'UK - BRITISH OVERSEAS (GBO)'},{v:'GBS',t:'UK - BRITISH SUBJECT (GBS)'},{v:'GBP',t:'UK - PROTECTED PERSON (GBP)'}];
+
+const ID_REQUIRED_NATIONS=['BEL','BRN','CHL','HRV','CZE','EST','DEU','GRC','HUN','ISR','LUX','MLT','MCO','NLD','PRT','SGP','SVK','SVN','KOR','ESP','TWN'];
 
 const WORLD_COUNTRIES="AFGHANISTAN (AFG),ALAND ISLANDS (ALA),ALBANIA (ALB),ALGERIA (DZA),AMERICAN SAMOA (ASM),ANDORRA (AND),ANGOLA (AGO),ANGUILLA (AIA),ANTARCTICA (ATA),ANTIGUA AND BARBUDA (ATG),ARGENTINA (ARG),ARMENIA (ARM),ARUBA (ABW),AUSTRALIA (AUS),AUSTRIA (AUT),AZERBAIJAN (AZE),BAHAMAS (BHS),BAHRAIN (BHR),BANGLADESH (BGD),BARBADOS (BRB),BELARUS (BLR),BELGIUM (BEL),BELIZE (BLZ),BENIN (BEN),BERMUDA (BMU),BHUTAN (BTN),BOLIVIA (BOL),BONAIRE SINT EUSTATIUS AND SABA (BES),BOSNIA AND HERZEGOVINA (BIH),BOTSWANA (BWA),BOUVET ISLAND (BVT),BRAZIL (BRA),BRITISH INDIAN OCEAN TERRITORY (IOT),BRUNEI (BRN),BULGARIA (BGR),BURKINA FASO (BFA),BURMA (BUR),BURUNDI (BDI),CAMBODIA (KHM),CAMEROON (CMR),CANADA (CAN),CAPE VERDE (CPV),CAYMAN ISLANDS (CYM),CENTRAL AFRICAN REPUBLIC (CAF),CHAD (TCD),CHILE (CHL),CHINA (CHN),CHRISTMAS ISLAND (CXR),COCOS KEELING ISLANDS (CCK),COLOMBIA (COL),COMOROS (COM),CONGO DEMOCRATIC REPUBLIC OF (COD),CONGO REPUBLIC OF (COG),COOK ISLANDS (COK),COSTA RICA (CRI),COTE D'IVOIRE (CIV),CROATIA (HRV),CUBA (CUB),CURACAO (CUW),CYPRUS (CYP),CZECH REPUBLIC (CZE),DENMARK (DNK),DJIBOUTI (DJI),DOMINICA (DMA),DOMINICAN REPUBLIC (DOM),EAST TIMOR (TMP),ECUADOR (ECU),EGYPT (EGY),EL SALVADOR (SLV),EQUATORIAL GUINEA (GNQ),ERITREA (ERI),ESTONIA (EST),ETHIOPIA (ETH),FALKLAND ISLANDS (FLK),FAROE ISLANDS (FRO),FIJI (FJI),FINLAND (FIN),FRANCE (FRA),FRENCH GUIANA (GUF),FRENCH POLYNESIA (PYF),GABON (GAB),GAMBIA (GMB),GEORGIA (GEO),GERMANY (DEU),GHANA (GHA),GIBRALTAR (GIB),GREECE (GRC),GREENLAND (GRL),GRENADA (GRD),GUADELOUPE (GLP),GUAM (GUM),GUATEMALA (GTM),GUERNSEY (GGY),GUINEA (GIN),GUINEA-BISSAU (GNB),GUYANA (GUY),HAITI (HTI),HONDURAS (HND),HONG KONG (HKG),HUNGARY (HUN),ICELAND (ISL),INDIA (IND),INDONESIA (IDN),IRAN (IRN),IRAQ (IRQ),IRELAND (IRL),ISLE OF MAN (IMN),ISRAEL (ISR),ITALY (ITA),JAMAICA (JAM),JAPAN (JPN),JERSEY (JEY),JORDAN (JOR),KAZAKHSTAN (KAZ),KENYA (KEN),KIRIBATI (KIR),KOSOVO (KVV),KUWAIT (KWT),KYRGYZSTAN (KGZ),LAOS (LAO),LATVIA (LVA),LEBANON (LBN),LESOTHO (LSO),LIBERIA (LBR),LIBYA (LBY),LIECHTENSTEIN (LIE),LITHUANIA (LTU),LUXEMBOURG (LUX),MACAU (MAC),MACEDONIA (MKD),MADAGASCAR (MDG),MALAWI (MWI),MALAYSIA (MYS),MALDIVES (MDV),MALI (MLI),MALTA (MLT),MARSHALL ISLANDS (MHL),MARTINIQUE (MTQ),MAURITANIA (MRT),MAURITIUS (MUS),MAYOTTE (MYT),MEXICO (MEX),MICRONESIA (FSM),MOLDOVA (MDA),MONACO (MCO),MONGOLIA (MNG),MONTENEGRO (MNE),MONTSERRAT (MSR),MOROCCO (MAR),MOZAMBIQUE (MOZ),MYANMAR (MMR),NAMIBIA (NAM),NAURU (NRU),NEPAL (NPL),NETHERLANDS (NLD),NEW CALEDONIA (NCL),NEW ZEALAND (NZL),NICARAGUA (NIC),NIGER (NER),NIGERIA (NGA),NIUE (NIU),NORFOLK ISLAND (NFK),NORTH KOREA (PRK),NORTHERN MARIANA ISLANDS (MNP),NORWAY (NOR),OMAN (OMN),PAKISTAN (PAK),PALAU (PLW),PALESTINIAN TERRITORIES (PSE),PANAMA (PAN),PAPUA NEW GUINEA (PNG),PARAGUAY (PRY),PERU (PER),PHILIPPINES (PHL),PITCAIRN ISLANDS (PCN),POLAND (POL),PORTUGAL (PRT),PUERTO RICO (PRI),QATAR (QAT),REUNION (REU),ROMANIA (ROM),RUSSIA (RUS),RWANDA (RWA),SAINT BARTHELEMY (BLM),SAINT KITTS AND NEVIS (KNA),SAINT LUCIA (LCA),SAINT MARTIN (MAF),SAINT VINCENT AND THE GRENADINES (VCT),SAMOA (WSM),SAN MARINO (SMR),SAO TOME AND PRINCIPE (STP),SAUDI ARABIA (SAU),SENEGAL (SEN),SERBIA (SRB),SEYCHELLES (SYC),SIERRA LEONE (SLE),SINGAPORE (SGP),SINT MAARTEN (SXM),SLOVAKIA (SVK),SLOVENIA (SVN),SOLOMON ISLANDS (SLB),SOMALIA (SOM),SOUTH AFRICA (ZAF),SOUTH KOREA (KOR),SOUTH SUDAN (SSD),SPAIN (ESP),SRI LANKA (LKA),ST. HELENA (SHN),SUDAN (SDN),SURINAME (SUR),SWAZILAND (SWZ),SWEDEN (SWE),SWITZERLAND (CHE),SYRIA (SYR),TAIWAN (TWN),TAJIKISTAN (TJK),TANZANIA (TZA),THAILAND (THA),TIMOR-LESTE (TLS),TOGO (TGO),TOKELAU (TKL),TONGA (TON),TRINIDAD AND TOBAGO (TTO),TUNISIA (TUN),TURKEY (TUR),TURKMENISTAN (TKM),TURKS AND CAICOS ISLANDS (TCA),TUVALU (TUV),UGANDA (UGA),UKRAINE (UKR),UNITED ARAB EMIRATES (ARE),UNITED KINGDOM (GBR),UNITED STATES (USA),URUGUAY (URY),UZBEKISTAN (UZB),VANUATU (VUT),VATICAN CITY STATE (VAT),VENEZUELA (VEN),VIETNAM (VNM),VIRGIN ISLANDS BRITISH (VGB),VIRGIN ISLANDS US (VIR),WESTERN SAHARA (ESH),YEMEN (YEM),ZAMBIA (ZMB),ZIMBABWE (ZWE)".split(',');
 
@@ -305,167 +334,344 @@ const PHONE_CODES=[{c:'JPN',f:'🇯🇵',n:'JAPAN',p:'+81'},{c:'AFG',f:'🇦🇫
 const MONTHS=['1 (Jan)','2 (Feb)','3 (Mar)','4 (Apr)','5 (May)','6 (Jun)','7 (Jul)','8 (Aug)','9 (Sep)','10 (Oct)','11 (Nov)','12 (Dec)'];
 
 // ===== HELPERS =====
-function fillSelect(sel,items,defaultVal,placeholder){
-  sel.innerHTML='';
-  if(placeholder)sel.appendChild(new Option(placeholder,''));
-  items.forEach(i=>{const o=new Option(typeof i==='string'?i:i.t,typeof i==='string'?i:i.v);sel.appendChild(o)});
-  if(defaultVal)sel.value=defaultVal;
-}
 function fillWorldCountry(sel,defaultVal){
   sel.innerHTML='<option value="">選択してください</option>';
   const jp=new Option('JAPAN (JPN)','JPN');sel.appendChild(jp);
   WORLD_COUNTRIES.filter(c=>!c.includes('JAPAN')).forEach(c=>{sel.appendChild(new Option(c,c))});
   if(defaultVal)sel.value=defaultVal;
 }
-function fillYears(sel,from,to){for(let y=to;y>=from;y--)sel.appendChild(new Option(y,y))}
 function fillDays(sel){for(let d=1;d<=31;d++)sel.appendChild(new Option(d,d))}
 function fillMonths(sel){MONTHS.forEach((m,i)=>sel.appendChild(new Option(m,i+1)))}
+function fillYearsGrouped(sel,from,to){
+  for(let decade=Math.floor(from/10)*10;decade<=to;decade+=10){
+    const g=document.createElement('optgroup');
+    g.label=decade+'s';
+    for(let y=Math.max(decade,from);y<=Math.min(decade+9,to);y++){
+      g.appendChild(new Option(y,y));
+    }
+    sel.appendChild(g);
+  }
+}
+const $=id=>document.getElementById(id);
+const showErr=(id,show)=>{const e=$(id);if(e)e.classList.toggle('show',!!show);updateBtn()};
+const nextBtn=()=>document.querySelector('.btn-next');
+function updateBtn(){
+  const errs=document.querySelectorAll('.error.show');
+  const btn=nextBtn();
+  if(btn)btn.classList.toggle('disabled',errs.length>0);
+}
+
+// ===== Full-width to half-width =====
+function toHalf(s){return s.replace(/[\uff01-\uff5e]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xfee0)).replace(/\u3000/g,' ')}
 
 // ===== INIT =====
 // DOB
-fillYears(document.getElementById('dobYear'),1900,2026);
-fillMonths(document.getElementById('dobMonth'));
-fillDays(document.getElementById('dobDay'));
+fillYearsGrouped($('dobYear'),1900,2026);
+fillMonths($('dobMonth'));fillDays($('dobDay'));
 
-// Nationality (ESTA only)
-const natSel=document.getElementById('nationality');
+// Nationality
+const natSel=$('nationality');
 natSel.innerHTML='<option value="">選択してください</option>';
 ESTA_NATIONS.forEach(n=>natSel.appendChild(new Option(n.t,n.v)));
 natSel.value='JPN';
 
 // Phone country
-const phoneSel=document.getElementById('phoneCountry');
-PHONE_CODES.forEach(p=>phoneSel.appendChild(new Option(p.f+' '+p.n+' ('+p.p+')',p.p)));
+PHONE_CODES.forEach(p=>$('phoneCountry').appendChild(new Option(p.f+' '+p.n+' ('+p.p+')',p.p)));
 
 // Address country
-fillWorldCountry(document.getElementById('addrCountry'),'JPN');
+fillWorldCountry($('addrCountry'),'JPN');
 
 // Passport dates
-['passIssuDay','passExpDay'].forEach(id=>fillDays(document.getElementById(id)));
-['passIssuMonth','passExpMonth'].forEach(id=>fillMonths(document.getElementById(id)));
-fillYears(document.getElementById('passIssuYear'),2016,2026);
-fillYears(document.getElementById('passExpYear'),2026,2036);
+['passIssuDay','passExpDay'].forEach(id=>fillDays($(id)));
+['passIssuMonth','passExpMonth'].forEach(id=>fillMonths($(id)));
+fillYearsGrouped($('passIssuYear'),2016,2026);
+fillYearsGrouped($('passExpYear'),2026,2036);
 
-// Issuing country, birth country, nationality selects
-['issuingCountry','birthCountry','curNatCountry','pastNatCountry'].forEach(id=>fillWorldCountry(document.getElementById(id),id==='birthCountry'?'JPN':null));
+// World country selects
+['issuingCountry','birthCountry','curNatCountry','pastNatCountry'].forEach(id=>fillWorldCountry($(id),id==='birthCountry'?'JPN':null));
 
-// Other doc expiry
-const expSel=document.getElementById('otherDocExpiry');
+// Other doc expiry (grouped)
+const expSel=$('otherDocExpiry');
 expSel.innerHTML='<option value="">Year</option><option value="UNKNOWN">UNKNOWN</option>';
-for(let y=2036;y>=1900;y--)expSel.appendChild(new Option(y,y));
+fillYearsGrouped(expSel,1900,2036);
 
-// Past nationality dates
-['pastNatAcqDay','pastNatRelDay'].forEach(id=>fillDays(document.getElementById(id)));
-['pastNatAcqMonth','pastNatRelMonth'].forEach(id=>fillMonths(document.getElementById(id)));
-['pastNatAcqYear','pastNatRelYear'].forEach(id=>fillYears(document.getElementById(id),1900,2026));
+// Past nationality dates (grouped)
+['pastNatAcqDay','pastNatRelDay'].forEach(id=>fillDays($(id)));
+['pastNatAcqMonth','pastNatRelMonth'].forEach(id=>fillMonths($(id)));
+['pastNatAcqYear','pastNatRelYear'].forEach(id=>fillYearsGrouped($(id),1900,2026));
 
-// ===== TOGGLES =====
-function setupToggle(yesId,noId,fieldsId){
-  const y=document.getElementById(yesId),n=document.getElementById(noId),f=document.getElementById(fieldsId);
-  [y,n].forEach(el=>el.addEventListener('change',()=>f.classList.toggle('show',y.checked)));
+// ===== TOGGLES with cleanup =====
+function setupToggle(yesId,noId,fieldsId,clearIds){
+  const y=$(yesId),n=$(noId),f=$(fieldsId);
+  y.addEventListener('change',()=>f.classList.add('show'));
+  n.addEventListener('change',()=>{
+    f.classList.remove('show');
+    if(clearIds)clearIds.forEach(cid=>{const el=$(cid);if(el){if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=''}});
+    updateBtn();
+  });
 }
 setupToggle('aliasYes','aliasNo','aliasFields');
-setupToggle('otherPassYes','otherPassNo','otherPassFields');
-setupToggle('curNatYes','curNatNo','curNatFields');
-setupToggle('pastNatYes','pastNatNo','pastNatFields');
-setupToggle('geYes','geNo','geFields');
+setupToggle('otherPassYes','otherPassNo','otherPassFields',['issuingCountry','docType','otherDocId','otherDocExpiry']);
+setupToggle('curNatYes','curNatNo','curNatFields',['curNatCountry','curNatHow']);
+setupToggle('pastNatYes','pastNatNo','pastNatFields',['pastNatCountry','pastNatAcqDay','pastNatAcqMonth','pastNatAcqYear','pastNatRelDay','pastNatRelMonth','pastNatRelYear']);
+setupToggle('geYes','geNo','geFields',['passId']);
 
-// ===== INPUT VALIDATION =====
-// Alpha only (name fields)
-function alphaOnly(input){
-  input.addEventListener('input',function(){
-    this.value=this.value.replace(/[^a-zA-Z\s]/g,'').toUpperCase();
+// ===== NATIONALITY → 個人識別番号 =====
+natSel.addEventListener('change',function(){
+  const v=this.value;
+  const show=ID_REQUIRED_NATIONS.includes(v);
+  $('personalIdFields').classList.toggle('show',show);
+  if(!show){$('personalId').value='';showErr('errPersonalId',false)}
+  if(v==='TWN'){$('personalId').placeholder='(例) A123456789';$('twnNote').style.display=''}
+  else{$('personalId').placeholder='空欄でも可';$('twnNote').style.display='none'}
+  updateBtn();
+});
+
+// ===== NAME FIELDS (alpha only, 45 chars, trim) =====
+function setupNameField(id){
+  const el=$(id);
+  el.addEventListener('input',function(){
+    this.value=toHalf(this.value).replace(/[^a-zA-Z\s]/g,'').toUpperCase().slice(0,45);
+    showErr('err'+id.charAt(0).toUpperCase()+id.slice(1),false);
   });
-  input.addEventListener('blur',function(){
-    const err=document.getElementById('err'+this.id.charAt(0).toUpperCase()+this.id.slice(1));
-    if(err)err.classList.toggle('show',this.required&&!this.value.trim());
+  el.addEventListener('blur',function(){
+    this.value=this.value.trim();
+    const empty=!this.value;
+    showErr('err'+id.charAt(0).toUpperCase()+id.slice(1),empty&&(this===document.activeElement||this.closest('.collapsible.show')||!this.closest('.collapsible')));
   });
 }
-['surname','givenName','aliasSurname','aliasGivenName','prefecture','birthCity'].forEach(id=>alphaOnly(document.getElementById(id)));
+['surname','givenName','aliasSurname','aliasGivenName'].forEach(setupNameField);
 
-// Alphanumeric fields (municipality, street, building, unit)
-['municipality','street','building','unit'].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener('input',function(){this.value=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase()});
+// ===== 個人識別番号 =====
+$('personalId').addEventListener('input',function(){
+  let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+  const nat=natSel.value;
+  const max=nat==='TWN'?10:14;
+  this.value=v.slice(0,max);
+  showErr('errPersonalId',false);
+});
+$('personalId').addEventListener('blur',function(){
+  const v=this.value;
+  const nat=natSel.value;
+  if(v){
+    if(nat==='TWN'&&v.length!==10){
+      $('errPersonalId').textContent='10桁の半角英数字で入力してください';
+      showErr('errPersonalId',true);
+    }else if(/[^A-Z0-9]/.test(v)){
+      $('errPersonalId').textContent='半角英数字で入力してください';
+      showErr('errPersonalId',true);
+    }else showErr('errPersonalId',false);
+  }
 });
 
-// Phone - digits only
-document.getElementById('phoneNumber').addEventListener('input',function(){
-  this.value=this.value.replace(/[^0-9]/g,'');
-  document.getElementById('errPhone').classList.toggle('show',false);
-});
-document.getElementById('phoneNumber').addEventListener('blur',function(){
-  if(this.value&&/[^0-9]/.test(this.value))document.getElementById('errPhone').classList.add('show');
-});
-
-// Postal code - digits only
-document.getElementById('postalCode').addEventListener('input',function(){
-  this.value=this.value.replace(/[^0-9]/g,'');
-  document.getElementById('errPostal').classList.remove('show');
-});
-
-// Email validation
+// ===== EMAIL (100 chars, trim, hyphen normalize) =====
 ['email1','email2'].forEach((id,i)=>{
-  document.getElementById(id).addEventListener('input',function(){
-    this.value=this.value.replace(/[^\x20-\x7E]/g,'').toLowerCase();
+  $(id).addEventListener('input',function(){
+    this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').replace(/\s/g,'').replace(/\u2010|\u2011|\u2012|\u2013|\u2014|\u2015|\uff0d/g,'-').toLowerCase().slice(0,100);
   });
-  document.getElementById(id).addEventListener('blur',function(){
-    const errId=i===0?'errEmail1':'errEmail2';
+  $(id).addEventListener('blur',function(){
+    this.value=this.value.trim();
     const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
-    document.getElementById(errId).classList.toggle('show',this.value&&!valid);
+    showErr(i===0?'errEmail1':'errEmail2',this.value&&!valid);
     if(i===1){
-      const match=document.getElementById('email1').value===this.value;
-      document.getElementById('errEmailMatch').classList.toggle('show',this.value&&document.getElementById('email1').value&&!match);
+      const match=$('email1').value===this.value;
+      showErr('errEmailMatch',this.value&&$('email1').value&&!match);
     }
   });
 });
 
-// Passport number - auto uppercase, alphanumeric
-document.getElementById('passportNum').addEventListener('input',function(){
-  const cleaned=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase();
-  this.value=cleaned;
-  document.getElementById('errPassportNum').classList.toggle('show',/[^\w]/.test(cleaned)||/[\u3000-\u9FFF]/.test(this.value));
+// ===== PHONE (20 chars, digits only, fullwidth→half) =====
+$('phoneNumber').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/[\s\-]/g,'').replace(/[^0-9]/g,'').slice(0,20);
+  showErr('errPhone',false);
+});
+$('phoneNumber').addEventListener('blur',function(){
+  if(this.value&&/[^0-9]/.test(this.value))showErr('errPhone',true);
 });
 
-// Other doc ID - auto uppercase
-document.getElementById('otherDocId').addEventListener('input',function(){
-  this.value=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase();
-});
-
-// PASS ID - 9 digits only
-document.getElementById('passId').addEventListener('input',function(){
-  this.value=this.value.replace(/[^0-9]/g,'');
-  document.getElementById('errPassId').classList.toggle('show',this.value.length>0&&this.value.length!==9);
-});
-
-// File uploads
-document.getElementById('passportFile').addEventListener('change',function(){
-  document.getElementById('passportFileName').textContent=this.files[0]?'✓ '+this.files[0].name:'';
-});
-document.getElementById('selfieFile').addEventListener('change',function(){
-  document.getElementById('selfieFileName').textContent=this.files[0]?'✓ '+this.files[0].name:'';
-});
-
-// DOB future date check
-function checkDobFuture(){
-  const y=+document.getElementById('dobYear').value,m=+document.getElementById('dobMonth').value,d=+document.getElementById('dobDay').value;
-  if(y&&m&&d){
-    const dob=new Date(y,m-1,d),now=new Date();
-    const err=document.getElementById('topError');
-    if(dob>now){err.textContent='生年月日が未来の日付です。正しい日付を入力してください。';err.classList.add('show')}
-    else err.classList.remove('show');
+// ===== POSTAL CODE (10 chars, digits only, auto-lookup) =====
+$('postalCode').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/\s/g,'').replace(/[^0-9]/g,'').slice(0,10);
+  showErr('errPostal',false);showErr('errPostalInvalid',false);
+  if(this.value.length>=7){
+    fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+this.value)
+      .then(r=>r.json()).then(d=>{
+        if(d.results&&d.results[0]){
+          const r=d.results[0];
+          $('prefecture').value=(r.address1||'').toUpperCase();
+          $('municipality').value=((r.address2||'')+(r.address3||'')).toUpperCase();
+          showErr('errPostalInvalid',false);
+        }else{showErr('errPostalInvalid',true)}
+      }).catch(()=>{});
   }
+});
+
+// ===== ADDRESS FIELDS =====
+function setupAddrField(id,maxLen,allowDigits){
+  const el=$(id);
+  const allowed=allowDigits?/[^a-zA-Z0-9\s.,':;\-\/]/g:/[^a-zA-Z\s.,':;\-\/]/g;
+  el.addEventListener('input',function(){
+    this.value=toHalf(this.value).replace(allowed,'').toUpperCase().replace(/\s{2,}/g,' ').slice(0,maxLen);
+  });
+  el.addEventListener('blur',function(){this.value=this.value.trim()});
 }
-['dobYear','dobMonth','dobDay'].forEach(id=>document.getElementById(id).addEventListener('change',checkDobFuture));
+setupAddrField('prefecture',60,false);
+setupAddrField('municipality',70,true);
+setupAddrField('street',60,true);
+setupAddrField('building',60,true);
+// Unit - no spaces
+$('unit').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/[^a-zA-Z0-9.,':;\-\/]/g,'').toUpperCase().replace(/\s/g,'').slice(0,10);
+});
+
+// ===== FILE UPLOADS (10MB max) =====
+function setupFileUpload(inputId,nameId,errId){
+  $(inputId).addEventListener('change',function(){
+    const file=this.files[0];
+    if(file&&file.size>10*1024*1024){
+      showErr(errId,true);$(nameId).textContent='';this.value='';
+    }else{
+      showErr(errId,false);
+      $(nameId).textContent=file?'✓ '+file.name:'';
+    }
+  });
+}
+setupFileUpload('passportFile','passportFileName','errPassportFile');
+setupFileUpload('selfieFile','selfieFileName','errSelfieFile');
+
+// ===== PASSPORT NUMBER =====
+$('passportNum').addEventListener('input',function(){
+  let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+  const nat=natSel.value;
+  const max=nat==='JPN'?9:10;
+  this.value=v.slice(0,max);
+  showErr('errPassportNum',false);
+});
+$('passportNum').addEventListener('blur',function(){
+  const v=this.value;const nat=natSel.value;
+  if(!v)return;
+  if(/[^\x20-\x7E]/.test(v)||/[\u3000-\u9FFF]/.test(v)){showErr('errPassportNum',true);return}
+  if(nat==='JPN'){
+    if(v.length!==9||!/^[TM][A-Z]\d{7}$/.test(v)){showErr('errPassportNum',true);return}
+  }
+  showErr('errPassportNum',false);
+});
+
+// ===== DOB future check =====
+function getDob(){
+  const y=+$('dobYear').value,m=+$('dobMonth').value,d=+$('dobDay').value;
+  return(y&&m&&d)?new Date(y,m-1,d):null;
+}
+function checkDob(){
+  const dob=getDob();
+  if(dob&&dob>new Date())showErr('errDob',true);
+  else showErr('errDob',false);
+  updateBtn();
+}
+['dobYear','dobMonth','dobDay'].forEach(id=>$(id).addEventListener('change',checkDob));
+
+// ===== PASSPORT DATE VALIDATION =====
+function getDateFromSelects(dayId,monthId,yearId){
+  const d=+$(dayId).value,m=+$(monthId).value,y=+$(yearId).value;
+  return(d&&m&&y)?new Date(y,m-1,d):null;
+}
+function checkPassportDates(){
+  const dob=getDob();
+  const issue=getDateFromSelects('passIssuDay','passIssuMonth','passIssuYear');
+  const expiry=getDateFromSelects('passExpDay','passExpMonth','passExpYear');
+  const now=new Date();
+  // Issue date: must be > DOB and <= today
+  if(issue&&dob&&issue<=dob){showErr('errPassIssu',true)}
+  else if(issue&&issue>now){showErr('errPassIssu',true)}
+  else showErr('errPassIssu',false);
+  // Expiry date: must be > today
+  if(expiry&&expiry<=now){showErr('errPassExp',true)}
+  else showErr('errPassExp',false);
+  // Japan passport period check (T:10y1d, M:5y1d)
+  showErr('errPassExpPeriod',false);
+  $('correctedPassportNote').style.display='none';
+  $('correctedPassportFields').classList.remove('show');
+  if(issue&&expiry&&natSel.value==='JPN'){
+    const pn=$('passportNum').value;
+    const prefix=pn?pn[0]:'';
+    if(prefix==='T'||prefix==='M'){
+      const maxYears=prefix==='T'?10:5;
+      const maxDate=new Date(issue.getFullYear()+maxYears,issue.getMonth(),issue.getDate()+1);
+      if(expiry>maxDate){
+        showErr('errPassExpPeriod',true);
+        $('correctedPassportNote').style.display='';
+        $('correctedPassportFields').classList.add('show');
+      }else if(expiry<=issue){
+        showErr('errPassExp',true);
+      }
+    }
+  }else if(issue&&expiry&&natSel.value!=='JPN'){
+    // Non-Japan: no period restriction
+  }
+  updateBtn();
+}
+['passIssuDay','passIssuMonth','passIssuYear','passExpDay','passExpMonth','passExpYear'].forEach(id=>$(id).addEventListener('change',checkPassportDates));
+$('passportNum').addEventListener('blur',checkPassportDates);
+
+// ===== OTHER DOC ID (25 chars) =====
+$('otherDocId').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,25);
+  showErr('errDocId',false);
+});
+$('otherDocId').addEventListener('blur',function(){
+  if(this.value&&/[^A-Z0-9]/.test(this.value))showErr('errDocId',true);
+});
+
+// ===== OTHER DOC EXPIRY vs DOB =====
+$('otherDocExpiry').addEventListener('change',function(){
+  const dob=getDob();
+  const v=this.value;
+  if(v&&v!=='UNKNOWN'&&dob&&+v<dob.getFullYear())showErr('errDocExpiry',true);
+  else showErr('errDocExpiry',false);
+});
+
+// ===== BIRTH CITY (70 chars) =====
+$('birthCity').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase().replace(/\s{2,}/g,' ').slice(0,70);
+  showErr('errBirthCity',false);
+});
+$('birthCity').addEventListener('blur',function(){
+  this.value=this.value.trim();
+  if(this.value&&/[^\x20-\x7E]/.test(this.value))showErr('errBirthCity',true);
+});
+
+// ===== PASS ID (9 digits) =====
+$('passId').addEventListener('input',function(){
+  this.value=toHalf(this.value).replace(/\s/g,'').replace(/[^0-9]/g,'').slice(0,9);
+  showErr('errPassId',this.value.length>0&&this.value.length!==9);
+});
+
+// ===== PAST NATIONALITY DATES vs DOB =====
+function checkPastNatDate(dayId,monthId,yearId,errId){
+  ['change'].forEach(evt=>{
+    [dayId,monthId,yearId].forEach(id=>$(id).addEventListener(evt,function(){
+      const dt=getDateFromSelects(dayId,monthId,yearId);
+      const dob=getDob();
+      if(dt&&dob&&dt<dob)showErr(errId,true);
+      else showErr(errId,false);
+    }));
+  });
+}
+checkPastNatDate('pastNatAcqDay','pastNatAcqMonth','pastNatAcqYear','errPastNatAcq');
+checkPastNatDate('pastNatRelDay','pastNatRelMonth','pastNatRelYear','errPastNatRel');
 
 // ===== MODALS =====
-function showModal(id){document.getElementById(id).classList.add('show')}
-function closeModal(id){document.getElementById(id).classList.remove('show')}
+function showModal(id){$(id).classList.add('show')}
+function closeModal(id){$(id).classList.remove('show')}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')})});
 
 // ===== FORM SUBMIT =====
 document.getElementById('appForm').addEventListener('submit',function(e){
   e.preventDefault();
+  // Trim all text inputs on submit
+  this.querySelectorAll('input[type="text"],input[type="email"]').forEach(el=>{el.value=el.value.trim()});
+  const errs=document.querySelectorAll('.error.show');
+  if(errs.length>0){window.scrollTo({top:0,behavior:'smooth'});return}
   alert('送信完了 / Submitted!');
 });
 </script>
