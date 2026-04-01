@@ -250,6 +250,12 @@
       <div class="error" id="errPassExpPeriod">パスポート発行日と有効期限に誤りがあります</div>
       <div id="correctedPassportNote" style="display:none;font-size:12px;color:#666;margin-top:6px">訂正旅券・公用旅券の方は下記質問にて「該当する」を選択してください。</div>
     </div>
+    <div class="form-group"><label>パスポート発行国 <span class="en">/ Country of Issuance</span><span class="required">必須</span></label>
+      <input type="hidden" id="issuingCountry" value="JPN">
+      <div class="custom-select" id="issuingCountryWrap"><button type="button" class="cs-btn" id="issuingCountryBtn">選択してください</button><div class="cs-list" id="issuingCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+      <div class="hint">※通常は国籍と同じです。異なる場合のみ変更してください。</div>
+    </div>
+
     <div class="collapsible" id="correctedPassportFields">
       <div class="form-group"><label>訂正旅券・公用旅券 <span class="required">必須</span></label>
         <div class="toggle-group"><input type="radio" id="corrPassYes" name="corrPass" value="yes"><label for="corrPassYes">該当する</label><input type="radio" id="corrPassNo" name="corrPass" value="no"><label for="corrPassNo">該当しない</label></div>
@@ -778,6 +784,11 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
     $('personalIdNote').style.display='none';
     $('personalIdDna').style.display='none';
   }
+  // Sync issuing country with nationality
+  $('issuingCountry').value=v;
+  const icBtn=$('issuingCountryBtn');
+  const icItem=WORLD_ITEMS.find(i=>i.value===v);
+  if(icBtn&&icItem)icBtn.textContent=icItem.label;
   updateBtn();
 });
 initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN',function(v){
@@ -814,7 +825,7 @@ initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'J
   $('street').placeholder=fmt.stPh;
 });
 initCustomSelect('birthCountryWrap','birthCountry','birthCountryBtn',WORLD_ITEMS,'JPN');
-initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS);
+initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS,'JPN');
 initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS);
 initCustomSelect('pastNatCountryWrap','pastNatCountry','pastNatCountryBtn',WORLD_ITEMS);
 
