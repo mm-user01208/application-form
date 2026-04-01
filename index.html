@@ -361,29 +361,40 @@
   <!-- ========== STEP 2: 渡航・滞在先情報 ========== -->
   <div id="step2Content" style="display:none">
 
-  <!-- 渡航目的 -->
+  <div style="background:#f0f0f0;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:13px;color:#555">※「はい」「いいえ」どちらを選択されても審査に影響はありません。</span>
+    <button type="button" class="help-btn" onclick="openModal('step2HelpModal')" style="margin-left:12px">？</button>
+  </div>
+
+  <!-- 渡航情報 -->
   <div class="card">
     <div class="section-header"><span class="section-title">渡航情報</span></div>
     <div class="form-group"><label>米国への渡航目的は、他国へ乗り継ぐためですか？ <span class="required">必須</span></label>
-      <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no"><label for="transitNo">いいえ</label></div>
+      <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no" checked><label for="transitNo">いいえ</label></div>
+      <div class="hint">※米国にて滞在する方は「いいえ」、乗り継ぎの方は「はい」を選択してください。</div>
     </div>
-    <div class="collapsible" id="transitDetailFields">
+    <div class="collapsible show" id="transitDetailFields">
       <div class="form-group"><label>米国到着予定日 <span class="en">/ Arrival Date</span><span class="optional">任意</span></label>
-        <input type="date" id="arrivalDate" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px"></div>
+        <div class="date-row"><select id="arrYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span><select id="arrMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="arrDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span></div>
+      </div>
       <div class="form-group"><label>航空会社名 <span class="en">/ Airline</span><span class="optional">任意</span></label>
-        <input type="text" id="airline" placeholder="(例) JAPAN AIRLINES"></div>
+        <input type="text" id="airline" maxlength="50" placeholder="(例) JAPAN AIRLINES">
+        <div class="error" id="errAirline">半角英字で入力してください</div></div>
       <div class="form-group"><label>便名 <span class="en">/ Flight Number</span><span class="optional">任意</span></label>
-        <input type="text" id="flightNo" placeholder="(例) JL001"></div>
+        <input type="text" id="flightNo" maxlength="8" placeholder="(例) JL001">
+        <div class="error" id="errFlightNo">半角英字で入力してください</div></div>
       <div class="form-group"><label>米国内の滞在先都市 <span class="en">/ City</span><span class="optional">任意</span></label>
-        <input type="text" id="arrivalCity" placeholder="(例) NEW YORK"></div>
+        <input type="text" id="arrivalCity" maxlength="50" placeholder="(例) NEW YORK">
+        <div class="error" id="errArrivalCity">半角英字で入力してください</div></div>
     </div>
   </div>
 
   <!-- 滞在先情報 -->
   <div class="card">
     <div class="section-header"><span class="section-title">滞在先情報</span></div>
-    <div class="form-group"><label>米国での滞在先の住所を登録しますか？ <span class="optional">任意</span></label>
+    <div class="form-group"><label>米国での滞在先の住所を登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="stayYes" name="hasStay" value="yes"><label for="stayYes">はい</label><input type="radio" id="stayNo" name="hasStay" value="no" checked><label for="stayNo">いいえ</label></div>
+      <div class="hint">※不明な場合や未定の場合は「いいえ」を選択してください。</div>
     </div>
     <div class="collapsible" id="stayFields">
       <div class="form-group"><label>滞在先の名称 <span class="en">/ Accommodation Name</span><span class="optional">任意</span></label>
@@ -429,7 +440,7 @@
 
   <div class="btn-row" id="step2Btns">
     <button type="button" class="btn-back" onclick="goToStep1()">必須項目の入力へ戻る</button>
-    <button type="button" class="btn-next" onclick="goToStep3()">個人情報の入力へ進む</button>
+    <button type="button" class="btn-next" id="step2NextBtn" onclick="goToStep3()">個人情報の入力へ進む</button>
   </div>
   </div><!-- /step2Content -->
 
@@ -607,6 +618,8 @@
 </div>
 
 <!-- ===== MODALS ===== -->
+<!-- Step2 Help Modal (placeholder) -->
+<div class="modal-overlay" id="step2HelpModal"><div class="modal-content"><button class="modal-close" onclick="closeModal('step2HelpModal')">×</button><h3>渡航・滞在先情報について</h3><div class="modal-row"><div class="modal-text"><p>「はい」「いいえ」どちらを選択されても審査結果に影響はありません。</p><p>わかる範囲でご入力ください。不明な項目は空欄のままで問題ありません。</p><p>渡航情報は出発前に変更することも可能です。</p></div></div></div></div>
 <div class="modal-overlay" id="helpApplicant"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpApplicant')">×</button><h3>申請者情報の入力方法</h3><div class="modal-row"><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:12px"><div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:8px">申請者情報</p><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">姓 / Surname <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) YAMADA</div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">名 / Given name <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) TARO</div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">別名の有無 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:2px;border:1px solid #d0d5dd;border-radius:5px;overflow:hidden"><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">別名があります</span><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#1a3a5c;color:#fff">別名はありません</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">性別 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:2px;border:1px solid #d0d5dd;border-radius:5px;overflow:hidden"><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">男性</span><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">女性</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">生年月日 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;gap:3px;margin-top:2px"><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Year</div><span style="font-size:9px;line-height:28px;color:#666">年</span><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Month</div><span style="font-size:9px;line-height:28px;color:#666">月</span><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Day</div><span style="font-size:9px;line-height:28px;color:#666">日</span></div></div><div><span style="font-size:10px;font-weight:600">国籍 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">選択してください</div></div></div></div></div><div class="modal-text"><p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p><p>姓/名を逆に入力する、スペルの間違いにご注意ください。別名・別称がある方は「別名があります」にチェックを入れて当該の名前を入力してください。</p><p>TSU、SHO、JO、CHOなどの入力はスペルの間違いにご注意ください。<br>（例）姓 : TUDA → TSUDA　名 : SYOTA → SHOTA</p><p>以下の国籍に該当する方は「個人識別番号」の入力欄が表示されます。任意のため空欄でも構いませんが、台湾市民は個人識別番号(パスポート記載の英語1文字と数字9桁)の入力が必要です。</p><p style="font-size:12px;color:#666;line-height:1.6">Belgium(BEL)、Brunei(BRN)、Chile(CHL)、Czech republic(CZE)、Estonia(EST)、Germany(DEU)、Greece(GRC)、Hungary(HUN)、Israel(ISR)、Luxembourg(LUX)、Malta(MLT)、Monaco(MCO)、Netherlands(NLD)、Portugal(PRT)、Singapore(SGP)、Slovakia(SVK)、Slovenia(SVN)、South Korea(KOR)、Spain(ESP)、Taiwan(TWN)、Croatia(HRV)</p></div></div></div></div>
 
 <div class="modal-overlay" id="helpContact"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpContact')">×</button><h3>連絡先情報の入力方法</h3><div class="modal-row"><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:12px"><div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:8px">連絡先情報</p><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">メールアドレス <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) yamada_taro@example.co.jp</div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">メールアドレス <span style="background:#2d5f8a;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">確認用</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) yamada_taro@example.co.jp</div></div><div><span style="font-size:10px;font-weight:600">電話番号 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;gap:4px;margin-top:2px"><div style="width:130px;border:1px solid #d0d5dd;border-radius:5px;padding:5px 6px;font-size:10px;display:flex;align-items:center;gap:3px"><img src="https://flagcdn.com/w40/jp.png" style="width:18px;height:12px;border-radius:2px"> JAPAN (+81)</div><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;color:#b0b8c1;font-size:11px">(例) 09012345678</div></div></div></div></div></div><div class="modal-text"><p>メールアドレスの入力間違いにご注意ください。</p><p>申請完了後、「申請受付メール」と「渡航認証可否通知メール」を当サイトより送信します。フリーメールや携帯端末のメールアドレスをご利用の方は、迷惑メールフォルダ等への振り分けや受信できない場合がありますのでご注意ください。</p></div></div></div></div>
@@ -1281,12 +1294,25 @@ function goToStep4(){
 
 // ===== STEP 2 INIT =====
 let step2Inited=false;
+function checkStep2Errors(){
+  const hasErr=document.querySelectorAll('#step2Content .error').length>0&&
+    Array.from(document.querySelectorAll('#step2Content .error')).some(e=>e.style.display==='block');
+  const btn=$('step2NextBtn');if(btn)btn.disabled=hasErr;
+}
+function s2err(id,show){const e=$(id);if(e)e.style.display=show?'block':'none';checkStep2Errors();}
 function initStep2(){
   if(step2Inited)return;step2Inited=true;
 
-  // Transit detail: show when "いいえ" (not transit = staying in US)
-  $('transitNo').addEventListener('change',()=>$('transitDetailFields').classList.add('show'));
+  // Arrival date dropdowns (future only)
+  const now=new Date();const curY=now.getFullYear();const curM=now.getMonth()+1;
+  const arrY=$('arrYear'),arrM=$('arrMonth'),arrD=$('arrDay');
+  for(let y=curY;y<=curY+3;y++){const o=document.createElement('option');o.value=y;o.textContent=y;arrY.appendChild(o);}
+  for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m;arrM.appendChild(o);}
+  for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=d;o.textContent=d;arrD.appendChild(o);}
+
+  // Transit toggle: default is "いいえ" (show details), "はい" hides
   $('transitYes').addEventListener('change',()=>$('transitDetailFields').classList.remove('show'));
+  $('transitNo').addEventListener('change',()=>$('transitDetailFields').classList.add('show'));
 
   // Toggle collapsible sections
   [{yes:'stayYes',no:'stayNo',fields:'stayFields'},
@@ -1296,9 +1322,32 @@ function initStep2(){
     $(t.no).addEventListener('change',()=>$(t.fields).classList.remove('show'));
   });
 
-  // Auto uppercase for step2 text fields
+  // Airline: alpha, space, &.- only, max 50, auto-uppercase, normalize spaces
+  $('airline').addEventListener('input',function(){
+    let v=toHalf(this.value).toUpperCase().replace(/[^A-Z &.\-]/g,'').replace(/\s+/g,' ');
+    this.value=v;
+    s2err('errAirline',v.length>0&&!/^[A-Z &.\-]+$/.test(v));
+  });
+  $('airline').addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+
+  // Flight number: 2 alpha + digits, max 8
+  $('flightNo').addEventListener('input',function(){
+    let v=toHalf(this.value).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    this.value=v;
+    const valid=v.length===0||/^[A-Z]{1,2}[0-9]{1,6}$/.test(v);
+    s2err('errFlightNo',!valid&&v.length>0);
+  });
+
+  // Arrival city: alpha, space, hyphen only, max 50
+  $('arrivalCity').addEventListener('input',function(){
+    let v=toHalf(this.value).toUpperCase().replace(/[^A-Z \-]/g,'').replace(/\s+/g,' ');
+    this.value=v;
+    s2err('errArrivalCity',v.length>0&&!/^[A-Z \-]+$/.test(v));
+  });
+  $('arrivalCity').addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+
+  // Auto uppercase for other step2 text fields
   ['stayName','stayState','stayCity','stayStreet','stayBuilding','stayRoom',
-   'airline','flightNo','arrivalCity',
    'usContactSurname','usContactGivenName','usContactState','usContactCity','usContactStreet'
   ].forEach(id=>{
     const el=$(id);if(!el)return;
