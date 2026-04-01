@@ -281,8 +281,8 @@
     </div>
     <div class="collapsible" id="otherPassFields">
       <div class="form-group"><label>発給国 <span class="required">必須</span></label>
-        <input type="hidden" id="issuingCountry" value="">
-        <div class="custom-select" id="issuingCountryWrap"><button type="button" class="cs-btn" id="issuingCountryBtn">選択してください</button><div class="cs-list" id="issuingCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+        <input type="hidden" id="otherPassCountry" value="">
+        <div class="custom-select" id="otherPassCountryWrap"><button type="button" class="cs-btn" id="otherPassCountryBtn">選択してください</button><div class="cs-list" id="otherPassCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
       </div>
       <div class="form-group"><label>種類 <span class="required">必須</span></label>
         <select id="docType"><option value="">選択してください</option><option value="passport">パスポート</option><option value="id_card">国家身分証明書</option></select>
@@ -886,6 +886,7 @@ initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'J
 });
 initCustomSelect('birthCountryWrap','birthCountry','birthCountryBtn',WORLD_ITEMS,'JPN');
 initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS,'JPN');
+initCustomSelect('otherPassCountryWrap','otherPassCountry','otherPassCountryBtn',WORLD_ITEMS);
 initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS);
 initCustomSelect('pastNatCountryWrap','pastNatCountry','pastNatCountryBtn',WORLD_ITEMS);
 
@@ -938,7 +939,7 @@ function setupToggle(yesId,noId,fieldsId,clearIds){
   });
 }
 setupToggle('aliasYes','aliasNo','aliasFields');
-setupToggle('otherPassYes','otherPassNo','otherPassFields',['issuingCountry','docType','otherDocId','otherDocExpiry']);
+setupToggle('otherPassYes','otherPassNo','otherPassFields',['otherPassCountry','docType','otherDocId','otherDocExpiry']);
 setupToggle('curNatYes','curNatNo','curNatFields',['curNatCountry','curNatHow']);
 setupToggle('pastNatYes','pastNatNo','pastNatFields',['pastNatCountry','pastNatAcqDay','pastNatAcqMonth','pastNatAcqYear','pastNatRelDay','pastNatRelMonth','pastNatRelYear']);
 setupToggle('geYes','geNo','geFields',['passId']);
