@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" width="400" height="280">
+  <!-- Passport background -->
+  <rect x="10" y="10" width="380" height="260" rx="8" fill="#f5f0e8" stroke="#c0b8a8" stroke-width="2"/>
+  
+  <!-- Header text -->
+  <text x="200" y="38" text-anchor="middle" font-family="serif" font-size="11" fill="#1a3a5c" font-weight="bold">UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND</text>
+  <text x="200" y="54" text-anchor="middle" font-family="serif" font-size="14" fill="#1a3a5c" font-weight="bold" letter-spacing="3">PASSPORT</text>
+  
+  <!-- Photo area -->
+  <rect x="30" y="68" width="100" height="130" rx="4" fill="#d0d0d0" stroke="#aaa" stroke-width="1"/>
+  <circle cx="80" cy="110" r="25" fill="#bbb"/>
+  <ellipse cx="80" cy="155" rx="30" ry="25" fill="#bbb"/>
+  
+  <!-- Info lines -->
+  <text x="148" y="85" font-family="monospace" font-size="9" fill="#444">Type / Type</text>
+  <rect x="148" y="90" width="60" height="12" rx="2" fill="#e0ddd5"/>
+  <text x="230" y="85" font-family="monospace" font-size="9" fill="#444">Country code</text>
+  <rect x="230" y="90" width="50" height="12" rx="2" fill="#e0ddd5"/>
+  
+  <text x="148" y="120" font-family="monospace" font-size="9" fill="#444">Surname / Nom</text>
+  <rect x="148" y="125" width="220" height="12" rx="2" fill="#e0ddd5"/>
+  
+  <text x="148" y="150" font-family="monospace" font-size="9" fill="#444">Given names / Prénoms</text>
+  <rect x="148" y="155" width="220" height="12" rx="2" fill="#e0ddd5"/>
+  
+  <text x="148" y="180" font-family="monospace" font-size="9" fill="#444">Date of birth / Nationality / Sex</text>
+  <rect x="148" y="185" width="100" height="12" rx="2" fill="#e0ddd5"/>
+  <rect x="260" y="185" width="108" height="12" rx="2" fill="#e0ddd5"/>
+  
+  <!-- MRZ Code area (highlighted) -->
+  <rect x="20" y="210" width="360" height="52" rx="4" fill="#fff3cd" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <text x="30" y="228" font-family="monospace" font-size="10" fill="#333" letter-spacing="1.5">P&lt;GBRSMITH&lt;&lt;JOHN&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>
+  <text x="30" y="248" font-family="monospace" font-size="10" fill="#333" letter-spacing="1.5">1234567890GBR8501011M3012315&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;00</text>
+  
+  <!-- MRZ label -->
+  <text x="200" y="275" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#e74c3c" font-weight="bold">▲ MRZ code</text>
+  
+  <!-- Arrow pointing to MRZ -->
+  <line x1="320" y1="205" x2="340" y2="215" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+</svg>
