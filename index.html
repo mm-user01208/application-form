@@ -343,12 +343,199 @@
     </div>
   </div>
 
-  <!-- ボタン -->
-  <div class="btn-row">
+  <!-- Step1 ボタン -->
+  <div class="btn-row" id="step1Btns">
     <button type="button" class="btn-back" onclick="window.scrollTo({top:0,behavior:'smooth'})">TOPへ戻る</button>
-    <button type="submit" class="btn-next">選択項目の入力へ進む</button>
+    <button type="button" class="btn-next" onclick="goToStep2()">選択項目の入力へ進む</button>
   </div>
   </form>
+
+  <!-- ========== STEP 2: 選択項目の入力 ========== -->
+  <div id="step2Content" style="display:none">
+
+  <!-- 渡航目的 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">渡航情報</span></div>
+    <div class="form-group"><label>米国への渡航目的は、他国へ乗り継ぐためですか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no"><label for="transitNo">いいえ</label></div>
+    </div>
+  </div>
+
+  <!-- 滞在先情報 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">滞在先情報</span></div>
+    <div class="form-group"><label>米国での滞在先の住所を登録しますか？ <span class="optional">任意</span></label>
+      <div class="toggle-group"><input type="radio" id="stayYes" name="hasStay" value="yes"><label for="stayYes">はい</label><input type="radio" id="stayNo" name="hasStay" value="no" checked><label for="stayNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="stayFields">
+      <div class="form-group"><label>滞在先の名称 <span class="en">/ Accommodation Name</span><span class="optional">任意</span></label>
+        <input type="text" id="stayName" placeholder="(例) HILTON HOTEL TOKYO"></div>
+      <div class="form-group"><label>州 <span class="en">/ State</span><span class="optional">任意</span></label>
+        <input type="text" id="stayState" placeholder="(例) CALIFORNIA"></div>
+      <div class="form-group"><label>都市名 <span class="en">/ City</span><span class="optional">任意</span></label>
+        <input type="text" id="stayCity" placeholder="(例) LOS ANGELES"></div>
+      <div class="form-group"><label>通り名 <span class="en">/ Street</span><span class="optional">任意</span></label>
+        <input type="text" id="stayStreet" placeholder="(例) 123 MAIN ST"></div>
+      <div class="form-group"><label>建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
+        <input type="text" id="stayBuilding" placeholder="空欄でも可"></div>
+      <div class="form-group"><label>部屋番号 <span class="en">/ Room</span><span class="optional">任意</span></label>
+        <input type="text" id="stayRoom" placeholder="空欄でも可"></div>
+      <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
+        <input type="text" id="stayPhone" placeholder="(例) 2125551234"></div>
+    </div>
+  </div>
+
+  <!-- 就労経験 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">就労情報</span></div>
+    <div class="form-group"><label>現在または過去に就労経験はありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="employYes" name="hasEmploy" value="yes"><label for="employYes">はい</label><input type="radio" id="employNo" name="hasEmploy" value="no"><label for="employNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="employFields">
+      <div class="form-group"><label>雇用者名または雇用状況 <span class="en">/ Employer</span><span class="required">必須</span></label>
+        <input type="text" id="employerName" placeholder="(例) ABC CORPORATION">
+        <div class="error" id="errEmployerName">半角英数字で入力してください</div></div>
+      <div class="form-group"><label>雇用者 国 <span class="en">/ Country</span><span class="required">必須</span></label>
+        <input type="hidden" id="employCountry" value="">
+        <div class="custom-select" id="employCountryWrap"><button type="button" class="cs-btn" id="employCountryBtn">選択してください</button><div class="cs-list" id="employCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div></div>
+      <div class="form-group"><label>雇用者 都道府県 <span class="en">/ State/Prefecture</span><span class="optional">任意</span></label>
+        <input type="text" id="employState" placeholder="(例) TOKYO"></div>
+      <div class="form-group"><label>雇用者 市区町村 <span class="en">/ City</span><span class="optional">任意</span></label>
+        <input type="text" id="employCity" placeholder="(例) CHIYODA-KU"></div>
+      <div class="form-group"><label>雇用者 丁番地 <span class="en">/ Street</span><span class="optional">任意</span></label>
+        <input type="text" id="employStreet" placeholder="(例) 1-1-1 MARUNOUCHI"></div>
+      <div class="form-group"><label>雇用者 建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
+        <input type="text" id="employBuilding" placeholder="空欄でも可"></div>
+      <div class="form-group"><label>雇用者 電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
+        <input type="text" id="employPhone" placeholder="(例) 0312345678"></div>
+      <div class="form-group"><label>職名 <span class="en">/ Job Title</span><span class="optional">任意</span></label>
+        <input type="text" id="employTitle" placeholder="(例) ENGINEER"></div>
+    </div>
+  </div>
+
+  <!-- SNSアカウント -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">SNS情報</span></div>
+    <div class="form-group"><label>SNSアカウントを登録しますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="snsYes" name="hasSns" value="yes"><label for="snsYes">はい</label><input type="radio" id="snsNo" name="hasSns" value="no"><label for="snsNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="snsFields">
+      <div class="form-group"><label>利用しているSNS <span class="required">必須</span></label>
+        <select id="snsPlatform" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px">
+          <option value="">選択してください</option>
+          <option value="facebook">Facebook</option>
+          <option value="instagram">Instagram</option>
+          <option value="twitter">X (Twitter)</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="youtube">YouTube</option>
+          <option value="tiktok">TikTok</option>
+          <option value="weibo">Weibo</option>
+          <option value="other">その他</option>
+        </select></div>
+      <div class="form-group"><label>アカウント名 <span class="en">/ Account Name</span><span class="required">必須</span></label>
+        <input type="text" id="snsAccount" placeholder="(例) @yamada_taro">
+        <div class="error" id="errSnsAccount">アカウント名を入力してください</div></div>
+    </div>
+  </div>
+
+  <!-- 緊急連絡先 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">緊急連絡先</span></div>
+    <div class="form-group"><label>緊急連絡先を登録しますか？ <span class="optional">任意</span></label>
+      <div class="toggle-group"><input type="radio" id="emergYes" name="hasEmerg" value="yes"><label for="emergYes">はい</label><input type="radio" id="emergNo" name="hasEmerg" value="no" checked><label for="emergNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="emergFields">
+      <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
+        <input type="text" id="emergSurname" placeholder="(例) YAMADA"></div>
+      <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
+        <input type="text" id="emergGivenName" placeholder="(例) HANAKO"></div>
+      <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="optional">任意</span></label>
+        <input type="email" id="emergEmail" placeholder="(例) hanako@example.com"></div>
+      <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
+        <input type="text" id="emergPhone" placeholder="(例) 09012345678"></div>
+    </div>
+  </div>
+
+  <!-- 両親の名前 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">両親の情報</span></div>
+    <div class="form-group"><label>両親の名前を登録しますか？ <span class="optional">任意</span></label>
+      <div class="toggle-group"><input type="radio" id="parentYes" name="hasParent" value="yes"><label for="parentYes">はい</label><input type="radio" id="parentNo" name="hasParent" value="no" checked><label for="parentNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="parentFields">
+      <div class="form-group"><label>父親の姓 <span class="en">/ Father's Surname</span><span class="optional">任意</span></label>
+        <input type="text" id="fatherSurname" placeholder="(例) YAMADA"></div>
+      <div class="form-group"><label>父親の名 <span class="en">/ Father's Given name</span><span class="optional">任意</span></label>
+        <input type="text" id="fatherGivenName" placeholder="(例) ICHIRO"></div>
+      <div class="form-group"><label>母親の姓 <span class="en">/ Mother's Surname</span><span class="optional">任意</span></label>
+        <input type="text" id="motherSurname" placeholder="(例) SUZUKI"></div>
+      <div class="form-group"><label>母親の名 <span class="en">/ Mother's Given name</span><span class="optional">任意</span></label>
+        <input type="text" id="motherGivenName" placeholder="(例) YOKO"></div>
+    </div>
+  </div>
+
+  <!-- 適格性質問 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">適格性に関する質問</span></div>
+    <div class="notice-box" style="margin-bottom:20px"><strong>⚠ 注意：</strong>以下の質問にはすべて正直にお答えください。虚偽の回答は申請の却下や入国拒否の原因となります。</div>
+    <div class="form-group"><label>① 身体的・精神的疾患を患っている、または薬物乱用者・薬物中毒者ですか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq1Yes" name="eq1" value="yes"><label for="eq1Yes">はい</label><input type="radio" id="eq1No" name="eq1" value="no"><label for="eq1No">いいえ</label></div></div>
+    <div class="form-group"><label>② 逮捕されたことがある、または有罪判決を受けたことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq2Yes" name="eq2" value="yes"><label for="eq2Yes">はい</label><input type="radio" id="eq2No" name="eq2" value="no"><label for="eq2No">いいえ</label></div></div>
+    <div class="form-group"><label>③ 規制薬物の所持、使用、流通に関与したことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq3Yes" name="eq3" value="yes"><label for="eq3Yes">はい</label><input type="radio" id="eq3No" name="eq3" value="no"><label for="eq3No">いいえ</label></div></div>
+    <div class="form-group"><label>④ テロ活動、スパイ行為、破壊活動、大量虐殺に関与したことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq4Yes" name="eq4" value="yes"><label for="eq4Yes">はい</label><input type="radio" id="eq4No" name="eq4" value="no"><label for="eq4No">いいえ</label></div></div>
+    <div class="form-group"><label>⑤ 米国のビザや入国許可を不正に取得しようとしたことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq5Yes" name="eq5" value="yes"><label for="eq5Yes">はい</label><input type="radio" id="eq5No" name="eq5" value="no"><label for="eq5No">いいえ</label></div></div>
+    <div class="form-group"><label>⑥ 米国で許可なく就労する意図がありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq6Yes" name="eq6" value="yes"><label for="eq6Yes">はい</label><input type="radio" id="eq6No" name="eq6" value="no"><label for="eq6No">いいえ</label></div></div>
+    <div class="form-group"><label>⑦ 米国のビザを拒否されたことがある、または入国を拒否されたことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq7Yes" name="eq7" value="yes"><label for="eq7Yes">はい</label><input type="radio" id="eq7No" name="eq7" value="no"><label for="eq7No">いいえ</label></div></div>
+    <div class="form-group"><label>⑧ 米国での滞在許可期間を超過して滞在したことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq8Yes" name="eq8" value="yes"><label for="eq8Yes">はい</label><input type="radio" id="eq8No" name="eq8" value="no"><label for="eq8No">いいえ</label></div></div>
+    <div class="form-group"><label>⑨ 2011年3月1日以降にイラン、イラク、リビア、北朝鮮、ソマリア、スーダン、シリア、イエメン、キューバに渡航したことがありますか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="eq9Yes" name="eq9" value="yes"><label for="eq9Yes">はい</label><input type="radio" id="eq9No" name="eq9" value="no"><label for="eq9No">いいえ</label></div></div>
+  </div>
+
+  <!-- 同意事項 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">同意事項</span></div>
+    <div class="form-group">
+      <div style="background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:16px;max-height:200px;overflow-y:auto;font-size:13px;line-height:1.8;color:#444">
+        <p style="font-weight:700;margin-bottom:8px">免責事項</p>
+        <p>電子渡航認証システム（ESTA）は法執行データベースとの照合を行います。ビザ免除プログラムに基づき米国への入国を希望する全ての旅行者は、搭乗許可を得る前に本システムを通じて電子渡航認証を取得する必要があります。</p>
+        <p>電子渡航認証の申請が承認された場合でも、それは渡航の適格性を確立するものであり、ビザ免除プログラムに基づく米国への入国許可を確立するものではありません。米国到着時に、入国審査官により入国の可否が判断されます。</p>
+        <p>申請者本人または代理人により提供される全ての情報は、真実かつ正確でなければなりません。虚偽の情報を故意に提供した場合、行政処分または刑事罰の対象となる場合があります。</p>
+        <p><strong>警告：</strong>ビザ免除プログラムにより米国に入国した場合、無許可の就労、就学、外国報道機関の代理は禁止されています。また、非移民ステータスの変更、滞在期間の延長、永住者への資格変更を申請することはできません（移民国籍法第245条(c)(4)に基づく場合を除く）。</p>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:14px;color:#333">
+        <input type="checkbox" id="agreeDisclaimer" style="margin-top:3px;width:18px;height:18px;flex-shrink:0">
+        上記の免責事項を読み、理解し、同意します。<span class="required">必須</span>
+      </label>
+    </div>
+    <div class="form-group">
+      <div style="background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:16px;max-height:200px;overflow-y:auto;font-size:13px;line-height:1.8;color:#444">
+        <p style="font-weight:700;margin-bottom:8px">利用規約</p>
+        <p>本申請サービスは、米国電子渡航認証システム（ESTA）の申請を代行するサービスです。本サービスの利用料金には、米国政府への申請手数料およびサービス手数料が含まれます。</p>
+        <p>申請内容に誤りがあった場合、申請が却下される可能性があります。申請者は提供する全ての情報の正確性について責任を負うものとします。</p>
+        <p>申請が却下された場合でも、サービス手数料の返金はいたしかねます。米国政府への申請手数料の返金については、米国政府の規定に従います。</p>
+        <p>本サービスは米国政府機関ではなく、米国政府とは一切関係のない民間のサービスです。</p>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:14px;color:#333">
+        <input type="checkbox" id="agreeTerms" style="margin-top:3px;width:18px;height:18px;flex-shrink:0">
+        上記の利用規約を読み、理解し、同意します。<span class="required">必須</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Step2 ボタン -->
+  <div class="btn-row" id="step2Btns">
+    <button type="button" class="btn-back" onclick="goToStep1()">必須項目の入力へ戻る</button>
+    <button type="button" class="btn-next" id="step2NextBtn" onclick="goToStep3()">入力内容の確認へ進む</button>
+  </div>
+
+  </div><!-- /step2Content -->
 
   <div class="footer">© 2026 Application Form</div>
 </div>
@@ -976,12 +1163,76 @@ function closeModal(id){$(id).classList.remove('show')}
 // ===== FORM SUBMIT =====
 document.getElementById('appForm').addEventListener('submit',function(e){
   e.preventDefault();
-  // Trim all text inputs on submit
   this.querySelectorAll('input[type="text"],input[type="email"]').forEach(el=>{el.value=el.value.trim()});
   const errs=document.querySelectorAll('.error.show');
   if(errs.length>0){window.scrollTo({top:0,behavior:'smooth'});return}
   alert('送信完了 / Submitted!');
 });
+
+// ===== STEP NAVIGATION =====
+function goToStep2(){
+  // Hide step1, show step2
+  document.querySelectorAll('#step2Content .card').forEach(c=>c.style.display='');
+  $('step2Content').style.display='';
+  // Hide step1 cards
+  document.querySelectorAll('form .card').forEach(c=>c.style.display='none');
+  $('step1Btns').style.display='none';
+  // Update step indicator
+  document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===1)});
+  window.scrollTo({top:0,behavior:'smooth'});
+  initStep2();
+}
+function goToStep1(){
+  $('step2Content').style.display='none';
+  document.querySelectorAll('form .card').forEach(c=>c.style.display='');
+  $('step1Btns').style.display='';
+  document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===0)});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goToStep3(){
+  alert('入力内容の確認画面は現在準備中です。');
+}
+
+// ===== STEP 2 INIT =====
+let step2Inited=false;
+function initStep2(){
+  if(step2Inited)return;step2Inited=true;
+
+  // Toggle collapsible sections
+  const s2toggles=[
+    {yes:'stayYes',no:'stayNo',fields:'stayFields'},
+    {yes:'employYes',no:'employNo',fields:'employFields'},
+    {yes:'snsYes',no:'snsNo',fields:'snsFields'},
+    {yes:'emergYes',no:'emergNo',fields:'emergFields'},
+    {yes:'parentYes',no:'parentNo',fields:'parentFields'},
+  ];
+  s2toggles.forEach(t=>{
+    $(t.yes).addEventListener('change',()=>$(t.fields).classList.add('show'));
+    $(t.no).addEventListener('change',()=>{$(t.fields).classList.remove('show')});
+  });
+
+  // Employer country custom select
+  initCustomSelect('employCountryWrap','employCountry','employCountryBtn',WORLD_ITEMS,'');
+
+  // Auto uppercase for step2 text fields
+  const s2texts=['stayName','stayState','stayCity','stayStreet','stayBuilding','stayRoom',
+    'employerName','employState','employCity','employStreet','employBuilding','employTitle',
+    'emergSurname','emergGivenName','fatherSurname','fatherGivenName','motherSurname','motherGivenName'];
+  s2texts.forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){
+      this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase();
+    });
+  });
+
+  // Digits only for phone fields
+  ['stayPhone','employPhone','emergPhone'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){
+      this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20);
+    });
+  });
+}
 </script>
 </body>
 </html>
