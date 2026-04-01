@@ -5,400 +5,469 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>申請フォーム | Application Form</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-      background: #f0f2f5; color: #333; min-height: 100vh;
-    }
-    .header {
-      background: linear-gradient(135deg, #1a3a5c, #2d5f8a);
-      color: #fff; padding: 24px 0; text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .header h1 { font-size: 24px; font-weight: 600; letter-spacing: 1px; }
-    .header p { font-size: 13px; opacity: 0.8; margin-top: 6px; }
-    .container { max-width: 680px; margin: 32px auto; padding: 0 16px; }
-    .card {
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 32px;
-    }
-
-    /* ===== Step indicator ===== */
-    .steps { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
-    .step-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #999; }
-    .step-item.active { color: #1a3a5c; font-weight: 600; }
-    .step-num {
-      width: 28px; height: 28px; line-height: 28px; border-radius: 50%;
-      background: #ddd; color: #fff; text-align: center; font-size: 13px; font-weight: 600;
-    }
-    .step-item.active .step-num { background: #1a3a5c; }
-    .step-arrow { color: #ccc; font-size: 16px; }
-
-    /* ===== Notice box ===== */
-    .notice-box {
-      background: #fff8e1; border: 2px solid #f9a825; border-radius: 10px;
-      padding: 16px 20px; margin-bottom: 28px;
-    }
-    .notice-box p { font-size: 13px; line-height: 1.7; color: #5d4037; }
-    .notice-box strong { color: #000; font-size: 14px; }
-
-    /* ===== Section title with ? button ===== */
-    .section-header {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #e8ecf0;
-    }
-    .section-title { font-size: 18px; font-weight: 700; color: #1a3a5c; }
-    .help-btn {
-      width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2d5f8a;
-      background: #fff; color: #2d5f8a; font-size: 14px; font-weight: 700;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; flex-shrink: 0;
-    }
-    .help-btn:hover { background: #2d5f8a; color: #fff; }
-
-    /* ===== Modal ===== */
-    .modal-overlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-content {
-      background: #fff; border-radius: 12px; max-width: 600px; width: 90%;
-      max-height: 85vh; overflow-y: auto; padding: 28px; position: relative;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    }
-    .modal-close {
-      position: absolute; top: 12px; right: 16px; font-size: 24px;
-      background: none; border: none; cursor: pointer; color: #888;
-    }
-    .modal-close:hover { color: #333; }
-    .modal-content h3 { font-size: 16px; color: #1a3a5c; margin-bottom: 16px; }
-    .modal-content .modal-screenshot {
-      border: 1px solid #ddd; border-radius: 8px; padding: 16px;
-      background: #f9fafb; margin-bottom: 16px;
-    }
-    .modal-content .modal-screenshot img { width: 100%; border-radius: 6px; }
-    .modal-content .modal-text { font-size: 13px; line-height: 1.8; color: #444; }
-    .modal-content .modal-text p { margin-bottom: 12px; }
-
-    /* ===== Form ===== */
-    .form-group { margin-bottom: 24px; }
-    .form-group > label {
-      display: block; font-size: 14px; font-weight: 600;
-      color: #444; margin-bottom: 8px;
-    }
-    .form-group > label .en { font-weight: 400; color: #888; font-size: 13px; margin-left: 4px; }
-    .form-group > label .required {
-      background: #e74c3c; color: #fff; font-size: 11px;
-      padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 500;
-    }
-    .form-group input[type="text"],
-    .form-group select {
-      width: 100%; padding: 12px 16px; border: 1.5px solid #d0d5dd;
-      border-radius: 8px; font-size: 15px;
-      transition: border-color 0.2s, box-shadow 0.2s; outline: none; background: #fff;
-    }
-    .form-group input[type="text"]:focus,
-    .form-group select:focus {
-      border-color: #2d5f8a; box-shadow: 0 0 0 3px rgba(45,95,138,0.12);
-    }
-    .form-group input[type="text"]::placeholder { color: #b0b8c1; }
-    .form-group .hint { font-size: 12px; color: #888; margin-top: 6px; }
-    .form-group .note { font-size: 12px; color: #e67e22; margin-top: 6px; }
-
-    /* Toggle tabs */
-    .toggle-group {
-      display: flex; border-radius: 8px; overflow: hidden; border: 1.5px solid #d0d5dd;
-    }
-    .toggle-group label {
-      flex: 1; text-align: center; padding: 12px 16px; font-size: 14px;
-      font-weight: 500; cursor: pointer; background: #f8f9fa; color: #555;
-      transition: all 0.2s; margin-bottom: 0; border-right: 1px solid #d0d5dd;
-    }
-    .toggle-group label:last-child { border-right: none; }
-    .toggle-group input { display: none; }
-    .toggle-group input:checked + label { background: #1a3a5c; color: #fff; }
-
-    /* Alias fields */
-    .alias-fields {
-      max-height: 0; overflow: hidden; opacity: 0;
-      transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
-      margin-top: 0;
-    }
-    .alias-fields.show { max-height: 300px; opacity: 1; margin-top: 24px; }
-
-    /* Date row */
-    .date-row { display: flex; gap: 12px; }
-    .date-row select { flex: 1; }
-
-    /* Submit */
-    .btn-submit {
-      display: block; width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #1a3a5c, #2d5f8a);
-      color: #fff; border: none; border-radius: 8px;
-      font-size: 16px; font-weight: 600; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s; margin-top: 32px;
-    }
-    .btn-submit:hover { opacity: 0.9; }
-    .btn-submit:active { transform: scale(0.99); }
-
-    .footer { text-align: center; padding: 24px; font-size: 12px; color: #aaa; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
+    .header{background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;padding:24px 0;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .header h1{font-size:24px;font-weight:600;letter-spacing:1px}.header p{font-size:13px;opacity:.8;margin-top:6px}
+    .container{max-width:680px;margin:32px auto;padding:0 16px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:32px;margin-bottom:24px}
+    .steps{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+    .step-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#999}
+    .step-item.active{color:#1a3a5c;font-weight:600}
+    .step-num{width:28px;height:28px;line-height:28px;border-radius:50%;background:#ddd;color:#fff;text-align:center;font-size:13px;font-weight:600}
+    .step-item.active .step-num{background:#1a3a5c}.step-arrow{color:#ccc;font-size:16px}
+    .notice-box{background:#fff8e1;border:2px solid #f9a825;border-radius:10px;padding:16px 20px;margin-bottom:28px}
+    .notice-box p{font-size:13px;line-height:1.7;color:#5d4037}.notice-box strong{color:#000;font-size:14px}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #e8ecf0}
+    .section-title{font-size:18px;font-weight:700;color:#1a3a5c}
+    .help-btn{width:26px;height:26px;border-radius:50%;border:2px solid #2d5f8a;background:#fff;color:#2d5f8a;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .help-btn:hover{background:#2d5f8a;color:#fff}
+    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
+    .modal-overlay.show{display:flex}
+    .modal-content{background:#fff;border-radius:12px;max-width:620px;width:90%;max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+    .modal-close{position:absolute;top:12px;right:16px;font-size:24px;background:none;border:none;cursor:pointer;color:#888}.modal-close:hover{color:#333}
+    .modal-content h3{font-size:16px;color:#1a3a5c;margin-bottom:16px}
+    .modal-screenshot{border:1px solid #ddd;border-radius:8px;padding:16px;background:#f9fafb;margin-bottom:16px}
+    .modal-text{font-size:13px;line-height:1.8;color:#444}.modal-text p{margin-bottom:12px}
+    .form-group{margin-bottom:24px}
+    .form-group>label{display:block;font-size:14px;font-weight:600;color:#444;margin-bottom:8px}
+    .form-group>label .en{font-weight:400;color:#888;font-size:13px;margin-left:4px}
+    .form-group>label .required{background:#e74c3c;color:#fff;font-size:11px;padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:500}
+    .form-group>label .optional{background:#888;color:#fff;font-size:11px;padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:500}
+    .form-group>label .confirm-badge{background:#2d5f8a;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;margin-left:8px;font-weight:500}
+    .form-group input[type="text"],.form-group input[type="email"],.form-group select{width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px;transition:border-color .2s,box-shadow .2s;outline:none;background:#fff}
+    .form-group input:focus,.form-group select:focus{border-color:#2d5f8a;box-shadow:0 0 0 3px rgba(45,95,138,.12)}
+    .form-group input::placeholder{color:#b0b8c1}
+    .form-group .hint{font-size:12px;color:#888;margin-top:6px}
+    .form-group .note{font-size:12px;color:#e67e22;margin-top:6px}
+    .form-group .error{font-size:13px;color:#e74c3c;font-weight:600;margin-top:6px;display:none}
+    .form-group .error.show{display:block}
+    .form-group .red-hint{font-size:12px;color:#e74c3c;font-weight:600;margin-top:6px}
+    .toggle-group{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid #d0d5dd}
+    .toggle-group label{flex:1;text-align:center;padding:12px 16px;font-size:14px;font-weight:500;cursor:pointer;background:#f8f9fa;color:#555;transition:all .2s;margin-bottom:0;border-right:1px solid #d0d5dd}
+    .toggle-group label:last-child{border-right:none}
+    .toggle-group input{display:none}
+    .toggle-group input:checked+label{background:#1a3a5c;color:#fff}
+    .collapsible{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;margin-top:0}
+    .collapsible.show{max-height:2000px;opacity:1;margin-top:24px}
+    .date-row{display:flex;gap:12px}.date-row select{flex:1}
+    .phone-row{display:flex;gap:12px;align-items:flex-start}
+    .phone-row select{width:200px;flex-shrink:0}
+    .phone-row input{flex:1}
+    .postal-row{display:flex;gap:12px;align-items:flex-start}
+    .postal-row input{flex:1}
+    .postal-row a{display:inline-flex;align-items:center;gap:4px;padding:12px 16px;background:#2d5f8a;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap;transition:opacity .2s}
+    .postal-row a:hover{opacity:.85}
+    .upload-box{border:2px dashed #d0d5dd;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;background:#fafbfc}
+    .upload-box:hover{border-color:#2d5f8a}
+    .upload-box .upload-text{color:#888;font-size:14px}
+    .upload-box input[type="file"]{display:none}
+    .btn-row{display:flex;gap:12px;margin-top:32px}
+    .btn-back{flex:1;padding:14px;background:#f0f2f5;color:#1a3a5c;border:2px solid #d0d5dd;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+    .btn-back:hover{background:#e8ecf0}
+    .btn-next{flex:1;padding:14px;background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s}
+    .btn-next:hover{opacity:.9}
+    .top-error{background:#fdeaea;border:2px solid #e74c3c;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:none;color:#c0392b;font-weight:600;font-size:14px}
+    .top-error.show{display:block}
+    .footer{text-align:center;padding:24px;font-size:12px;color:#aaa}
+    .passport-example{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .passport-example img,.passport-example .placeholder-img{width:200px;height:140px;object-fit:cover;border-radius:8px;background:#e0e0e0;display:flex;align-items:center;justify-content:center;color:#888;font-size:12px;border:1px solid #ddd}
+    .photo-example{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+    .photo-example .ex-item{text-align:center;width:100px}
+    .photo-example .ex-item .placeholder-img{width:80px;height:100px;margin:0 auto 6px;border-radius:8px;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid #ddd}
+    .photo-example .ex-item p{font-size:11px;color:#666}
   </style>
 </head>
 <body>
+<div class="header"><h1>申請者情報入力</h1><p>Enter Applicant Information</p></div>
+<div class="container">
+  <div class="steps">
+    <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">②</span> 選択項目の入力</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">③</span> 入力内容の確認</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">④</span> 申請料お支払い</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">⑤</span> 申請完了</div>
+  </div>
+  <div class="notice-box">
+    <p><strong>注意事項：</strong>すべての項目は<span style="color:#e74c3c;font-weight:700">英語(ローマ字)</span>で入力してください。</p>
+    <p>申請方法に関する詳細は「<strong>？</strong>」ボタンをクリックしてください。</p>
+  </div>
+  <div class="top-error" id="topError"></div>
 
-  <div class="header">
-    <h1>申請者情報入力</h1>
-    <p>Enter Applicant Information</p>
+  <form id="appForm" novalidate>
+  <!-- ========== 申請者情報 ========== -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">申請者情報</span><button type="button" class="help-btn" onclick="showModal('helpApplicant')">？</button></div>
+    <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="required">必須</span></label><input type="text" id="surname" placeholder="(例) YAMADA" required><div class="error" id="errSurname">半角英字で入力してください</div></div>
+    <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="required">必須</span></label><input type="text" id="givenName" placeholder="(例) TARO" required><div class="error" id="errGivenName">半角英字で入力してください</div></div>
+    <div class="form-group"><label>別名の有無 <span class="en">/ Aliases</span><span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="aliasYes" name="hasAlias" value="yes"><label for="aliasYes">別名があります</label><input type="radio" id="aliasNo" name="hasAlias" value="no" checked><label for="aliasNo">別名はありません</label></div>
+      <div class="note">※上記以外の名前（別名・別称）はありますか？</div>
+    </div>
+    <div class="collapsible" id="aliasFields">
+      <div class="form-group"><label>姓 <span class="en">/ Surname (別名)</span><span class="required">必須</span></label><input type="text" id="aliasSurname" placeholder="(例) YAMADA"><div class="error" id="errAliasSurname">半角英字で入力してください</div></div>
+      <div class="form-group"><label>名 <span class="en">/ Given name (別名)</span><span class="required">必須</span></label><input type="text" id="aliasGivenName" placeholder="(例) HIROSHI"><div class="error" id="errAliasGivenName">半角英字で入力してください</div></div>
+    </div>
+    <div class="form-group"><label>性別 <span class="en">/ Gender</span><span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="genderMale" name="gender" value="male"><label for="genderMale">男性</label><input type="radio" id="genderFemale" name="gender" value="female"><label for="genderFemale">女性</label></div>
+    </div>
+    <div class="form-group"><label>生年月日 <span class="en">/ Date of birth</span><span class="required">必須</span></label>
+      <div class="date-row"><select id="dobYear"><option value="">年</option></select><select id="dobMonth"><option value="">月</option></select><select id="dobDay"><option value="">日</option></select></div>
+    </div>
+    <div class="form-group"><label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label><select id="nationality"></select></div>
   </div>
 
-  <div class="container">
-
-    <!-- ===== Step indicator ===== -->
-    <div class="steps">
-      <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div>
-      <span class="step-arrow">→</span>
-      <div class="step-item"><span class="step-num">②</span> 選択項目の入力</div>
-      <span class="step-arrow">→</span>
-      <div class="step-item"><span class="step-num">③</span> 入力内容の確認</div>
-      <span class="step-arrow">→</span>
-      <div class="step-item"><span class="step-num">④</span> 申請料お支払い</div>
-      <span class="step-arrow">→</span>
-      <div class="step-item"><span class="step-num">⑤</span> 申請完了</div>
+  <!-- ========== 連絡先情報 ========== -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">連絡先情報</span><button type="button" class="help-btn" onclick="showModal('helpContact')">？</button></div>
+    <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="required">必須</span></label>
+      <input type="email" id="email1" placeholder="(例) yamada_taro@example.co.jp">
+      <div class="note">※申請結果をメールにて送信します。迷惑メールフォルダに振り分けられる場合がありますのでご注意ください。</div>
+      <div class="error" id="errEmail1">メールアドレスを正しく入力してください</div>
     </div>
-
-    <!-- ===== Notice box ===== -->
-    <div class="notice-box">
-      <p><strong>注意事項：</strong>すべての項目は英語(ローマ字)で入力してください。</p>
-      <p>申請方法に関する詳細は「<strong>？</strong>」ボタンをクリックしてください。</p>
+    <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="confirm-badge">確認用</span><span class="required">必須</span></label>
+      <input type="email" id="email2" placeholder="(例) yamada_taro@example.co.jp">
+      <div class="note">※確認のため再度入力してください。</div>
+      <div class="error" id="errEmail2">メールアドレスを正しく入力してください</div>
+      <div class="error" id="errEmailMatch">メールアドレスが一致しません</div>
     </div>
-
-    <div class="card">
-
-      <!-- ===== Section header with ? ===== -->
-      <div class="section-header">
-        <span class="section-title">申請者情報</span>
-        <button class="help-btn" id="helpBtn" title="申請者情報の入力方法">？</button>
-      </div>
-
-      <form id="applicationForm">
-        <!-- Surname -->
-        <div class="form-group">
-          <label>姓 <span class="en">/ Surname</span><span class="required">必須</span></label>
-          <input type="text" id="surname" name="surname" placeholder="(例) YAMADA" required>
-        </div>
-
-        <!-- Given name -->
-        <div class="form-group">
-          <label>名 <span class="en">/ Given name</span><span class="required">必須</span></label>
-          <input type="text" id="givenName" name="givenName" placeholder="(例) TARO" required>
-        </div>
-
-        <!-- Alias toggle -->
-        <div class="form-group">
-          <label>別名の有無 <span class="en">/ Aliases</span><span class="required">必須</span></label>
-          <div class="toggle-group">
-            <input type="radio" id="aliasYes" name="hasAlias" value="yes">
-            <label for="aliasYes">別名があります</label>
-            <input type="radio" id="aliasNo" name="hasAlias" value="no" checked>
-            <label for="aliasNo">別名はありません</label>
-          </div>
-          <div class="note">※上記以外の名前(別名・別称)はありますか？</div>
-        </div>
-
-        <!-- Alias fields -->
-        <div class="alias-fields" id="aliasFields">
-          <div class="form-group">
-            <label>姓 <span class="en">/ Surname (別名)</span><span class="required">必須</span></label>
-            <input type="text" id="aliasSurname" name="aliasSurname" placeholder="(例) YAMADA">
-          </div>
-          <div class="form-group">
-            <label>名 <span class="en">/ Given name (別名)</span><span class="required">必須</span></label>
-            <input type="text" id="aliasGivenName" name="aliasGivenName" placeholder="(例) HIROSHI">
-          </div>
-        </div>
-
-        <!-- Gender -->
-        <div class="form-group">
-          <label>性別 <span class="en">/ Gender</span><span class="required">必須</span></label>
-          <div class="toggle-group">
-            <input type="radio" id="genderMale" name="gender" value="male">
-            <label for="genderMale">男性</label>
-            <input type="radio" id="genderFemale" name="gender" value="female">
-            <label for="genderFemale">女性</label>
-          </div>
-        </div>
-
-        <!-- Date of birth -->
-        <div class="form-group">
-          <label>生年月日 <span class="en">/ Date of birth</span><span class="required">必須</span></label>
-          <div class="date-row">
-            <select id="dobYear" name="dobYear" required><option value="">年</option></select>
-            <select id="dobMonth" name="dobMonth" required>
-              <option value="">月</option>
-              <option value="1">1 (Jan)</option><option value="2">2 (Feb)</option>
-              <option value="3">3 (Mar)</option><option value="4">4 (Apr)</option>
-              <option value="5">5 (May)</option><option value="6">6 (Jun)</option>
-              <option value="7">7 (Jul)</option><option value="8">8 (Aug)</option>
-              <option value="9">9 (Sep)</option><option value="10">10 (Oct)</option>
-              <option value="11">11 (Nov)</option><option value="12">12 (Dec)</option>
-            </select>
-            <select id="dobDay" name="dobDay" required><option value="">日</option></select>
-          </div>
-        </div>
-
-        <!-- Nationality -->
-        <div class="form-group">
-          <label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label>
-          <select id="nationality" name="nationality" required>
-            <option value="">選択してください</option>
-            <option value="JPN">JAPAN (JPN)</option>
-            <option value="AND">ANDORRA (AND)</option>
-            <option value="AUS">AUSTRALIA (AUS)</option>
-            <option value="AUT">AUSTRIA (AUT)</option>
-            <option value="BEL">BELGIUM (BEL)</option>
-            <option value="BRN">BRUNEI (BRN)</option>
-            <option value="CHL">CHILE (CHL)</option>
-            <option value="HRV">CROATIA (HRV)</option>
-            <option value="CZE">CZECH REPUBLIC (CZE)</option>
-            <option value="DNK">DENMARK (DNK)</option>
-            <option value="EST">ESTONIA (EST)</option>
-            <option value="FIN">FINLAND (FIN)</option>
-            <option value="FRA">FRANCE (FRA)</option>
-            <option value="DEU">GERMANY (DEU)</option>
-            <option value="GRC">GREECE (GRC)</option>
-            <option value="HUN">HUNGARY (HUN)</option>
-            <option value="ISL">ICELAND (ISL)</option>
-            <option value="IRL">IRELAND (IRL)</option>
-            <option value="ISR">ISRAEL (ISR)</option>
-            <option value="ITA">ITALY (ITA)</option>
-            <option value="LVA">LATVIA (LVA)</option>
-            <option value="LIE">LIECHTENSTEIN (LIE)</option>
-            <option value="LTU">LITHUANIA (LTU)</option>
-            <option value="LUX">LUXEMBOURG (LUX)</option>
-            <option value="MLT">MALTA (MLT)</option>
-            <option value="MCO">MONACO (MCO)</option>
-            <option value="NLD">NETHERLANDS (NLD)</option>
-            <option value="NZL">NEW ZEALAND (NZL)</option>
-            <option value="NOR">NORWAY (NOR)</option>
-            <option value="POL">POLAND (POL)</option>
-            <option value="PRT">PORTUGAL (PRT)</option>
-            <option value="QAT">QATAR (QAT)</option>
-            <option value="SMR">SAN MARINO (SMR)</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-submit">次へ進む / Next</button>
-      </form>
+    <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="required">必須</span></label>
+      <div class="phone-row"><select id="phoneCountry"></select><input type="text" id="phoneNumber" placeholder="(例) 09012345678"></div>
+      <div class="red-hint">半角数字で入力してください</div>
+      <div class="hint">※先頭の0は省略されて登録されます。</div>
+      <div class="error" id="errPhone">半角数字で入力してください</div>
     </div>
-
-    <div class="footer">© 2026 Application Form</div>
+    <div class="form-group"><label>電話種別 <span class="en">/ Phone Type</span><span class="required">必須</span></label>
+      <select id="phoneType"><option value="">選択してください</option><option value="home">自宅</option><option value="work">勤務先</option><option value="mobile">携帯</option><option value="other">その他</option></select>
+    </div>
   </div>
 
-  <!-- ===== Help Modal ===== -->
-  <div class="modal-overlay" id="helpModal">
-    <div class="modal-content">
-      <button class="modal-close" id="modalClose">×</button>
-      <h3>申請者情報の入力方法</h3>
+  <!-- ========== 住所情報 ========== -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">住所情報</span><button type="button" class="help-btn" onclick="showModal('helpAddress')">？</button></div>
+    <div class="form-group"><label>郵便番号 <span class="en">/ Postal Code</span><span class="required">必須</span></label>
+      <div class="postal-row"><input type="text" id="postalCode" placeholder="(例) 1000000"><a href="https://www.post.japanpost.jp/zipcode/index.html" target="_blank">🔍 郵便番号を検索</a></div>
+      <div class="hint">※ハイフンを除いた数字のみ入力してください。</div>
+      <div class="error" id="errPostal">数字のみ入力してください</div>
+    </div>
+    <div class="form-group"><label>国 <span class="en">/ Country</span><span class="required">必須</span></label><select id="addrCountry"></select></div>
+    <div class="form-group"><label>都道府県 <span class="en">/ Prefecture</span><span class="required">必須</span></label>
+      <input type="text" id="prefecture" placeholder="(例) TOKYO">
+      <div class="red-hint">半角英字（ローマ字）にて入力してください</div>
+      <div class="hint">※ローマ字にて入力してください。</div>
+    </div>
+    <div class="form-group"><label>市区町村 <span class="en">/ Municipality</span><span class="required">必須</span></label>
+      <input type="text" id="municipality" placeholder="(例) CHIYODA-KU MARUNOUCHI">
+      <div class="red-hint">半角英数字で入力してください</div>
+      <div class="hint">※ローマ字・数字にて入力してください。</div>
+    </div>
+    <div class="form-group"><label>丁番地 <span class="en">/ Street</span><span class="required">必須</span></label>
+      <input type="text" id="street" placeholder="(例) 1-1-1">
+      <div class="hint">※ローマ字・数字にて入力してください。</div>
+    </div>
+    <div class="form-group"><label>建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
+      <input type="text" id="building" placeholder="(例) ABC HOUSE・空欄でも可">
+      <div class="hint">※ローマ字・数字にて入力してください。</div>
+    </div>
+    <div class="form-group"><label>部屋番号 <span class="en">/ Unit</span><span class="optional">任意</span></label>
+      <input type="text" id="unit" placeholder="(例) 101・空欄でも可">
+      <div class="hint">※ローマ字・数字にて入力してください。</div>
+    </div>
+  </div>
 
-      <div class="modal-screenshot" id="modalScreenshot">
-        <!-- Screenshot placeholder - will be replaced with actual screenshot -->
-        <div style="background:#f0f2f5;border-radius:8px;padding:20px;">
-          <div style="background:#fff;border-radius:8px;padding:20px;border:1px solid #e0e0e0;">
-            <p style="font-weight:700;color:#1a3a5c;font-size:15px;margin-bottom:12px;">申請者情報 / Applicant Information</p>
-            <div style="margin-bottom:10px;">
-              <span style="font-size:12px;font-weight:600;">姓 / Surname <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">(例) YAMADA</div>
-            </div>
-            <div style="margin-bottom:10px;">
-              <span style="font-size:12px;font-weight:600;">名 / Given name <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">(例) TARO</div>
-            </div>
-            <div style="margin-bottom:10px;">
-              <span style="font-size:12px;font-weight:600;">別名の有無 / Aliases <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="display:flex;margin-top:4px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden;">
-                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">別名があります</span>
-                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#1a3a5c;color:#fff;">別名はありません</span>
-              </div>
-            </div>
-            <div style="margin-bottom:10px;">
-              <span style="font-size:12px;font-weight:600;">性別 / Gender <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="display:flex;margin-top:4px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden;">
-                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">男性</span>
-                <span style="flex:1;text-align:center;padding:6px;font-size:12px;background:#f8f9fa;">女性</span>
-              </div>
-            </div>
-            <div style="margin-bottom:10px;">
-              <span style="font-size:12px;font-weight:600;">生年月日 / Date of birth <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="display:flex;gap:6px;margin-top:4px;">
-                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">年</div>
-                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">月</div>
-                <div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font-size:12px;color:#b0b8c1;">日</div>
-              </div>
-            </div>
-            <div>
-              <span style="font-size:12px;font-weight:600;">国籍 / Nationality <span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;">必須</span></span>
-              <div style="border:1px solid #d0d5dd;border-radius:6px;padding:8px 12px;margin-top:4px;color:#b0b8c1;font-size:13px;">選択してください</div>
-            </div>
-          </div>
-        </div>
+  <!-- ========== パスポート情報 ========== -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">パスポート情報</span><button type="button" class="help-btn" onclick="showModal('helpPassport')">？</button></div>
+    <div class="form-group"><label>パスポートのアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpPassportUpload')">？</button></label>
+      <div class="upload-box" onclick="document.getElementById('passportFile').click()"><span class="upload-text">画像を選択してください</span><input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif"></div>
+      <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
+      <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+    </div>
+    <div class="form-group"><label>顔写真のアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpSelfieUpload')">？</button></label>
+      <div class="upload-box" onclick="document.getElementById('selfieFile').click()"><span class="upload-text">写真を選択してください</span><input type="file" id="selfieFile" accept=".jpg,.jpeg,.png,.gif"></div>
+      <div class="hint">※肩から頭部までが写っている写真をアップロードしてください。</div>
+      <div class="hint" style="color:#e74c3c">※パスポートの顔写真は使用できません。</div>
+      <div id="selfieFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+    </div>
+    <div class="form-group"><label>パスポート番号 <span class="en">/ Passport Number</span><span class="required">必須</span></label>
+      <input type="text" id="passportNum" placeholder="(例) TH1234567">
+      <div class="error" id="errPassportNum">パスポート番号に誤りがあります</div>
+    </div>
+    <div class="form-group"><label>パスポート発行年月日 <span class="en">/ Issue Date</span><span class="required">必須</span></label>
+      <div class="date-row"><select id="passIssuDay"><option value="">Day</option></select><select id="passIssuMonth"><option value="">Month</option></select><select id="passIssuYear"><option value="">Year</option></select></div>
+    </div>
+    <div class="form-group"><label>パスポート有効期間満了日 <span class="en">/ Expiry Date</span><span class="required">必須</span></label>
+      <div class="date-row"><select id="passExpDay"><option value="">Day</option></select><select id="passExpMonth"><option value="">Month</option></select><select id="passExpYear"><option value="">Year</option></select></div>
+    </div>
+
+    <!-- 他国パスポート -->
+    <div class="form-group"><label>他国のパスポート有無 <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="otherPassYes" name="otherPass" value="yes"><label for="otherPassYes">はい</label><input type="radio" id="otherPassNo" name="otherPass" value="no" checked><label for="otherPassNo">いいえ</label></div>
+      <div class="note">※これまでに他国のパスポートおよび国家身分証明書を発給されたことはありますか？</div>
+    </div>
+    <div class="collapsible" id="otherPassFields">
+      <div class="form-group"><label>発給国 <span class="required">必須</span></label><select id="issuingCountry"></select></div>
+      <div class="form-group"><label>種類 <span class="required">必須</span></label>
+        <select id="docType"><option value="">選択してください</option><option value="passport">パスポート</option><option value="id_card">国家身分証明書</option></select>
       </div>
+      <div class="form-group"><label>ID番号 <span class="required">必須</span></label>
+        <input type="text" id="otherDocId" placeholder="半角英数字で入力してください">
+        <div class="hint">※不明な場合は「UNKNOWN」と入力してください。</div>
+        <div class="error" id="errDocId">半角英数字で入力してください</div>
+      </div>
+      <div class="form-group"><label>有効期限 <span class="required">必須</span></label>
+        <select id="otherDocExpiry"></select>
+        <div class="hint">※不明な場合は「UNKNOWN」を選択してください。</div>
+      </div>
+    </div>
 
-      <div class="modal-text">
-        <p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p>
-        <p>姓/名を逆に入力する、スペルの間違いにご注意ください。別名・別称がある方は「別名があります」にチェックを入れて当該の名前を入力してください。</p>
-        <p>TSU、SHO、JO、CHOなどの入力はスペルの間違いにご注意ください。<br>
-        （例）姓 : TUDA → TSUDA　名 : SYOTA → SHOTA</p>
-        <p>以下の国籍に該当する方は「個人識別番号」の入力欄が表示されます。任意のため空欄でも構いませんが、台湾市民は個人識別番号(パスポート記載の英語1文字と数字9桁)の入力が必要です。</p>
-        <p style="font-size:12px;color:#666;line-height:1.6;">
-          Belgium(BEL)、Brunei(BRN)、Chile(CHL)、Czech republic(CZE)、Estonia(EST)、Germany(DEU)、Greece(GRC)、Hungary(HUN)、Israel(ISR)、Luxembourg(LUX)、Malta(MLT)、Monaco(MCO)、Netherlands(NLD)、Portugal(PRT)、Singapore(SGP)、Slovakia(SVK)、Slovenia(SVN)、South Korea(KOR)、Spain(ESP)、Taiwan(TWN)、Croatia(HRV)
-        </p>
-        <p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p>
+    <!-- 出生国/都市 -->
+    <div class="form-group"><label>出生国 <span class="en">/ Country of Birth</span><span class="required">必須</span></label><select id="birthCountry"></select></div>
+    <div class="form-group"><label>出生都市 <span class="en">/ City of Birth</span><span class="optional">任意</span></label>
+      <input type="text" id="birthCity" placeholder="(例) TOKYO・空欄でも可">
+      <div class="hint">※出生した都道府県または市区町村をローマ字にて入力してください。ご不明な場合は、空欄のままで構いません。</div>
+    </div>
+
+    <!-- 他国籍（現在） -->
+    <div class="form-group"><label>他国籍の有無（現在）<span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="curNatYes" name="curNat" value="yes"><label for="curNatYes">はい</label><input type="radio" id="curNatNo" name="curNat" value="no" checked><label for="curNatNo">いいえ</label></div>
+      <div class="note">※現在、他の国の国民または市民ですか？</div>
+    </div>
+    <div class="collapsible" id="curNatFields">
+      <div class="form-group"><label>他国籍（現在）<span class="required">必須</span></label><select id="curNatCountry"></select><div class="hint">※現在の国籍を選択してください</div></div>
+      <div class="form-group"><label>他国籍取得の経緯 <span class="required">必須</span></label>
+        <select id="curNatHow"><option value="">選択してください</option><option value="birth">出生による</option><option value="parents">両親を通じて</option><option value="naturalization">帰化</option><option value="other">その他</option></select>
+        <div class="hint">※他国籍を取得した経緯を選択してください</div>
+      </div>
+    </div>
+
+    <!-- 他国籍（過去） -->
+    <div class="form-group"><label>他国籍の有無（過去）<span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="pastNatYes" name="pastNat" value="yes"><label for="pastNatYes">はい</label><input type="radio" id="pastNatNo" name="pastNat" value="no" checked><label for="pastNatNo">いいえ</label></div>
+      <div class="note">※これまでに他の国の国民または市民だったことはありますか？</div>
+    </div>
+    <div class="collapsible" id="pastNatFields">
+      <div class="form-group"><label>他国籍（過去）<span class="required">必須</span></label><select id="pastNatCountry"></select><div class="hint">※過去の国籍を選択してください</div></div>
+      <div class="form-group"><label>他国籍（過去）の取得日 <span class="required">必須</span></label>
+        <div class="date-row"><select id="pastNatAcqDay"><option value="">Day</option></select><select id="pastNatAcqMonth"><option value="">Month</option></select><select id="pastNatAcqYear"><option value="">Year</option></select></div>
+        <div class="hint">国籍を得た日付を選択してください。</div>
+      </div>
+      <div class="form-group"><label>他国籍（過去）の放棄日 <span class="required">必須</span></label>
+        <div class="date-row"><select id="pastNatRelDay"><option value="">Day</option></select><select id="pastNatRelMonth"><option value="">Month</option></select><select id="pastNatRelYear"><option value="">Year</option></select></div>
+        <div class="hint">国籍を放棄した日付を選択してください。</div>
+      </div>
+    </div>
+
+    <!-- GE/NEXUS/SENTRI -->
+    <div class="form-group"><label>GE/NEXUS/SENTRIメンバーですか？ <span class="required">必須</span></label>
+      <div class="toggle-group"><input type="radio" id="geYes" name="geMember" value="yes"><label for="geYes">はい</label><input type="radio" id="geNo" name="geMember" value="no" checked><label for="geNo">いいえ</label></div>
+      <div class="note">※CBP Global Entry/NEXUS/SENTRIのメンバーですか？ご存知でない方は「いいえ」を選択してください。</div>
+    </div>
+    <div class="collapsible" id="geFields">
+      <div class="form-group"><label>PASS ID <span class="required">必須</span></label>
+        <input type="text" id="passId" placeholder="PASS IDは9桁の数字です">
+        <div class="error" id="errPassId">9桁の数字で入力してください</div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Alias toggle
-    const aliasYes = document.getElementById('aliasYes');
-    const aliasNo = document.getElementById('aliasNo');
-    const aliasFields = document.getElementById('aliasFields');
-    function toggleAlias() {
-      const show = aliasYes.checked;
-      aliasFields.classList.toggle('show', show);
-      document.getElementById('aliasSurname').required = show;
-      document.getElementById('aliasGivenName').required = show;
-    }
-    aliasYes.addEventListener('change', toggleAlias);
-    aliasNo.addEventListener('change', toggleAlias);
+  <!-- ボタン -->
+  <div class="btn-row">
+    <button type="button" class="btn-back" onclick="window.scrollTo({top:0,behavior:'smooth'})">TOPへ戻る</button>
+    <button type="submit" class="btn-next">選択項目の入力へ進む</button>
+  </div>
+  </form>
 
-    // Populate year (1900-2026, descending)
-    const yearSel = document.getElementById('dobYear');
-    for (let y = 2026; y >= 1900; y--) {
-      const o = document.createElement('option'); o.value = y; o.textContent = y;
-      yearSel.appendChild(o);
-    }
-    // Populate day (1-31)
-    const daySel = document.getElementById('dobDay');
-    for (let d = 1; d <= 31; d++) {
-      const o = document.createElement('option'); o.value = d; o.textContent = d;
-      daySel.appendChild(o);
-    }
+  <div class="footer">© 2026 Application Form</div>
+</div>
 
-    // Help modal
-    const helpModal = document.getElementById('helpModal');
-    document.getElementById('helpBtn').addEventListener('click', () => helpModal.classList.add('show'));
-    document.getElementById('modalClose').addEventListener('click', () => helpModal.classList.remove('show'));
-    helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('show'); });
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="helpApplicant"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpApplicant')">×</button><h3>申請者情報の入力方法</h3><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:16px"><div style="background:#fff;border-radius:8px;padding:16px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:10px">申請者情報</p><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">姓 / Surname <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) YAMADA</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">名 / Given name <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) TARO</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">別名の有無 <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:3px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden"><span style="flex:1;text-align:center;padding:5px;font-size:11px;background:#f8f9fa">別名があります</span><span style="flex:1;text-align:center;padding:5px;font-size:11px;background:#1a3a5c;color:#fff">別名はありません</span></div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">性別 <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:3px;border:1px solid #d0d5dd;border-radius:6px;overflow:hidden"><span style="flex:1;text-align:center;padding:5px;font-size:11px;background:#f8f9fa">男性</span><span style="flex:1;text-align:center;padding:5px;font-size:11px;background:#f8f9fa">女性</span></div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">生年月日 <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="display:flex;gap:4px;margin-top:3px"><div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:5px 8px;font-size:11px;color:#b0b8c1">年</div><div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:5px 8px;font-size:11px;color:#b0b8c1">月</div><div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:5px 8px;font-size:11px;color:#b0b8c1">日</div></div></div><div><span style="font-size:11px;font-weight:600">国籍 <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">選択してください</div></div></div></div></div><div class="modal-text"><p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p><p>姓/名を逆に入力する、スペルの間違いにご注意ください。別名・別称がある方は「別名があります」にチェックを入れて当該の名前を入力してください。</p><p>TSU、SHO、JO、CHOなどの入力はスペルの間違いにご注意ください。<br>（例）姓 : TUDA → TSUDA　名 : SYOTA → SHOTA</p><p>以下の国籍に該当する方は「個人識別番号」の入力欄が表示されます。任意のため空欄でも構いませんが、台湾市民は個人識別番号(パスポート記載の英語1文字と数字9桁)の入力が必要です。</p><p style="font-size:12px;color:#666;line-height:1.6">Belgium(BEL)、Brunei(BRN)、Chile(CHL)、Czech republic(CZE)、Estonia(EST)、Germany(DEU)、Greece(GRC)、Hungary(HUN)、Israel(ISR)、Luxembourg(LUX)、Malta(MLT)、Monaco(MCO)、Netherlands(NLD)、Portugal(PRT)、Singapore(SGP)、Slovakia(SVK)、Slovenia(SVN)、South Korea(KOR)、Spain(ESP)、Taiwan(TWN)、Croatia(HRV)</p><p>姓/名はパスポート記載と同様にアルファベット大文字で入力してください。</p></div></div></div>
 
-    // Form submit
-    document.getElementById('applicationForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const fd = new FormData(this);
-      const data = Object.fromEntries(fd.entries());
-      if (!aliasYes.checked) { delete data.aliasSurname; delete data.aliasGivenName; }
-      alert('送信完了 / Submitted!\n\n' + JSON.stringify(data, null, 2));
-    });
-  </script>
+<div class="modal-overlay" id="helpContact"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpContact')">×</button><h3>連絡先情報の入力方法</h3><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:16px"><div style="background:#fff;border-radius:8px;padding:16px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:10px">連絡先情報</p><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">メールアドレス <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) yamada_taro@example.co.jp</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">メールアドレス <span style="background:#2d5f8a;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">確認用</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) yamada_taro@example.co.jp</div></div><div><span style="font-size:11px;font-weight:600">電話番号 <span style="background:#e74c3c;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">必須</span></span><div style="display:flex;gap:6px;margin-top:3px"><div style="width:120px;border:1px solid #d0d5dd;border-radius:6px;padding:6px 8px;font-size:11px">🇯🇵 +81</div><div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;color:#b0b8c1;font-size:12px">(例) 09012345678</div></div></div></div></div></div><div class="modal-text"><p>メールアドレスの入力間違いにご注意ください。</p><p>申請完了後、「申請受付メール」と「渡航認証可否通知メール」を当サイトより送信します。フリーメールや携帯端末のメールアドレスをご利用の方は、迷惑メールフォルダ等への振り分けや受信できない場合がありますのでご注意ください。</p></div></div></div>
+
+<div class="modal-overlay" id="helpAddress"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpAddress')">×</button><h3>住所情報の入力方法</h3><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:16px"><div style="background:#fff;border-radius:8px;padding:16px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:10px">住所情報</p><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">郵便番号</span><div style="display:flex;gap:6px;margin-top:3px"><div style="flex:1;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;color:#b0b8c1;font-size:12px">(例) 1000000</div><div style="background:#2d5f8a;color:#fff;border-radius:6px;padding:6px 10px;font-size:11px;white-space:nowrap">🔍 郵便番号を検索</div></div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">国</span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;font-size:12px">JAPAN (JPN)</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">都道府県</span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) TOKYO</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">市区町村</span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) CHIYODA-KU MARUNOUCHI</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">丁番地</span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) 1-1-1</div></div><div style="margin-bottom:8px"><span style="font-size:11px;font-weight:600">建物名 <span style="background:#888;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">任意</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) ABC HOUSE</div></div><div><span style="font-size:11px;font-weight:600">部屋番号 <span style="background:#888;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">任意</span></span><div style="border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;margin-top:3px;color:#b0b8c1;font-size:12px">(例) 101</div></div></div></div></div><div class="modal-text"><p>住所は全てローマ字で入力します。戸籍の本籍地ではなく、現在居住中の住所を入力してください。日本国内の住所は、郵便番号を入力いただくと都道府県と市区町村が自動で反映されます。</p></div></div></div>
+
+<div class="modal-overlay" id="helpPassport"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpPassport')">×</button><h3>パスポート情報の入力方法</h3><div class="modal-text"><p><strong>パスポート情報</strong></p><p>パスポートの顔写真ページ全体を撮影した画像のアップロードと、パスポートの記載情報を入力してください。</p><p>顔写真ページ全体が映っていない、照明の反射で文字や画像が正しく識別できない場合は申請受付後に再提出が必要となります。日本発行のパスポート番号はアルファベット2文字と数字7桁の9桁です。入力の際は「発行年月日」と「有効期間満了日」の間違いにご注意ください。</p><hr style="margin:16px 0;border:none;border-top:1px solid #e0e0e0"><p><strong>他国のパスポート・国家身分証明書の有無</strong></p><p>申請者情報の国籍欄で選択した国以外からパスポートや国家身分証明書の発給を受けたことがある方は「はい」を選択し、発給国・種類・ID番号・有効期限を入力してください。ID番号または有効期限を忘れてしまった方、分からない方はどちらの項目も「UNKNOWN(不明)」を選択して構いません。</p><hr style="margin:16px 0;border:none;border-top:1px solid #e0e0e0"><p><strong>出生国・出生都市</strong></p><p>申請者情報の国籍欄で選択した国以外の国籍・市民権を保有する方は「はい」を選択し、国籍と取得の経緯(出生による/両親を通じて/帰化/その他)を選択してください。</p><p>過去に申請者情報の国籍欄で選択した国以外の国籍・市民権を保有していた方は「はい」を選択し、「過去に保有していた国籍」「過去に他国籍を取得した日」「他国籍を放棄した日」の選択が必須となります。「過去に他国籍を取得した日」と「他国籍を放棄した日」は、左から日/月/年の順に選択してください。</p><hr style="margin:16px 0;border:none;border-top:1px solid #e0e0e0"><p><strong>GE/NEXUS/SENTRIメンバー</strong></p><p>CBP Global Entry/NEXUS/SENTRIメンバーの方は「はい」を選択し、9桁のPASS IDを入力してください。</p></div></div></div>
+
+<div class="modal-overlay" id="helpPassportUpload"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpPassportUpload')">×</button><h3>パスポート画像のアップロード</h3><div class="modal-text"><p>パスポートの顔写真ページ画像をアップロードしてください。</p><p>アップロードできる画像の種類は、jpg、jpeg、png、gifに限られ、ファイルサイズの上限は10MBです。</p><p>パスポート下部にある機械読み取り部分（MRZコード）を含むページ全体が映っている必要があります。</p><p>顔写真ページ全体が映っていない、ぼやけている、照明の反射で文字や画像が正しく識別できない場合は、申請受付後に再提出をお願いすることがあります。画像内で下記の項目がすべて映っていることをご確認ください。画像が用意できましたら「画像を選択してください」をクリックし、アップロードをお願いします。</p></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜良い画像の例＞</p><p style="font-size:13px;color:#666">パスポートの顔写真ページ全体が明瞭に映っている、画像の中心に撮影されている</p><div style="width:200px;height:140px;background:#e8f0e8;border:2px solid #4caf50;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:8px 0;color:#4caf50;font-size:13px">✓ 良い例</div></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜悪い画像の例＞</p><div class="photo-example"><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">✗</div><p>ページ全体が写っていない</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">✗</div><p>ぼやけている</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">✗</div><p>フラッシュ、照明の反射で文字が見えない</p></div></div></div></div></div>
+
+<div class="modal-overlay" id="helpSelfieUpload"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpSelfieUpload')">×</button><h3>顔写真のアップロード</h3><div class="modal-text"><p>顔写真をアップロードしてください。</p><p>アップロードできる画像の種類は jpg、jpeg、png、gif で、ファイルサイズの上限は10MBです。</p><p>背景が無地で肩から頭部までが写っているカラー写真である必要があります。</p><p>肩から頭部までが写っていない、背景が無地でない、白黒写真、加工やフィルターを使用している場合は、申請受付後に再提出をお願いすることがあります。下記の＜悪い画像の例＞に当てはまっていないかご確認ください。写真が用意できましたら「写真を選択してください」をクリックし、アップロードをお願いします。</p></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜良い画像の例＞</p><p style="font-size:13px;color:#666;margin-bottom:8px">背景が無地で肩から頭部までが写っているカラー写真</p><div style="width:80px;height:100px;background:#e8f0e8;border:2px solid #4caf50;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#4caf50;font-size:24px;margin-bottom:16px">👤</div></div><div><p style="font-weight:700;margin-bottom:8px">＜悪い画像の例＞</p><div class="photo-example"><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">✗</div><p>肩から頭部までが写っていない</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">🌄</div><p>背景が無地ではない</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">⚙️</div><p>白黒写真、加工やフィルター使用</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">😷</div><p>帽子やサングラス、マスク等の装飾品</p></div><div class="ex-item"><div class="placeholder-img" style="background:#fde8e8;border-color:#e74c3c;color:#e74c3c">📋</div><p>パスポートの顔写真を切り取ったもの</p></div></div><p style="font-size:12px;color:#666;margin-top:12px">※帽子やサングラス、マスク、マフラーの装飾品は不可<br>※パスポートの顔写真は使用できません。使用した場合は申請が取り消されます。<br>※画像の種類は jpg、jpeg、png、gif で、ファイルサイズの上限は10MBです。</p></div></div></div>
+
+<script>
+// ===== DATA =====
+const ESTA_NATIONS=[{v:'JPN',t:'JAPAN (JPN)'},{v:'AND',t:'ANDORRA (AND)'},{v:'AUS',t:'AUSTRALIA (AUS)'},{v:'AUT',t:'AUSTRIA (AUT)'},{v:'BEL',t:'BELGIUM (BEL)'},{v:'BRN',t:'BRUNEI (BRN)'},{v:'CHL',t:'CHILE (CHL)'},{v:'HRV',t:'CROATIA (HRV)'},{v:'CZE',t:'CZECH REPUBLIC (CZE)'},{v:'DNK',t:'DENMARK (DNK)'},{v:'EST',t:'ESTONIA (EST)'},{v:'FIN',t:'FINLAND (FIN)'},{v:'FRA',t:'FRANCE (FRA)'},{v:'DEU',t:'GERMANY (DEU)'},{v:'GRC',t:'GREECE (GRC)'},{v:'HUN',t:'HUNGARY (HUN)'},{v:'ISL',t:'ICELAND (ISL)'},{v:'IRL',t:'IRELAND (IRL)'},{v:'ISR',t:'ISRAEL (ISR)'},{v:'ITA',t:'ITALY (ITA)'},{v:'LVA',t:'LATVIA (LVA)'},{v:'LIE',t:'LIECHTENSTEIN (LIE)'},{v:'LTU',t:'LITHUANIA (LTU)'},{v:'LUX',t:'LUXEMBOURG (LUX)'},{v:'MLT',t:'MALTA (MLT)'},{v:'MCO',t:'MONACO (MCO)'},{v:'NLD',t:'NETHERLANDS (NLD)'},{v:'NZL',t:'NEW ZEALAND (NZL)'},{v:'NOR',t:'NORWAY (NOR)'},{v:'POL',t:'POLAND (POL)'},{v:'PRT',t:'PORTUGAL (PRT)'},{v:'QAT',t:'QATAR (QAT)'},{v:'SMR',t:'SAN MARINO (SMR)'}];
+
+const WORLD_COUNTRIES="AFGHANISTAN (AFG),ALAND ISLANDS (ALA),ALBANIA (ALB),ALGERIA (DZA),AMERICAN SAMOA (ASM),ANDORRA (AND),ANGOLA (AGO),ANGUILLA (AIA),ANTARCTICA (ATA),ANTIGUA AND BARBUDA (ATG),ARGENTINA (ARG),ARMENIA (ARM),ARUBA (ABW),AUSTRALIA (AUS),AUSTRIA (AUT),AZERBAIJAN (AZE),BAHAMAS (BHS),BAHRAIN (BHR),BANGLADESH (BGD),BARBADOS (BRB),BELARUS (BLR),BELGIUM (BEL),BELIZE (BLZ),BENIN (BEN),BERMUDA (BMU),BHUTAN (BTN),BOLIVIA (BOL),BONAIRE SINT EUSTATIUS AND SABA (BES),BOSNIA AND HERZEGOVINA (BIH),BOTSWANA (BWA),BOUVET ISLAND (BVT),BRAZIL (BRA),BRITISH INDIAN OCEAN TERRITORY (IOT),BRUNEI (BRN),BULGARIA (BGR),BURKINA FASO (BFA),BURMA (BUR),BURUNDI (BDI),CAMBODIA (KHM),CAMEROON (CMR),CANADA (CAN),CAPE VERDE (CPV),CAYMAN ISLANDS (CYM),CENTRAL AFRICAN REPUBLIC (CAF),CHAD (TCD),CHILE (CHL),CHINA (CHN),CHRISTMAS ISLAND (CXR),COCOS KEELING ISLANDS (CCK),COLOMBIA (COL),COMOROS (COM),CONGO DEMOCRATIC REPUBLIC OF (COD),CONGO REPUBLIC OF (COG),COOK ISLANDS (COK),COSTA RICA (CRI),COTE D'IVOIRE (CIV),CROATIA (HRV),CUBA (CUB),CURACAO (CUW),CYPRUS (CYP),CZECH REPUBLIC (CZE),DENMARK (DNK),DJIBOUTI (DJI),DOMINICA (DMA),DOMINICAN REPUBLIC (DOM),EAST TIMOR (TMP),ECUADOR (ECU),EGYPT (EGY),EL SALVADOR (SLV),EQUATORIAL GUINEA (GNQ),ERITREA (ERI),ESTONIA (EST),ETHIOPIA (ETH),FALKLAND ISLANDS (FLK),FAROE ISLANDS (FRO),FIJI (FJI),FINLAND (FIN),FRANCE (FRA),FRENCH GUIANA (GUF),FRENCH POLYNESIA (PYF),GABON (GAB),GAMBIA (GMB),GEORGIA (GEO),GERMANY (DEU),GHANA (GHA),GIBRALTAR (GIB),GREECE (GRC),GREENLAND (GRL),GRENADA (GRD),GUADELOUPE (GLP),GUAM (GUM),GUATEMALA (GTM),GUERNSEY (GGY),GUINEA (GIN),GUINEA-BISSAU (GNB),GUYANA (GUY),HAITI (HTI),HONDURAS (HND),HONG KONG (HKG),HUNGARY (HUN),ICELAND (ISL),INDIA (IND),INDONESIA (IDN),IRAN (IRN),IRAQ (IRQ),IRELAND (IRL),ISLE OF MAN (IMN),ISRAEL (ISR),ITALY (ITA),JAMAICA (JAM),JAPAN (JPN),JERSEY (JEY),JORDAN (JOR),KAZAKHSTAN (KAZ),KENYA (KEN),KIRIBATI (KIR),KOSOVO (KVV),KUWAIT (KWT),KYRGYZSTAN (KGZ),LAOS (LAO),LATVIA (LVA),LEBANON (LBN),LESOTHO (LSO),LIBERIA (LBR),LIBYA (LBY),LIECHTENSTEIN (LIE),LITHUANIA (LTU),LUXEMBOURG (LUX),MACAU (MAC),MACEDONIA (MKD),MADAGASCAR (MDG),MALAWI (MWI),MALAYSIA (MYS),MALDIVES (MDV),MALI (MLI),MALTA (MLT),MARSHALL ISLANDS (MHL),MARTINIQUE (MTQ),MAURITANIA (MRT),MAURITIUS (MUS),MAYOTTE (MYT),MEXICO (MEX),MICRONESIA (FSM),MOLDOVA (MDA),MONACO (MCO),MONGOLIA (MNG),MONTENEGRO (MNE),MONTSERRAT (MSR),MOROCCO (MAR),MOZAMBIQUE (MOZ),MYANMAR (MMR),NAMIBIA (NAM),NAURU (NRU),NEPAL (NPL),NETHERLANDS (NLD),NEW CALEDONIA (NCL),NEW ZEALAND (NZL),NICARAGUA (NIC),NIGER (NER),NIGERIA (NGA),NIUE (NIU),NORFOLK ISLAND (NFK),NORTH KOREA (PRK),NORTHERN MARIANA ISLANDS (MNP),NORWAY (NOR),OMAN (OMN),PAKISTAN (PAK),PALAU (PLW),PALESTINIAN TERRITORIES (PSE),PANAMA (PAN),PAPUA NEW GUINEA (PNG),PARAGUAY (PRY),PERU (PER),PHILIPPINES (PHL),PITCAIRN ISLANDS (PCN),POLAND (POL),PORTUGAL (PRT),PUERTO RICO (PRI),QATAR (QAT),REUNION (REU),ROMANIA (ROM),RUSSIA (RUS),RWANDA (RWA),SAINT BARTHELEMY (BLM),SAINT KITTS AND NEVIS (KNA),SAINT LUCIA (LCA),SAINT MARTIN (MAF),SAINT VINCENT AND THE GRENADINES (VCT),SAMOA (WSM),SAN MARINO (SMR),SAO TOME AND PRINCIPE (STP),SAUDI ARABIA (SAU),SENEGAL (SEN),SERBIA (SRB),SEYCHELLES (SYC),SIERRA LEONE (SLE),SINGAPORE (SGP),SINT MAARTEN (SXM),SLOVAKIA (SVK),SLOVENIA (SVN),SOLOMON ISLANDS (SLB),SOMALIA (SOM),SOUTH AFRICA (ZAF),SOUTH KOREA (KOR),SOUTH SUDAN (SSD),SPAIN (ESP),SRI LANKA (LKA),ST. HELENA (SHN),SUDAN (SDN),SURINAME (SUR),SWAZILAND (SWZ),SWEDEN (SWE),SWITZERLAND (CHE),SYRIA (SYR),TAIWAN (TWN),TAJIKISTAN (TJK),TANZANIA (TZA),THAILAND (THA),TIMOR-LESTE (TLS),TOGO (TGO),TOKELAU (TKL),TONGA (TON),TRINIDAD AND TOBAGO (TTO),TUNISIA (TUN),TURKEY (TUR),TURKMENISTAN (TKM),TURKS AND CAICOS ISLANDS (TCA),TUVALU (TUV),UGANDA (UGA),UKRAINE (UKR),UNITED ARAB EMIRATES (ARE),UNITED KINGDOM (GBR),UNITED STATES (USA),URUGUAY (URY),UZBEKISTAN (UZB),VANUATU (VUT),VATICAN CITY STATE (VAT),VENEZUELA (VEN),VIETNAM (VNM),VIRGIN ISLANDS BRITISH (VGB),VIRGIN ISLANDS US (VIR),WESTERN SAHARA (ESH),YEMEN (YEM),ZAMBIA (ZMB),ZIMBABWE (ZWE)".split(',');
+
+const PHONE_CODES=[{c:'JPN',f:'🇯🇵',n:'JAPAN',p:'+81'},{c:'AFG',f:'🇦🇫',n:'AFGHANISTAN',p:'+93'},{c:'ALB',f:'🇦🇱',n:'ALBANIA',p:'+355'},{c:'DZA',f:'🇩🇿',n:'ALGERIA',p:'+213'},{c:'AND',f:'🇦🇩',n:'ANDORRA',p:'+376'},{c:'AGO',f:'🇦🇴',n:'ANGOLA',p:'+244'},{c:'ARG',f:'🇦🇷',n:'ARGENTINA',p:'+54'},{c:'ARM',f:'🇦🇲',n:'ARMENIA',p:'+374'},{c:'AUS',f:'🇦🇺',n:'AUSTRALIA',p:'+61'},{c:'AUT',f:'🇦🇹',n:'AUSTRIA',p:'+43'},{c:'AZE',f:'🇦🇿',n:'AZERBAIJAN',p:'+994'},{c:'BHS',f:'🇧🇸',n:'BAHAMAS',p:'+1'},{c:'BHR',f:'🇧🇭',n:'BAHRAIN',p:'+973'},{c:'BGD',f:'🇧🇩',n:'BANGLADESH',p:'+880'},{c:'BRB',f:'🇧🇧',n:'BARBADOS',p:'+1'},{c:'BLR',f:'🇧🇾',n:'BELARUS',p:'+375'},{c:'BEL',f:'🇧🇪',n:'BELGIUM',p:'+32'},{c:'BLZ',f:'🇧🇿',n:'BELIZE',p:'+501'},{c:'BEN',f:'🇧🇯',n:'BENIN',p:'+229'},{c:'BTN',f:'🇧🇹',n:'BHUTAN',p:'+975'},{c:'BOL',f:'🇧🇴',n:'BOLIVIA',p:'+591'},{c:'BIH',f:'🇧🇦',n:'BOSNIA AND HERZEGOVINA',p:'+387'},{c:'BWA',f:'🇧🇼',n:'BOTSWANA',p:'+267'},{c:'BRA',f:'🇧🇷',n:'BRAZIL',p:'+55'},{c:'BRN',f:'🇧🇳',n:'BRUNEI',p:'+673'},{c:'BGR',f:'🇧🇬',n:'BULGARIA',p:'+359'},{c:'KHM',f:'🇰🇭',n:'CAMBODIA',p:'+855'},{c:'CMR',f:'🇨🇲',n:'CAMEROON',p:'+237'},{c:'CAN',f:'🇨🇦',n:'CANADA',p:'+1'},{c:'CHL',f:'🇨🇱',n:'CHILE',p:'+56'},{c:'CHN',f:'🇨🇳',n:'CHINA',p:'+86'},{c:'COL',f:'🇨🇴',n:'COLOMBIA',p:'+57'},{c:'CRI',f:'🇨🇷',n:'COSTA RICA',p:'+506'},{c:'HRV',f:'🇭🇷',n:'CROATIA',p:'+385'},{c:'CUB',f:'🇨🇺',n:'CUBA',p:'+53'},{c:'CYP',f:'🇨🇾',n:'CYPRUS',p:'+357'},{c:'CZE',f:'🇨🇿',n:'CZECH REPUBLIC',p:'+420'},{c:'DNK',f:'🇩🇰',n:'DENMARK',p:'+45'},{c:'DOM',f:'🇩🇴',n:'DOMINICAN REPUBLIC',p:'+1'},{c:'ECU',f:'🇪🇨',n:'ECUADOR',p:'+593'},{c:'EGY',f:'🇪🇬',n:'EGYPT',p:'+20'},{c:'SLV',f:'🇸🇻',n:'EL SALVADOR',p:'+503'},{c:'EST',f:'🇪🇪',n:'ESTONIA',p:'+372'},{c:'ETH',f:'🇪🇹',n:'ETHIOPIA',p:'+251'},{c:'FIN',f:'🇫🇮',n:'FINLAND',p:'+358'},{c:'FRA',f:'🇫🇷',n:'FRANCE',p:'+33'},{c:'DEU',f:'🇩🇪',n:'GERMANY',p:'+49'},{c:'GHA',f:'🇬🇭',n:'GHANA',p:'+233'},{c:'GRC',f:'🇬🇷',n:'GREECE',p:'+30'},{c:'GTM',f:'🇬🇹',n:'GUATEMALA',p:'+502'},{c:'HTI',f:'🇭🇹',n:'HAITI',p:'+509'},{c:'HND',f:'🇭🇳',n:'HONDURAS',p:'+504'},{c:'HKG',f:'🇭🇰',n:'HONG KONG',p:'+852'},{c:'HUN',f:'🇭🇺',n:'HUNGARY',p:'+36'},{c:'ISL',f:'🇮🇸',n:'ICELAND',p:'+354'},{c:'IND',f:'🇮🇳',n:'INDIA',p:'+91'},{c:'IDN',f:'🇮🇩',n:'INDONESIA',p:'+62'},{c:'IRN',f:'🇮🇷',n:'IRAN',p:'+98'},{c:'IRQ',f:'🇮🇶',n:'IRAQ',p:'+964'},{c:'IRL',f:'🇮🇪',n:'IRELAND',p:'+353'},{c:'ISR',f:'🇮🇱',n:'ISRAEL',p:'+972'},{c:'ITA',f:'🇮🇹',n:'ITALY',p:'+39'},{c:'JAM',f:'🇯🇲',n:'JAMAICA',p:'+1'},{c:'JOR',f:'🇯🇴',n:'JORDAN',p:'+962'},{c:'KAZ',f:'🇰🇿',n:'KAZAKHSTAN',p:'+7'},{c:'KEN',f:'🇰🇪',n:'KENYA',p:'+254'},{c:'KWT',f:'🇰🇼',n:'KUWAIT',p:'+965'},{c:'KGZ',f:'🇰🇬',n:'KYRGYZSTAN',p:'+996'},{c:'LAO',f:'🇱🇦',n:'LAOS',p:'+856'},{c:'LVA',f:'🇱🇻',n:'LATVIA',p:'+371'},{c:'LBN',f:'🇱🇧',n:'LEBANON',p:'+961'},{c:'LBY',f:'🇱🇾',n:'LIBYA',p:'+218'},{c:'LIE',f:'🇱🇮',n:'LIECHTENSTEIN',p:'+423'},{c:'LTU',f:'🇱🇹',n:'LITHUANIA',p:'+370'},{c:'LUX',f:'🇱🇺',n:'LUXEMBOURG',p:'+352'},{c:'MYS',f:'🇲🇾',n:'MALAYSIA',p:'+60'},{c:'MDV',f:'🇲🇻',n:'MALDIVES',p:'+960'},{c:'MLT',f:'🇲🇹',n:'MALTA',p:'+356'},{c:'MEX',f:'🇲🇽',n:'MEXICO',p:'+52'},{c:'MDA',f:'🇲🇩',n:'MOLDOVA',p:'+373'},{c:'MCO',f:'🇲🇨',n:'MONACO',p:'+377'},{c:'MNG',f:'🇲🇳',n:'MONGOLIA',p:'+976'},{c:'MNE',f:'🇲🇪',n:'MONTENEGRO',p:'+382'},{c:'MAR',f:'🇲🇦',n:'MOROCCO',p:'+212'},{c:'MOZ',f:'🇲🇿',n:'MOZAMBIQUE',p:'+258'},{c:'MMR',f:'🇲🇲',n:'MYANMAR',p:'+95'},{c:'NPL',f:'🇳🇵',n:'NEPAL',p:'+977'},{c:'NLD',f:'🇳🇱',n:'NETHERLANDS',p:'+31'},{c:'NZL',f:'🇳🇿',n:'NEW ZEALAND',p:'+64'},{c:'NIC',f:'🇳🇮',n:'NICARAGUA',p:'+505'},{c:'NGA',f:'🇳🇬',n:'NIGERIA',p:'+234'},{c:'PRK',f:'🇰🇵',n:'NORTH KOREA',p:'+850'},{c:'NOR',f:'🇳🇴',n:'NORWAY',p:'+47'},{c:'OMN',f:'🇴🇲',n:'OMAN',p:'+968'},{c:'PAK',f:'🇵🇰',n:'PAKISTAN',p:'+92'},{c:'PAN',f:'🇵🇦',n:'PANAMA',p:'+507'},{c:'PRY',f:'🇵🇾',n:'PARAGUAY',p:'+595'},{c:'PER',f:'🇵🇪',n:'PERU',p:'+51'},{c:'PHL',f:'🇵🇭',n:'PHILIPPINES',p:'+63'},{c:'POL',f:'🇵🇱',n:'POLAND',p:'+48'},{c:'PRT',f:'🇵🇹',n:'PORTUGAL',p:'+351'},{c:'QAT',f:'🇶🇦',n:'QATAR',p:'+974'},{c:'ROM',f:'🇷🇴',n:'ROMANIA',p:'+40'},{c:'RUS',f:'🇷🇺',n:'RUSSIA',p:'+7'},{c:'SAU',f:'🇸🇦',n:'SAUDI ARABIA',p:'+966'},{c:'SRB',f:'🇷🇸',n:'SERBIA',p:'+381'},{c:'SGP',f:'🇸🇬',n:'SINGAPORE',p:'+65'},{c:'SVK',f:'🇸🇰',n:'SLOVAKIA',p:'+421'},{c:'SVN',f:'🇸🇮',n:'SLOVENIA',p:'+386'},{c:'ZAF',f:'🇿🇦',n:'SOUTH AFRICA',p:'+27'},{c:'KOR',f:'🇰🇷',n:'SOUTH KOREA',p:'+82'},{c:'ESP',f:'🇪🇸',n:'SPAIN',p:'+34'},{c:'LKA',f:'🇱🇰',n:'SRI LANKA',p:'+94'},{c:'SWE',f:'🇸🇪',n:'SWEDEN',p:'+46'},{c:'CHE',f:'🇨🇭',n:'SWITZERLAND',p:'+41'},{c:'TWN',f:'🇹🇼',n:'TAIWAN',p:'+886'},{c:'THA',f:'🇹🇭',n:'THAILAND',p:'+66'},{c:'TUR',f:'🇹🇷',n:'TURKEY',p:'+90'},{c:'UKR',f:'🇺🇦',n:'UKRAINE',p:'+380'},{c:'ARE',f:'🇦🇪',n:'UAE',p:'+971'},{c:'GBR',f:'🇬🇧',n:'UNITED KINGDOM',p:'+44'},{c:'USA',f:'🇺🇸',n:'UNITED STATES',p:'+1'},{c:'URY',f:'🇺🇾',n:'URUGUAY',p:'+598'},{c:'UZB',f:'🇺🇿',n:'UZBEKISTAN',p:'+998'},{c:'VEN',f:'🇻🇪',n:'VENEZUELA',p:'+58'},{c:'VNM',f:'🇻🇳',n:'VIETNAM',p:'+84'},{c:'ZMB',f:'🇿🇲',n:'ZAMBIA',p:'+260'},{c:'ZWE',f:'🇿🇼',n:'ZIMBABWE',p:'+263'}];
+
+const MONTHS=['1 (Jan)','2 (Feb)','3 (Mar)','4 (Apr)','5 (May)','6 (Jun)','7 (Jul)','8 (Aug)','9 (Sep)','10 (Oct)','11 (Nov)','12 (Dec)'];
+
+// ===== HELPERS =====
+function fillSelect(sel,items,defaultVal,placeholder){
+  sel.innerHTML='';
+  if(placeholder)sel.appendChild(new Option(placeholder,''));
+  items.forEach(i=>{const o=new Option(typeof i==='string'?i:i.t,typeof i==='string'?i:i.v);sel.appendChild(o)});
+  if(defaultVal)sel.value=defaultVal;
+}
+function fillWorldCountry(sel,defaultVal){
+  sel.innerHTML='<option value="">選択してください</option>';
+  const jp=new Option('JAPAN (JPN)','JPN');sel.appendChild(jp);
+  WORLD_COUNTRIES.filter(c=>!c.includes('JAPAN')).forEach(c=>{sel.appendChild(new Option(c,c))});
+  if(defaultVal)sel.value=defaultVal;
+}
+function fillYears(sel,from,to){for(let y=to;y>=from;y--)sel.appendChild(new Option(y,y))}
+function fillDays(sel){for(let d=1;d<=31;d++)sel.appendChild(new Option(d,d))}
+function fillMonths(sel){MONTHS.forEach((m,i)=>sel.appendChild(new Option(m,i+1)))}
+
+// ===== INIT =====
+// DOB
+fillYears(document.getElementById('dobYear'),1900,2026);
+fillMonths(document.getElementById('dobMonth'));
+fillDays(document.getElementById('dobDay'));
+
+// Nationality (ESTA only)
+const natSel=document.getElementById('nationality');
+natSel.innerHTML='<option value="">選択してください</option>';
+ESTA_NATIONS.forEach(n=>natSel.appendChild(new Option(n.t,n.v)));
+natSel.value='JPN';
+
+// Phone country
+const phoneSel=document.getElementById('phoneCountry');
+PHONE_CODES.forEach(p=>phoneSel.appendChild(new Option(p.f+' '+p.n+' ('+p.p+')',p.p)));
+
+// Address country
+fillWorldCountry(document.getElementById('addrCountry'),'JPN');
+
+// Passport dates
+['passIssuDay','passExpDay'].forEach(id=>fillDays(document.getElementById(id)));
+['passIssuMonth','passExpMonth'].forEach(id=>fillMonths(document.getElementById(id)));
+fillYears(document.getElementById('passIssuYear'),2016,2026);
+fillYears(document.getElementById('passExpYear'),2026,2036);
+
+// Issuing country, birth country, nationality selects
+['issuingCountry','birthCountry','curNatCountry','pastNatCountry'].forEach(id=>fillWorldCountry(document.getElementById(id),id==='birthCountry'?'JPN':null));
+
+// Other doc expiry
+const expSel=document.getElementById('otherDocExpiry');
+expSel.innerHTML='<option value="">Year</option><option value="UNKNOWN">UNKNOWN</option>';
+for(let y=2036;y>=1900;y--)expSel.appendChild(new Option(y,y));
+
+// Past nationality dates
+['pastNatAcqDay','pastNatRelDay'].forEach(id=>fillDays(document.getElementById(id)));
+['pastNatAcqMonth','pastNatRelMonth'].forEach(id=>fillMonths(document.getElementById(id)));
+['pastNatAcqYear','pastNatRelYear'].forEach(id=>fillYears(document.getElementById(id),1900,2026));
+
+// ===== TOGGLES =====
+function setupToggle(yesId,noId,fieldsId){
+  const y=document.getElementById(yesId),n=document.getElementById(noId),f=document.getElementById(fieldsId);
+  [y,n].forEach(el=>el.addEventListener('change',()=>f.classList.toggle('show',y.checked)));
+}
+setupToggle('aliasYes','aliasNo','aliasFields');
+setupToggle('otherPassYes','otherPassNo','otherPassFields');
+setupToggle('curNatYes','curNatNo','curNatFields');
+setupToggle('pastNatYes','pastNatNo','pastNatFields');
+setupToggle('geYes','geNo','geFields');
+
+// ===== INPUT VALIDATION =====
+// Alpha only (name fields)
+function alphaOnly(input){
+  input.addEventListener('input',function(){
+    this.value=this.value.replace(/[^a-zA-Z\s]/g,'').toUpperCase();
+  });
+  input.addEventListener('blur',function(){
+    const err=document.getElementById('err'+this.id.charAt(0).toUpperCase()+this.id.slice(1));
+    if(err)err.classList.toggle('show',this.required&&!this.value.trim());
+  });
+}
+['surname','givenName','aliasSurname','aliasGivenName','prefecture','birthCity'].forEach(id=>alphaOnly(document.getElementById(id)));
+
+// Alphanumeric fields (municipality, street, building, unit)
+['municipality','street','building','unit'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',function(){this.value=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase()});
+});
+
+// Phone - digits only
+document.getElementById('phoneNumber').addEventListener('input',function(){
+  this.value=this.value.replace(/[^0-9]/g,'');
+  document.getElementById('errPhone').classList.toggle('show',false);
+});
+document.getElementById('phoneNumber').addEventListener('blur',function(){
+  if(this.value&&/[^0-9]/.test(this.value))document.getElementById('errPhone').classList.add('show');
+});
+
+// Postal code - digits only
+document.getElementById('postalCode').addEventListener('input',function(){
+  this.value=this.value.replace(/[^0-9]/g,'');
+  document.getElementById('errPostal').classList.remove('show');
+});
+
+// Email validation
+['email1','email2'].forEach((id,i)=>{
+  document.getElementById(id).addEventListener('input',function(){
+    this.value=this.value.replace(/[^\x20-\x7E]/g,'').toLowerCase();
+  });
+  document.getElementById(id).addEventListener('blur',function(){
+    const errId=i===0?'errEmail1':'errEmail2';
+    const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+    document.getElementById(errId).classList.toggle('show',this.value&&!valid);
+    if(i===1){
+      const match=document.getElementById('email1').value===this.value;
+      document.getElementById('errEmailMatch').classList.toggle('show',this.value&&document.getElementById('email1').value&&!match);
+    }
+  });
+});
+
+// Passport number - auto uppercase, alphanumeric
+document.getElementById('passportNum').addEventListener('input',function(){
+  const cleaned=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase();
+  this.value=cleaned;
+  document.getElementById('errPassportNum').classList.toggle('show',/[^\w]/.test(cleaned)||/[\u3000-\u9FFF]/.test(this.value));
+});
+
+// Other doc ID - auto uppercase
+document.getElementById('otherDocId').addEventListener('input',function(){
+  this.value=this.value.replace(/[^\x20-\x7E]/g,'').toUpperCase();
+});
+
+// PASS ID - 9 digits only
+document.getElementById('passId').addEventListener('input',function(){
+  this.value=this.value.replace(/[^0-9]/g,'');
+  document.getElementById('errPassId').classList.toggle('show',this.value.length>0&&this.value.length!==9);
+});
+
+// File uploads
+document.getElementById('passportFile').addEventListener('change',function(){
+  document.getElementById('passportFileName').textContent=this.files[0]?'✓ '+this.files[0].name:'';
+});
+document.getElementById('selfieFile').addEventListener('change',function(){
+  document.getElementById('selfieFileName').textContent=this.files[0]?'✓ '+this.files[0].name:'';
+});
+
+// DOB future date check
+function checkDobFuture(){
+  const y=+document.getElementById('dobYear').value,m=+document.getElementById('dobMonth').value,d=+document.getElementById('dobDay').value;
+  if(y&&m&&d){
+    const dob=new Date(y,m-1,d),now=new Date();
+    const err=document.getElementById('topError');
+    if(dob>now){err.textContent='生年月日が未来の日付です。正しい日付を入力してください。';err.classList.add('show')}
+    else err.classList.remove('show');
+  }
+}
+['dobYear','dobMonth','dobDay'].forEach(id=>document.getElementById(id).addEventListener('change',checkDobFuture));
+
+// ===== MODALS =====
+function showModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')})});
+
+// ===== FORM SUBMIT =====
+document.getElementById('appForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  alert('送信完了 / Submitted!');
+});
+</script>
 </body>
 </html>
