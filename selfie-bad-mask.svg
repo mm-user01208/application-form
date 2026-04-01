@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" width="150" height="200">
+  <rect width="150" height="200" fill="#ffffff" rx="4"/>
+  <!-- Person -->
+  <ellipse cx="75" cy="210" rx="58" ry="45" fill="#2c2c2c"/>
+  <path d="M55 170 L75 180 L95 170 L95 175 L75 185 L55 175 Z" fill="#f0f0f0"/>
+  <rect x="63" y="140" width="24" height="32" rx="8" fill="#1a1a1a"/>
+  <ellipse cx="75" cy="110" rx="32" ry="38" fill="#1a1a1a"/>
+  <ellipse cx="75" cy="78" rx="34" ry="16" fill="#111"/>
+  <ellipse cx="75" cy="85" rx="35" ry="12" fill="#1a1a1a"/>
+  <ellipse cx="42" cy="112" rx="6" ry="10" fill="#1a1a1a"/>
+  <ellipse cx="108" cy="112" rx="6" ry="10" fill="#1a1a1a"/>
+  <ellipse cx="62" cy="106" rx="7" ry="3" fill="#222"/>
+  <ellipse cx="88" cy="106" rx="7" ry="3" fill="#222"/>
+
+  <!-- Sunglasses -->
+  <rect x="50" y="99" width="22" height="14" rx="3" fill="#111" stroke="#333" stroke-width="1.5"/>
+  <rect x="78" y="99" width="22" height="14" rx="3" fill="#111" stroke="#333" stroke-width="1.5"/>
+  <line x1="72" y1="105" x2="78" y2="105" stroke="#333" stroke-width="1.5"/>
+  <line x1="50" y1="105" x2="42" y2="103" stroke="#333" stroke-width="1.5"/>
+  <line x1="100" y1="105" x2="108" y2="103" stroke="#333" stroke-width="1.5"/>
+  <!-- Lens reflection -->
+  <rect x="54" y="101" width="6" height="3" rx="1" fill="#333" opacity="0.5" transform="rotate(-15,57,102)"/>
+  <rect x="82" y="101" width="6" height="3" rx="1" fill="#333" opacity="0.5" transform="rotate(-15,85,102)"/>
+
+  <!-- Mask -->
+  <path d="M50 120 Q50 115 55 115 L95 115 Q100 115 100 120 L100 138 Q100 145 90 148 Q80 150 75 150 Q70 150 60 148 Q50 145 50 138 Z" fill="#e0e0e0" stroke="#ccc" stroke-width="1"/>
+  <!-- Mask pleats -->
+  <line x1="52" y1="125" x2="98" y2="125" stroke="#d0d0d0" stroke-width="0.8"/>
+  <line x1="52" y1="130" x2="98" y2="130" stroke="#d0d0d0" stroke-width="0.8"/>
+  <line x1="52" y1="135" x2="98" y2="135" stroke="#d0d0d0" stroke-width="0.8"/>
+  <!-- Mask ear loops -->
+  <path d="M50 118 Q38 120 40 130 Q42 140 50 140" fill="none" stroke="#ccc" stroke-width="1.2"/>
+  <path d="M100 118 Q112 120 110 130 Q108 140 100 140" fill="none" stroke="#ccc" stroke-width="1.2"/>
+
+  <rect x="2" y="2" width="146" height="196" rx="3" fill="none" stroke="#e74c3c" stroke-width="3"/>
+  <circle cx="130" cy="18" r="12" fill="#e74c3c"/>
+  <text x="130" y="23" text-anchor="middle" font-family="sans-serif" font-size="14" fill="white" font-weight="bold">✗</text>
+</svg>
