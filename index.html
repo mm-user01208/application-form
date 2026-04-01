@@ -421,15 +421,15 @@ function initCustomSelect(wrapId,hiddenId,btnId,items,defaultVal,onSelect){
     container.innerHTML='';
     items.filter(i=>!filter||i.label.toLowerCase().includes(filter.toLowerCase())).forEach(i=>{
       const d=document.createElement('div');d.className='cs-item';
-      d.innerHTML=flagImg(i.code)+' '+i.label;
-      d.onclick=()=>{hidden.value=i.value;btn.innerHTML=flagImg(i.code)+' '+i.label;list.classList.remove('open');search.value='';if(onSelect)onSelect(i.value)};
+      d.textContent=i.label;
+      d.onclick=()=>{hidden.value=i.value;btn.textContent=i.label;list.classList.remove('open');search.value='';if(onSelect)onSelect(i.value)};
       container.appendChild(d);
     });
   }
   render();
   if(defaultVal){
     const def=items.find(i=>i.value===defaultVal);
-    if(def){hidden.value=def.value;btn.innerHTML=flagImg(def.code)+' '+def.label}
+    if(def){hidden.value=def.value;btn.textContent=def.label}
   }
   btn.onclick=e=>{e.stopPropagation();list.classList.toggle('open');if(list.classList.contains('open')){search.focus();render()}};
   search.addEventListener('input',()=>render(search.value));
