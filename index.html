@@ -101,10 +101,11 @@
 <div class="container">
   <div class="steps">
     <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">②</span> 選択項目の入力</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">③</span> 入力内容の確認</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">④</span> 申請料お支払い</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">⑤</span> 申請完了</div>
+    <div class="step-item"><span class="step-num">②</span> 渡航・滞在先情報</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">③</span> 個人情報の入力</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">④</span> 入力内容の確認</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">⑤</span> 申請料お支払い</div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">⑥</span> 申請完了</div>
   </div>
   <div class="notice-box">
     <p><strong>注意事項：</strong>すべての項目は<span style="color:#e74c3c;font-weight:700">英語(ローマ字)</span>で入力してください。</p>
@@ -352,11 +353,12 @@
   <!-- Step1 ボタン -->
   <div class="btn-row" id="step1Btns">
     <button type="button" class="btn-back" onclick="window.scrollTo({top:0,behavior:'smooth'})">TOPへ戻る</button>
-    <button type="button" class="btn-next" onclick="goToStep2()">選択項目の入力へ進む</button>
+    <button type="button" class="btn-next" onclick="goToStep2()">渡航・滞在先情報へ進む</button>
   </div>
   </form>
 
   <!-- ========== STEP 2: 選択項目の入力 ========== -->
+  <!-- ========== STEP 2: 渡航・滞在先情報 ========== -->
   <div id="step2Content" style="display:none">
 
   <!-- 渡航目的 -->
@@ -364,6 +366,16 @@
     <div class="section-header"><span class="section-title">渡航情報</span></div>
     <div class="form-group"><label>米国への渡航目的は、他国へ乗り継ぐためですか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no"><label for="transitNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="transitDetailFields">
+      <div class="form-group"><label>米国到着予定日 <span class="en">/ Arrival Date</span><span class="optional">任意</span></label>
+        <input type="date" id="arrivalDate" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px"></div>
+      <div class="form-group"><label>航空会社名 <span class="en">/ Airline</span><span class="optional">任意</span></label>
+        <input type="text" id="airline" placeholder="(例) JAPAN AIRLINES"></div>
+      <div class="form-group"><label>便名 <span class="en">/ Flight Number</span><span class="optional">任意</span></label>
+        <input type="text" id="flightNo" placeholder="(例) JL001"></div>
+      <div class="form-group"><label>米国内の滞在先都市 <span class="en">/ City</span><span class="optional">任意</span></label>
+        <input type="text" id="arrivalCity" placeholder="(例) NEW YORK"></div>
     </div>
   </div>
 
@@ -375,7 +387,7 @@
     </div>
     <div class="collapsible" id="stayFields">
       <div class="form-group"><label>滞在先の名称 <span class="en">/ Accommodation Name</span><span class="optional">任意</span></label>
-        <input type="text" id="stayName" placeholder="(例) HILTON HOTEL TOKYO"></div>
+        <input type="text" id="stayName" placeholder="(例) HILTON HOTEL"></div>
       <div class="form-group"><label>州 <span class="en">/ State</span><span class="optional">任意</span></label>
         <input type="text" id="stayState" placeholder="(例) CALIFORNIA"></div>
       <div class="form-group"><label>都市名 <span class="en">/ City</span><span class="optional">任意</span></label>
@@ -390,6 +402,39 @@
         <input type="text" id="stayPhone" placeholder="(例) 2125551234"></div>
     </div>
   </div>
+
+  <!-- 米国内連絡先 -->
+  <div class="card">
+    <div class="section-header"><span class="section-title">米国内連絡先</span></div>
+    <div class="form-group"><label>米国内の連絡先を登録しますか？ <span class="optional">任意</span></label>
+      <div class="toggle-group"><input type="radio" id="usContactYes" name="hasUsContact" value="yes"><label for="usContactYes">はい</label><input type="radio" id="usContactNo" name="hasUsContact" value="no" checked><label for="usContactNo">いいえ</label></div>
+    </div>
+    <div class="collapsible" id="usContactFields">
+      <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactSurname" placeholder="(例) SMITH"></div>
+      <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactGivenName" placeholder="(例) JOHN"></div>
+      <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactPhone" placeholder="(例) 2125551234"></div>
+      <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="optional">任意</span></label>
+        <input type="email" id="usContactEmail" placeholder="(例) john@example.com"></div>
+      <div class="form-group"><label>州 <span class="en">/ State</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactState" placeholder="(例) NEW YORK"></div>
+      <div class="form-group"><label>市 <span class="en">/ City</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactCity" placeholder="(例) NEW YORK"></div>
+      <div class="form-group"><label>通り名 <span class="en">/ Street</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactStreet" placeholder="(例) 123 BROADWAY"></div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="step2Btns">
+    <button type="button" class="btn-back" onclick="goToStep1()">必須項目の入力へ戻る</button>
+    <button type="button" class="btn-next" onclick="goToStep3()">個人情報の入力へ進む</button>
+  </div>
+  </div><!-- /step2Content -->
+
+  <!-- ========== STEP 3: 個人情報の入力 ========== -->
+  <div id="step3Content" style="display:none">
 
   <!-- 就労経験 -->
   <div class="card">
@@ -417,30 +462,39 @@
       <div class="form-group"><label>職名 <span class="en">/ Job Title</span><span class="optional">任意</span></label>
         <input type="text" id="employTitle" placeholder="(例) ENGINEER"></div>
     </div>
+    <!-- 就労なしの場合の雇用状況 -->
+    <div class="collapsible" id="employStatusFields">
+      <div class="form-group"><label>現在の雇用状況 <span class="en">/ Current Status</span><span class="required">必須</span></label>
+        <select id="employStatus" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px">
+          <option value="">選択してください</option>
+          <option value="student">学生 / Student</option>
+          <option value="unemployed">無職 / Unemployed</option>
+          <option value="retired">退職 / Retired</option>
+          <option value="homemaker">主婦・主夫 / Homemaker</option>
+          <option value="child">子供 / Child</option>
+          <option value="other">その他 / Other</option>
+        </select></div>
+    </div>
   </div>
 
-  <!-- SNSアカウント -->
+  <!-- SNSアカウント（複数対応） -->
   <div class="card">
     <div class="section-header"><span class="section-title">SNS情報</span></div>
     <div class="form-group"><label>SNSアカウントを登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="snsYes" name="hasSns" value="yes"><label for="snsYes">はい</label><input type="radio" id="snsNo" name="hasSns" value="no"><label for="snsNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="snsFields">
-      <div class="form-group"><label>利用しているSNS <span class="required">必須</span></label>
-        <select id="snsPlatform" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px">
-          <option value="">選択してください</option>
-          <option value="facebook">Facebook</option>
-          <option value="instagram">Instagram</option>
-          <option value="twitter">X (Twitter)</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="youtube">YouTube</option>
-          <option value="tiktok">TikTok</option>
-          <option value="weibo">Weibo</option>
-          <option value="other">その他</option>
-        </select></div>
-      <div class="form-group"><label>アカウント名 <span class="en">/ Account Name</span><span class="required">必須</span></label>
-        <input type="text" id="snsAccount" placeholder="(例) @yamada_taro">
-        <div class="error" id="errSnsAccount">アカウント名を入力してください</div></div>
+      <div id="snsEntries">
+        <div class="sns-entry" style="border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:12px">
+          <div class="form-group" style="margin-bottom:12px"><label>利用しているSNS <span class="required">必須</span></label>
+            <select class="snsPlatformSel" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px">
+              <option value="">選択してください</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="twitter">X (Twitter)</option><option value="linkedin">LinkedIn</option><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="weibo">Weibo</option><option value="other">その他</option>
+            </select></div>
+          <div class="form-group" style="margin-bottom:0"><label>アカウント名 <span class="en">/ Account Name</span><span class="required">必須</span></label>
+            <input type="text" class="snsAccountInput" placeholder="(例) @yamada_taro"></div>
+        </div>
+      </div>
+      <button type="button" onclick="addSnsEntry()" style="background:#2d5f8a;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer;margin-top:4px">＋ SNSアカウントを追加</button>
     </div>
   </div>
 
@@ -462,21 +516,29 @@
     </div>
   </div>
 
-  <!-- 両親の名前 -->
+  <!-- 両親の名前（Unknown対応） -->
   <div class="card">
     <div class="section-header"><span class="section-title">両親の情報</span></div>
     <div class="form-group"><label>両親の名前を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="parentYes" name="hasParent" value="yes"><label for="parentYes">はい</label><input type="radio" id="parentNo" name="hasParent" value="no" checked><label for="parentNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="parentFields">
-      <div class="form-group"><label>父親の姓 <span class="en">/ Father's Surname</span><span class="optional">任意</span></label>
-        <input type="text" id="fatherSurname" placeholder="(例) YAMADA"></div>
-      <div class="form-group"><label>父親の名 <span class="en">/ Father's Given name</span><span class="optional">任意</span></label>
-        <input type="text" id="fatherGivenName" placeholder="(例) ICHIRO"></div>
-      <div class="form-group"><label>母親の姓 <span class="en">/ Mother's Surname</span><span class="optional">任意</span></label>
-        <input type="text" id="motherSurname" placeholder="(例) SUZUKI"></div>
-      <div class="form-group"><label>母親の名 <span class="en">/ Mother's Given name</span><span class="optional">任意</span></label>
-        <input type="text" id="motherGivenName" placeholder="(例) YOKO"></div>
+      <p style="font-weight:600;color:#1a3a5c;margin-bottom:12px">父親 / Father</p>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;cursor:pointer"><input type="checkbox" id="fatherUnknown" style="width:16px;height:16px">不明 / Unknown</label>
+      <div id="fatherFields">
+        <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
+          <input type="text" id="fatherSurname" placeholder="(例) YAMADA"></div>
+        <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
+          <input type="text" id="fatherGivenName" placeholder="(例) ICHIRO"></div>
+      </div>
+      <p style="font-weight:600;color:#1a3a5c;margin:16px 0 12px">母親 / Mother</p>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;cursor:pointer"><input type="checkbox" id="motherUnknown" style="width:16px;height:16px">不明 / Unknown</label>
+      <div id="motherFields">
+        <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
+          <input type="text" id="motherSurname" placeholder="(例) SUZUKI"></div>
+        <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
+          <input type="text" id="motherGivenName" placeholder="(例) YOKO"></div>
+      </div>
     </div>
   </div>
 
@@ -535,13 +597,11 @@
     </div>
   </div>
 
-  <!-- Step2 ボタン -->
-  <div class="btn-row" id="step2Btns">
-    <button type="button" class="btn-back" onclick="goToStep1()">必須項目の入力へ戻る</button>
-    <button type="button" class="btn-next" id="step2NextBtn" onclick="goToStep3()">入力内容の確認へ進む</button>
+  <div class="btn-row" id="step3Btns">
+    <button type="button" class="btn-back" onclick="goToStep2from3()">渡航・滞在先情報へ戻る</button>
+    <button type="button" class="btn-next" onclick="goToStep4()">入力内容の確認へ進む</button>
   </div>
-
-  </div><!-- /step2Content -->
+  </div><!-- /step3Content -->
 
   <div class="footer">© 2026 Application Form</div>
 </div>
@@ -1181,26 +1241,40 @@ document.getElementById('appForm').addEventListener('submit',function(e){
 });
 
 // ===== STEP NAVIGATION =====
-function goToStep2(){
-  // Hide step1, show step2
-  document.querySelectorAll('#step2Content .card').forEach(c=>c.style.display='');
-  $('step2Content').style.display='';
-  // Hide step1 cards
+function hideAllSteps(){
   document.querySelectorAll('form .card').forEach(c=>c.style.display='none');
   $('step1Btns').style.display='none';
-  // Update step indicator
-  document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===1)});
+  $('step2Content').style.display='none';
+  $('step3Content').style.display='none';
+}
+function showStep(n){
+  document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===n)});
   window.scrollTo({top:0,behavior:'smooth'});
-  initStep2();
 }
 function goToStep1(){
-  $('step2Content').style.display='none';
+  hideAllSteps();
   document.querySelectorAll('form .card').forEach(c=>c.style.display='');
   $('step1Btns').style.display='';
-  document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===0)});
-  window.scrollTo({top:0,behavior:'smooth'});
+  showStep(0);
+}
+function goToStep2(){
+  hideAllSteps();
+  $('step2Content').style.display='';
+  showStep(1);
+  initStep2();
+}
+function goToStep2from3(){
+  hideAllSteps();
+  $('step2Content').style.display='';
+  showStep(1);
 }
 function goToStep3(){
+  hideAllSteps();
+  $('step3Content').style.display='';
+  showStep(2);
+  initStep3();
+}
+function goToStep4(){
   alert('入力内容の確認画面は現在準備中です。');
 }
 
@@ -1209,39 +1283,87 @@ let step2Inited=false;
 function initStep2(){
   if(step2Inited)return;step2Inited=true;
 
+  // Transit detail: show when "いいえ" (not transit = staying in US)
+  $('transitNo').addEventListener('change',()=>$('transitDetailFields').classList.add('show'));
+  $('transitYes').addEventListener('change',()=>$('transitDetailFields').classList.remove('show'));
+
   // Toggle collapsible sections
-  const s2toggles=[
-    {yes:'stayYes',no:'stayNo',fields:'stayFields'},
-    {yes:'employYes',no:'employNo',fields:'employFields'},
-    {yes:'snsYes',no:'snsNo',fields:'snsFields'},
-    {yes:'emergYes',no:'emergNo',fields:'emergFields'},
-    {yes:'parentYes',no:'parentNo',fields:'parentFields'},
-  ];
-  s2toggles.forEach(t=>{
+  [{yes:'stayYes',no:'stayNo',fields:'stayFields'},
+   {yes:'usContactYes',no:'usContactNo',fields:'usContactFields'}
+  ].forEach(t=>{
     $(t.yes).addEventListener('change',()=>$(t.fields).classList.add('show'));
-    $(t.no).addEventListener('change',()=>{$(t.fields).classList.remove('show')});
+    $(t.no).addEventListener('change',()=>$(t.fields).classList.remove('show'));
+  });
+
+  // Auto uppercase for step2 text fields
+  ['stayName','stayState','stayCity','stayStreet','stayBuilding','stayRoom',
+   'airline','flightNo','arrivalCity',
+   'usContactSurname','usContactGivenName','usContactState','usContactCity','usContactStreet'
+  ].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase()});
+  });
+  ['stayPhone','usContactPhone'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20)});
+  });
+}
+
+// SNS add entry
+function addSnsEntry(){
+  const container=$('snsEntries');
+  const div=document.createElement('div');
+  div.className='sns-entry';
+  div.style.cssText='border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:12px;position:relative';
+  div.innerHTML='<button type="button" onclick="this.parentElement.remove()" style="position:absolute;top:8px;right:8px;background:#e74c3c;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;line-height:24px">×</button>'
+    +'<div class="form-group" style="margin-bottom:12px"><label>利用しているSNS <span class="required">必須</span></label>'
+    +'<select class="snsPlatformSel" style="width:100%;padding:12px 16px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:15px">'
+    +'<option value="">選択してください</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="twitter">X (Twitter)</option><option value="linkedin">LinkedIn</option><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="weibo">Weibo</option><option value="other">その他</option></select></div>'
+    +'<div class="form-group" style="margin-bottom:0"><label>アカウント名 <span class="en">/ Account Name</span><span class="required">必須</span></label>'
+    +'<input type="text" class="snsAccountInput" placeholder="(例) @yamada_taro"></div>';
+  container.appendChild(div);
+}
+
+let step3Inited=false;
+function initStep3(){
+  if(step3Inited)return;step3Inited=true;
+
+  // Employment toggles
+  $('employYes').addEventListener('change',()=>{$('employFields').classList.add('show');$('employStatusFields').classList.remove('show')});
+  $('employNo').addEventListener('change',()=>{$('employFields').classList.remove('show');$('employStatusFields').classList.add('show')});
+
+  // Other toggles
+  [{yes:'snsYes',no:'snsNo',fields:'snsFields'},
+   {yes:'emergYes',no:'emergNo',fields:'emergFields'},
+   {yes:'parentYes',no:'parentNo',fields:'parentFields'}
+  ].forEach(t=>{
+    $(t.yes).addEventListener('change',()=>$(t.fields).classList.add('show'));
+    $(t.no).addEventListener('change',()=>$(t.fields).classList.remove('show'));
+  });
+
+  // Parent Unknown checkboxes
+  $('fatherUnknown').addEventListener('change',function(){
+    $('fatherFields').style.display=this.checked?'none':'';
+    if(this.checked){$('fatherSurname').value='';$('fatherGivenName').value=''}
+  });
+  $('motherUnknown').addEventListener('change',function(){
+    $('motherFields').style.display=this.checked?'none':'';
+    if(this.checked){$('motherSurname').value='';$('motherGivenName').value=''}
   });
 
   // Employer country custom select
   initCustomSelect('employCountryWrap','employCountry','employCountryBtn',WORLD_ITEMS,'');
 
-  // Auto uppercase for step2 text fields
-  const s2texts=['stayName','stayState','stayCity','stayStreet','stayBuilding','stayRoom',
-    'employerName','employState','employCity','employStreet','employBuilding','employTitle',
-    'emergSurname','emergGivenName','fatherSurname','fatherGivenName','motherSurname','motherGivenName'];
-  s2texts.forEach(id=>{
+  // Auto uppercase for step3 text fields
+  ['employerName','employState','employCity','employStreet','employBuilding','employTitle',
+   'emergSurname','emergGivenName','fatherSurname','fatherGivenName','motherSurname','motherGivenName'
+  ].forEach(id=>{
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){
-      this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase();
-    });
+    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase()});
   });
-
-  // Digits only for phone fields
-  ['stayPhone','employPhone','emergPhone'].forEach(id=>{
+  ['employPhone','emergPhone'].forEach(id=>{
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){
-      this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20);
-    });
+    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20)});
   });
 }
 </script>
