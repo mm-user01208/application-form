@@ -53,16 +53,17 @@
     .date-row{display:flex;gap:12px}.date-row select{flex:1}
     .phone-row{display:flex;gap:12px;align-items:flex-start}
     .phone-row input{flex:1}
-    .phone-custom{position:relative;width:220px;flex-shrink:0}
-    .phone-custom-btn{width:100%;padding:12px 14px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;min-height:46px}
-    .phone-custom-btn img{width:24px;height:16px;object-fit:cover;border-radius:2px}
-    .phone-custom-btn::after{content:'▾';position:absolute;right:12px;color:#888}
-    .phone-custom-list{display:none;position:absolute;top:100%;left:0;right:0;max-height:280px;overflow-y:auto;background:#fff;border:1px solid #d0d5dd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:100;margin-top:2px}
-    .phone-custom-list.open{display:block}
-    .phone-custom-search{width:100%;padding:8px 12px;border:none;border-bottom:1px solid #eee;font-size:13px;outline:none}
-    .phone-custom-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px}
-    .phone-custom-item:hover{background:#f0f4ff}
-    .phone-custom-item img{width:24px;height:16px;object-fit:cover;border-radius:2px}
+    .custom-select{position:relative}
+    .custom-select.phone-size{width:220px;flex-shrink:0}
+    .cs-btn{width:100%;padding:12px 14px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;min-height:46px;position:relative}
+    .cs-btn img{width:24px;height:16px;object-fit:cover;border-radius:2px}
+    .cs-btn::after{content:'▾';position:absolute;right:12px;color:#888}
+    .cs-list{display:none;position:absolute;top:100%;left:0;right:0;max-height:280px;overflow-y:auto;background:#fff;border:1px solid #d0d5dd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:100;margin-top:2px}
+    .cs-list.open{display:block}
+    .cs-search{width:100%;padding:8px 12px;border:none;border-bottom:1px solid #eee;font-size:13px;outline:none;position:sticky;top:0;background:#fff}
+    .cs-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px}
+    .cs-item:hover{background:#f0f4ff}
+    .cs-item img{width:24px;height:16px;object-fit:cover;border-radius:2px}
     .postal-row{display:flex;gap:12px;align-items:flex-start}
     .postal-row input{flex:1}
     .postal-row a{display:inline-flex;align-items:center;gap:4px;padding:12px 16px;background:#2d5f8a;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap;transition:opacity .2s}
@@ -125,7 +126,10 @@
       <div class="date-row"><select id="dobYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span><select id="dobMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="dobDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span></div>
       <div class="error" id="errDob">正しい年月日を入力してください。</div>
     </div>
-    <div class="form-group"><label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label><select id="nationality"></select></div>
+    <div class="form-group"><label>国籍 <span class="en">/ Nationality</span><span class="required">必須</span></label>
+      <input type="hidden" id="nationality" value="JPN">
+      <div class="custom-select" id="nationalityWrap"><button type="button" class="cs-btn" id="nationalityBtn">選択してください</button><div class="cs-list" id="nationalityList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+    </div>
     <div class="collapsible" id="personalIdFields">
       <div class="form-group"><label>個人識別番号 <span class="optional">任意</span></label>
         <input type="text" id="personalId" placeholder="空欄でも可">
@@ -153,9 +157,9 @@
     <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="required">必須</span></label>
       <div class="phone-row">
         <input type="hidden" id="phoneCountry" value="+81">
-        <div class="phone-custom" id="phoneCustom">
-          <button type="button" class="phone-custom-btn" id="phoneBtn"><img id="phoneFlagImg" src="" alt="">🇯🇵 JAPAN (+81)</button>
-          <div class="phone-custom-list" id="phoneList"><input type="text" class="phone-custom-search" id="phoneSearch" placeholder="国名を検索..."><div id="phoneItems"></div></div>
+        <div class="custom-select phone-size" id="phoneCustom">
+          <button type="button" class="cs-btn" id="phoneBtn">JAPAN (+81)</button>
+          <div class="cs-list" id="phoneList"><input type="text" class="cs-search" id="phoneSearch" placeholder="国名を検索..."><div id="phoneItems" class="cs-items"></div></div>
         </div>
         <input type="text" id="phoneNumber" placeholder="(例) 09012345678">
       </div>
@@ -177,7 +181,10 @@
       <div class="error" id="errPostal">数字のみ入力してください</div>
       <div class="error" id="errPostalInvalid">入力いただいた郵便番号に間違いはありませんか？</div>
     </div>
-    <div class="form-group"><label>国 <span class="en">/ Country</span><span class="required">必須</span></label><select id="addrCountry"></select></div>
+    <div class="form-group"><label>国 <span class="en">/ Country</span><span class="required">必須</span></label>
+      <input type="hidden" id="addrCountry" value="JPN">
+      <div class="custom-select" id="addrCountryWrap"><button type="button" class="cs-btn" id="addrCountryBtn">選択してください</button><div class="cs-list" id="addrCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+    </div>
     <div class="form-group"><label>都道府県 <span class="en">/ Prefecture</span><span class="required">必須</span></label>
       <input type="text" id="prefecture" placeholder="(例) TOKYO">
       <div class="red-hint">半角英字（ローマ字）にて入力してください</div>
@@ -239,7 +246,10 @@
     </div>
 
     <!-- 出生国/都市 -->
-    <div class="form-group"><label>出生国 <span class="en">/ Country of Birth</span><span class="required">必須</span></label><select id="birthCountry"></select></div>
+    <div class="form-group"><label>出生国 <span class="en">/ Country of Birth</span><span class="required">必須</span></label>
+      <input type="hidden" id="birthCountry" value="JPN">
+      <div class="custom-select" id="birthCountryWrap"><button type="button" class="cs-btn" id="birthCountryBtn">選択してください</button><div class="cs-list" id="birthCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+    </div>
     <div class="form-group"><label>出生都市 <span class="en">/ City of Birth</span><span class="optional">任意</span></label>
       <input type="text" id="birthCity" placeholder="(例) TOKYO・空欄でも可">
       <div class="hint">※出生した都道府県または市区町村をローマ字にて入力してください。ご不明な場合は、空欄のままで構いません。</div>
@@ -252,7 +262,10 @@
       <div class="note">※これまでに他国のパスポートおよび国家身分証明書を発給されたことはありますか？</div>
     </div>
     <div class="collapsible" id="otherPassFields">
-      <div class="form-group"><label>発給国 <span class="required">必須</span></label><select id="issuingCountry"></select></div>
+      <div class="form-group"><label>発給国 <span class="required">必須</span></label>
+        <input type="hidden" id="issuingCountry" value="">
+        <div class="custom-select" id="issuingCountryWrap"><button type="button" class="cs-btn" id="issuingCountryBtn">選択してください</button><div class="cs-list" id="issuingCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+      </div>
       <div class="form-group"><label>種類 <span class="required">必須</span></label>
         <select id="docType"><option value="">選択してください</option><option value="passport">パスポート</option><option value="id_card">国家身分証明書</option></select>
       </div>
@@ -274,7 +287,10 @@
       <div class="note">※現在、他の国の国民または市民ですか？</div>
     </div>
     <div class="collapsible" id="curNatFields">
-      <div class="form-group"><label>他国籍（現在）<span class="required">必須</span></label><select id="curNatCountry"></select><div class="hint">※現在の国籍を選択してください</div></div>
+      <div class="form-group"><label>他国籍（現在）<span class="required">必須</span></label>
+        <input type="hidden" id="curNatCountry" value="">
+        <div class="custom-select" id="curNatCountryWrap"><button type="button" class="cs-btn" id="curNatCountryBtn">選択してください</button><div class="cs-list" id="curNatCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+        <div class="hint">※現在の国籍を選択してください</div></div>
       <div class="form-group"><label>他国籍取得の経緯 <span class="required">必須</span></label>
         <select id="curNatHow"><option value="">選択してください</option><option value="birth">出生による</option><option value="parents">両親を通じて</option><option value="naturalization">帰化</option><option value="other">その他</option></select>
         <div class="hint">※他国籍を取得した経緯を選択してください</div>
@@ -287,7 +303,10 @@
       <div class="note">※これまでに他の国の国民または市民だったことはありますか？</div>
     </div>
     <div class="collapsible" id="pastNatFields">
-      <div class="form-group"><label>他国籍（過去）<span class="required">必須</span></label><select id="pastNatCountry"></select><div class="hint">※過去の国籍を選択してください</div></div>
+      <div class="form-group"><label>他国籍（過去）<span class="required">必須</span></label>
+        <input type="hidden" id="pastNatCountry" value="">
+        <div class="custom-select" id="pastNatCountryWrap"><button type="button" class="cs-btn" id="pastNatCountryBtn">選択してください</button><div class="cs-list" id="pastNatCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
+        <div class="hint">※過去の国籍を選択してください</div></div>
       <div class="form-group"><label>他国籍（過去）の取得日 <span class="required">必須</span></label>
         <div class="date-row"><select id="pastNatAcqDay"><option value="">Day</option></select><span style="line-height:44px;font-size:13px;color:#666">日</span><select id="pastNatAcqMonth"><option value="">Month</option></select><span style="line-height:44px;font-size:13px;color:#666">月</span><select id="pastNatAcqYear"><option value="">Year</option></select><span style="line-height:44px;font-size:13px;color:#666">年</span></div>
         <div class="hint">国籍を得た日付を選択してください。</div>
@@ -385,37 +404,78 @@ function toHalf(s){return s.replace(/[\uff01-\uff5e]/g,c=>String.fromCharCode(c.
 fillYearsGrouped($('dobYear'),1900,2026);
 fillMonths($('dobMonth'));fillDays($('dobDay'));
 
-// Nationality
-const natSel=$('nationality');
-natSel.innerHTML='<option value="">選択してください</option>';
-ESTA_NATIONS.forEach(n=>natSel.appendChild(new Option(n.t,n.v)));
-natSel.value='JPN';
+// Nationality (handled by custom select below)
+const natSel={get value(){return $('nationality').value}};
 
-// Phone country - custom dropdown with flag images
-const flagUrl=c=>'https://flagcdn.com/w40/'+c.toLowerCase()+'.png';
-const ISO2MAP={JPN:'jp',AFG:'af',ALB:'al',DZA:'dz',AND:'ad',AGO:'ao',ARG:'ar',ARM:'am',AUS:'au',AUT:'at',AZE:'az',BHS:'bs',BHR:'bh',BGD:'bd',BRB:'bb',BLR:'by',BEL:'be',BLZ:'bz',BEN:'bj',BTN:'bt',BOL:'bo',BIH:'ba',BWA:'bw',BRA:'br',BRN:'bn',BGR:'bg',KHM:'kh',CMR:'cm',CAN:'ca',CHL:'cl',CHN:'cn',COL:'co',CRI:'cr',HRV:'hr',CUB:'cu',CYP:'cy',CZE:'cz',DNK:'dk',DOM:'do',ECU:'ec',EGY:'eg',SLV:'sv',EST:'ee',ETH:'et',FIN:'fi',FRA:'fr',DEU:'de',GHA:'gh',GRC:'gr',GTM:'gt',HTI:'ht',HND:'hn',HKG:'hk',HUN:'hu',ISL:'is',IND:'in',IDN:'id',IRN:'ir',IRQ:'iq',IRL:'ie',ISR:'il',ITA:'it',JAM:'jm',JOR:'jo',KAZ:'kz',KEN:'ke',KWT:'kw',KGZ:'kg',LAO:'la',LVA:'lv',LBN:'lb',LBY:'ly',LIE:'li',LTU:'lt',LUX:'lu',MYS:'my',MDV:'mv',MLT:'mt',MEX:'mx',MDA:'md',MCO:'mc',MNG:'mn',MNE:'me',MAR:'ma',MOZ:'mz',MMR:'mm',NPL:'np',NLD:'nl',NZL:'nz',NIC:'ni',NGA:'ng',PRK:'kp',NOR:'no',OMN:'om',PAK:'pk',PAN:'pa',PRY:'py',PER:'pe',PHL:'ph',POL:'pl',PRT:'pt',QAT:'qa',ROM:'ro',RUS:'ru',SAU:'sa',SRB:'rs',SGP:'sg',SVK:'sk',SVN:'si',ZAF:'za',KOR:'kr',ESP:'es',LKA:'lk',SWE:'se',CHE:'ch',TWN:'tw',THA:'th',TUR:'tr',UKR:'ua',ARE:'ae',GBR:'gb',USA:'us',URY:'uy',UZB:'uz',VEN:'ve',VNM:'vn',ZMB:'zm',ZWE:'zw'};
-function getFlag2(iso3){return ISO2MAP[iso3]||iso3.substring(0,2).toLowerCase()}
-(function initPhoneCustom(){
-  const items=$('phoneItems'),btn=$('phoneBtn'),list=$('phoneList'),search=$('phoneSearch'),hidden=$('phoneCountry');
-  function renderItems(filter){
-    items.innerHTML='';
-    PHONE_CODES.filter(p=>!filter||p.n.toLowerCase().includes(filter.toLowerCase())||p.p.includes(filter)).forEach(p=>{
-      const d=document.createElement('div');d.className='phone-custom-item';
-      d.innerHTML='<img src="'+flagUrl(getFlag2(p.c))+'" alt="'+p.c+'"> '+p.n+' ('+p.p+')';
-      d.onclick=()=>{hidden.value=p.p;btn.innerHTML='<img src="'+flagUrl(getFlag2(p.c))+'" alt=""> '+p.n+' ('+p.p+')';list.classList.remove('open');search.value=''};
-      items.appendChild(d);
+// ===== FLAG UTILS =====
+const flagUrl=c=>'https://flagcdn.com/w40/'+c+'.png';
+const ISO2MAP={JPN:'jp',AFG:'af',ALB:'al',DZA:'dz',AND:'ad',AGO:'ao',AIA:'ai',ATA:'aq',ATG:'ag',ARG:'ar',ARM:'am',ABW:'aw',AUS:'au',AUT:'at',AZE:'az',BHS:'bs',BHR:'bh',BGD:'bd',BRB:'bb',BLR:'by',BEL:'be',BLZ:'bz',BEN:'bj',BMU:'bm',BTN:'bt',BOL:'bo',BES:'bq',BIH:'ba',BWA:'bw',BRA:'br',BRN:'bn',BGR:'bg',BFA:'bf',BUR:'mm',BDI:'bi',KHM:'kh',CMR:'cm',CAN:'ca',CPV:'cv',CYM:'ky',CAF:'cf',TCD:'td',CHL:'cl',CHN:'cn',CXR:'cx',CCK:'cc',COL:'co',COM:'km',COD:'cd',COG:'cg',COK:'ck',CRI:'cr',CIV:'ci',HRV:'hr',CUB:'cu',CUW:'cw',CYP:'cy',CZE:'cz',DNK:'dk',DJI:'dj',DMA:'dm',DOM:'do',TMP:'tl',ECU:'ec',EGY:'eg',SLV:'sv',GNQ:'gq',ERI:'er',EST:'ee',ETH:'et',FLK:'fk',FRO:'fo',FJI:'fj',FIN:'fi',FRA:'fr',GUF:'gf',PYF:'pf',GAB:'ga',GMB:'gm',GEO:'ge',DEU:'de',GHA:'gh',GIB:'gi',GRC:'gr',GRL:'gl',GRD:'gd',GLP:'gp',GUM:'gu',GTM:'gt',GGY:'gg',GIN:'gn',GNB:'gw',GUY:'gy',HTI:'ht',HND:'hn',HKG:'hk',HUN:'hu',ISL:'is',IND:'in',IDN:'id',IRN:'ir',IRQ:'iq',IRL:'ie',IMN:'im',ISR:'il',ITA:'it',JAM:'jm',JEY:'je',JOR:'jo',KAZ:'kz',KEN:'ke',KIR:'ki',KVV:'xk',KWT:'kw',KGZ:'kg',LAO:'la',LVA:'lv',LBN:'lb',LSO:'ls',LBR:'lr',LBY:'ly',LIE:'li',LTU:'lt',LUX:'lu',MAC:'mo',MKD:'mk',MDG:'mg',MWI:'mw',MYS:'my',MDV:'mv',MLI:'ml',MLT:'mt',MHL:'mh',MTQ:'mq',MRT:'mr',MUS:'mu',MYT:'yt',MEX:'mx',FSM:'fm',MDA:'md',MCO:'mc',MNG:'mn',MNE:'me',MSR:'ms',MAR:'ma',MOZ:'mz',MMR:'mm',NAM:'na',NRU:'nr',NPL:'np',NLD:'nl',NCL:'nc',NZL:'nz',NIC:'ni',NER:'ne',NGA:'ng',NIU:'nu',NFK:'nf',PRK:'kp',MNP:'mp',NOR:'no',OMN:'om',PAK:'pk',PLW:'pw',PSE:'ps',PAN:'pa',PNG:'pg',PRY:'py',PER:'pe',PHL:'ph',PCN:'pn',POL:'pl',PRT:'pt',PRI:'pr',QAT:'qa',REU:'re',ROM:'ro',RUS:'ru',RWA:'rw',BLM:'bl',KNA:'kn',LCA:'lc',MAF:'mf',VCT:'vc',WSM:'ws',SMR:'sm',STP:'st',SAU:'sa',SEN:'sn',SRB:'rs',SYC:'sc',SLE:'sl',SGP:'sg',SXM:'sx',SVK:'sk',SVN:'si',SLB:'sb',SOM:'so',ZAF:'za',KOR:'kr',SSD:'ss',ESP:'es',LKA:'lk',SHN:'sh',SDN:'sd',SUR:'sr',SWZ:'sz',SWE:'se',CHE:'ch',SYR:'sy',TWN:'tw',TJK:'tj',TZA:'tz',THA:'th',TLS:'tl',TGO:'tg',TKL:'tk',TON:'to',TTO:'tt',TUN:'tn',TUR:'tr',TKM:'tm',TCA:'tc',TUV:'tv',UGA:'ug',UKR:'ua',ARE:'ae',GBR:'gb',GBD:'gb',GBN:'gb',GBO:'gb',GBS:'gb',GBP:'gb',USA:'us',URY:'uy',UZB:'uz',VUT:'vu',VAT:'va',VEN:'ve',VNM:'vn',VGB:'vg',VIR:'vi',ESH:'eh',YEM:'ye',ZMB:'zm',ZWE:'zw'};
+function iso2(iso3){return ISO2MAP[iso3]||iso3.substring(0,2).toLowerCase()}
+function flagImg(iso3){return '<img src="'+flagUrl(iso2(iso3))+'" alt="">'}
+
+// ===== GENERIC CUSTOM SELECT =====
+function initCustomSelect(wrapId,hiddenId,btnId,items,defaultVal,onSelect){
+  const wrap=$(wrapId),hidden=$(hiddenId),btn=$(btnId);
+  const list=wrap.querySelector('.cs-list'),search=wrap.querySelector('.cs-search'),container=wrap.querySelector('.cs-items');
+  function render(filter){
+    container.innerHTML='';
+    items.filter(i=>!filter||i.label.toLowerCase().includes(filter.toLowerCase())).forEach(i=>{
+      const d=document.createElement('div');d.className='cs-item';
+      d.innerHTML=flagImg(i.code)+' '+i.label;
+      d.onclick=()=>{hidden.value=i.value;btn.innerHTML=flagImg(i.code)+' '+i.label;list.classList.remove('open');search.value='';if(onSelect)onSelect(i.value)};
+      container.appendChild(d);
     });
   }
-  renderItems();
-  // Set initial flag image
-  btn.innerHTML='<img src="'+flagUrl('jp')+'" alt=""> JAPAN (+81)';
-  btn.onclick=e=>{e.stopPropagation();list.classList.toggle('open');if(list.classList.contains('open')){search.focus();renderItems()}};
-  search.oninput=()=>renderItems(search.value);
-  document.addEventListener('click',e=>{if(!$('phoneCustom').contains(e.target))list.classList.remove('open')});
-})();
+  render();
+  if(defaultVal){
+    const def=items.find(i=>i.value===defaultVal);
+    if(def){hidden.value=def.value;btn.innerHTML=flagImg(def.code)+' '+def.label}
+  }
+  btn.onclick=e=>{e.stopPropagation();list.classList.toggle('open');if(list.classList.contains('open')){search.focus();render()}};
+  search.addEventListener('input',()=>render(search.value));
+  document.addEventListener('click',e=>{if(!wrap.contains(e.target))list.classList.remove('open')});
+}
 
-// Address country
-fillWorldCountry($('addrCountry'),'JPN');
+// Build item arrays
+const ESTA_ITEMS=ESTA_NATIONS.map(n=>({value:n.v,code:n.v,label:n.t}));
+const WORLD_ITEMS=[{value:'JPN',code:'JPN',label:'JAPAN (JPN)'},...WORLD_COUNTRIES.filter(c=>!c.includes('JAPAN')).map(c=>{const m=c.match(/\((\w+)\)/);return{value:m?m[1]:c,code:m?m[1]:'',label:c}})];
+const PHONE_ITEMS=PHONE_CODES.map(p=>({value:p.p,code:p.c,label:p.n+' ('+p.p+')'}));
+
+// Init all custom selects
+initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JPN',v=>{
+  // trigger nationality change logic
+  const show=ID_REQUIRED_NATIONS.includes(v);
+  $('personalIdFields').classList.toggle('show',show);
+  if(!show){$('personalId').value='';showErr('errPersonalId',false)}
+  if(v==='TWN'){$('personalId').placeholder='(例) A123456789';$('twnNote').style.display=''}
+  else{$('personalId').placeholder='空欄でも可';$('twnNote').style.display='none'}
+  updateBtn();
+});
+initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN');
+initCustomSelect('birthCountryWrap','birthCountry','birthCountryBtn',WORLD_ITEMS,'JPN');
+initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS);
+initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS);
+initCustomSelect('pastNatCountryWrap','pastNatCountry','pastNatCountryBtn',WORLD_ITEMS);
+
+// Phone - custom (with phone-specific layout)
+(function(){
+  const wrap=$('phoneCustom'),hidden=$('phoneCountry'),btn=$('phoneBtn');
+  const list=$('phoneList'),search=$('phoneSearch'),container=$('phoneItems');
+  function render(filter){
+    container.innerHTML='';
+    PHONE_ITEMS.filter(i=>!filter||i.label.toLowerCase().includes(filter.toLowerCase())).forEach(i=>{
+      const d=document.createElement('div');d.className='cs-item';
+      d.innerHTML=flagImg(i.code)+' '+i.label;
+      d.onclick=()=>{hidden.value=i.value;btn.innerHTML=flagImg(i.code)+' '+i.label;list.classList.remove('open');search.value=''};
+      container.appendChild(d);
+    });
+  }
+  render();
+  btn.innerHTML=flagImg('JPN')+' JAPAN (+81)';
+  btn.onclick=e=>{e.stopPropagation();list.classList.toggle('open');if(list.classList.contains('open')){search.focus();render()}};
+  search.oninput=()=>render(search.value);
+  document.addEventListener('click',e=>{if(!wrap.contains(e.target))list.classList.remove('open')});
+})();
 
 // Passport dates
 ['passIssuDay','passExpDay'].forEach(id=>fillDays($(id)));
@@ -423,8 +483,7 @@ fillWorldCountry($('addrCountry'),'JPN');
 fillYearsGrouped($('passIssuYear'),2016,2026);
 fillYearsGrouped($('passExpYear'),2026,2036);
 
-// World country selects
-['issuingCountry','birthCountry','curNatCountry','pastNatCountry'].forEach(id=>fillWorldCountry($(id),id==='birthCountry'?'JPN':null));
+// World country selects (handled by custom selects below)
 
 // Other doc expiry (grouped)
 const expSel=$('otherDocExpiry');
@@ -452,16 +511,7 @@ setupToggle('curNatYes','curNatNo','curNatFields',['curNatCountry','curNatHow'])
 setupToggle('pastNatYes','pastNatNo','pastNatFields',['pastNatCountry','pastNatAcqDay','pastNatAcqMonth','pastNatAcqYear','pastNatRelDay','pastNatRelMonth','pastNatRelYear']);
 setupToggle('geYes','geNo','geFields',['passId']);
 
-// ===== NATIONALITY → 個人識別番号 =====
-natSel.addEventListener('change',function(){
-  const v=this.value;
-  const show=ID_REQUIRED_NATIONS.includes(v);
-  $('personalIdFields').classList.toggle('show',show);
-  if(!show){$('personalId').value='';showErr('errPersonalId',false)}
-  if(v==='TWN'){$('personalId').placeholder='(例) A123456789';$('twnNote').style.display=''}
-  else{$('personalId').placeholder='空欄でも可';$('twnNote').style.display='none'}
-  updateBtn();
-});
+// ===== NATIONALITY → 個人識別番号 (handled by custom select onSelect callback) =====
 
 // ===== NAME FIELDS (alpha only, 45 chars, trim) =====
 function setupNameField(id){
