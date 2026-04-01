@@ -11,11 +11,14 @@
     .header h1{font-size:24px;font-weight:600;letter-spacing:1px}.header p{font-size:13px;opacity:.8;margin-top:6px}
     .container{max-width:680px;margin:32px auto;padding:0 16px}
     .card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:32px;margin-bottom:24px}
-    .steps{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:28px;flex-wrap:wrap}
-    .step-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#999}
+    .steps{display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:28px;flex-wrap:nowrap}
+    .step-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#999;white-space:nowrap}
     .step-item.active{color:#1a3a5c;font-weight:600}
-    .step-num{width:28px;height:28px;line-height:28px;border-radius:50%;background:#ddd;color:#fff;text-align:center;font-size:13px;font-weight:600}
-    .step-item.active .step-num{background:#1a3a5c}.step-arrow{color:#ccc;font-size:16px}
+    .step-num{width:22px;height:22px;line-height:22px;border-radius:50%;background:#ddd;color:#fff;text-align:center;font-size:11px;font-weight:600}
+    .step-item.active .step-num{background:#1a3a5c}.step-arrow{color:#ccc;font-size:12px}
+    .email-suggest{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d0d5dd;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:50;max-height:180px;overflow-y:auto}
+    .email-suggest .es-item{padding:8px 12px;cursor:pointer;font-size:13px;color:#333}
+    .email-suggest .es-item:hover,.email-suggest .es-item.active{background:#e8f0fe;color:#1a3a5c}
     .notice-box{background:#fff8e1;border:2px solid #f9a825;border-radius:10px;padding:16px 20px;margin-bottom:28px}
     .notice-box p{font-size:13px;line-height:1.7;color:#5d4037}.notice-box strong{color:#000;font-size:14px}
     .section-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #e8ecf0}
@@ -135,7 +138,8 @@
       <div class="custom-select" id="nationalityWrap"><button type="button" class="cs-btn" id="nationalityBtn">選択してください</button><div class="cs-list" id="nationalityList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div>
     </div>
     <div class="collapsible" id="personalIdFields">
-      <div class="form-group"><label id="personalIdLabel">個人識別番号 <span class="optional" id="personalIdReq">任意</span></label>
+      <div class="form-group"><label id="personalIdLabel">国民ID番号 <span class="en">/ National Identification Number</span> <span class="optional" id="personalIdReq">任意</span></label>
+        <div id="personalIdNameHint" style="display:none;background:#e8f0fe;color:#1a3a5c;font-weight:700;font-size:14px;padding:6px 12px;border-radius:6px;border-left:4px solid #2d5f8a;margin:6px 0"></div>
         <input type="text" id="personalId" placeholder="空欄でも可">
         <div class="hint" id="personalIdHint">パスポートを除く国家発行の身分証明書に割り当てられた個人識別番号を入力してください。ご不明な場合は空欄のままで構いません。</div>
         <div class="hint" id="personalIdNote" style="display:none"></div>
@@ -149,12 +153,12 @@
   <div class="card">
     <div class="section-header"><span class="section-title">連絡先情報</span><button type="button" class="help-btn" onclick="showModal('helpContact')">？</button></div>
     <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="required">必須</span></label>
-      <input type="email" id="email1" placeholder="(例) yamada_taro@example.co.jp">
+      <div style="position:relative"><input type="email" id="email1" placeholder="(例) yamada_taro@example.co.jp" autocomplete="off"><div class="email-suggest" id="emailSuggest1"></div></div>
       <div class="note">※申請結果をメールにて送信します。迷惑メールフォルダに振り分けられる場合がありますのでご注意ください。</div>
       <div class="error" id="errEmail1">メールアドレスを正しく入力してください</div>
     </div>
     <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="confirm-badge">確認用</span><span class="required">必須</span></label>
-      <input type="email" id="email2" placeholder="(例) yamada_taro@example.co.jp">
+      <div style="position:relative"><input type="email" id="email2" placeholder="(例) yamada_taro@example.co.jp" autocomplete="off"><div class="email-suggest" id="emailSuggest2"></div></div>
       <div class="note">※確認のため再度入力してください。</div>
       <div class="error" id="errEmail2">メールアドレスを正しく入力してください</div>
       <div class="error" id="errEmailMatch">メールアドレスが一致しません</div>
@@ -397,7 +401,7 @@
 const ESTA_NATIONS=[
 {v:'AND',t:'ANDORRA (AND)'},{v:'AUS',t:'AUSTRALIA (AUS)'},{v:'AUT',t:'AUSTRIA (AUT)'},{v:'BEL',t:'BELGIUM (BEL)'},{v:'BRN',t:'BRUNEI (BRN)'},{v:'CHL',t:'CHILE (CHL)'},{v:'HRV',t:'CROATIA (HRV)'},{v:'CZE',t:'CZECH REPUBLIC (CZE)'},{v:'DNK',t:'DENMARK (DNK)'},{v:'EST',t:'ESTONIA (EST)'},{v:'FIN',t:'FINLAND (FIN)'},{v:'FRA',t:'FRANCE (FRA)'},{v:'DEU',t:'GERMANY (DEU)'},{v:'GRC',t:'GREECE (GRC)'},{v:'HUN',t:'HUNGARY (HUN)'},{v:'ISL',t:'ICELAND (ISL)'},{v:'IRL',t:'IRELAND (IRL)'},{v:'ISR',t:'ISRAEL (ISR)'},{v:'ITA',t:'ITALY (ITA)'},{v:'JPN',t:'JAPAN (JPN)'},{v:'LVA',t:'LATVIA (LVA)'},{v:'LIE',t:'LIECHTENSTEIN (LIE)'},{v:'LTU',t:'LITHUANIA (LTU)'},{v:'LUX',t:'LUXEMBOURG (LUX)'},{v:'MLT',t:'MALTA (MLT)'},{v:'MCO',t:'MONACO (MCO)'},{v:'NLD',t:'NETHERLANDS (NLD)'},{v:'NZL',t:'NEW ZEALAND (NZL)'},{v:'NOR',t:'NORWAY (NOR)'},{v:'POL',t:'POLAND (POL)'},{v:'PRT',t:'PORTUGAL (PRT)'},{v:'QAT',t:'QATAR (QAT)'},{v:'SMR',t:'SAN MARINO (SMR)'},{v:'SGP',t:'SINGAPORE (SGP)'},{v:'SVK',t:'SLOVAKIA (SVK)'},{v:'SVN',t:'SLOVENIA (SVN)'},{v:'KOR',t:'SOUTH KOREA (KOR)'},{v:'ESP',t:'SPAIN (ESP)'},{v:'SWE',t:'SWEDEN (SWE)'},{v:'CHE',t:'SWITZERLAND (CHE)'},{v:'TWN',t:'TAIWAN (TWN)'},{v:'GBR',t:'UK - BRITISH CITIZEN (GBR)'},{v:'GBD',t:'UK - BRITISH DTC (GBD)'},{v:'GBN',t:'UK - BRITISH NATIONAL (O) (GBN)'},{v:'GBO',t:'UK - BRITISH OVERSEAS (GBO)'},{v:'GBS',t:'UK - BRITISH SUBJECT (GBS)'},{v:'GBP',t:'UK - PROTECTED PERSON (GBP)'}];
 
-const ID_REQUIRED_NATIONS=['JPN','BEL','BRN','CHL','HRV','CZE','EST','DEU','GRC','HUN','ISR','LUX','MLT','MCO','NLD','PRT','SGP','SVK','SVN','KOR','ESP','TWN','GBR','GBD','GBN','GBO','GBS','GBP','FRA','ITA','AUT','AUS','NZL','POL','FIN','IRL','LVA','LTU','NOR','DNK','SWE','CHE'];
+const ID_REQUIRED_NATIONS=['JPN','BEL','BRN','CHL','HRV','CZE','EST','DEU','GRC','HUN','ISR','LUX','MLT','MCO','NLD','PRT','SGP','SVK','SVN','KOR','ESP','TWN','GBR','GBD','GBN','GBO','GBS','GBP','FRA','ITA','AUT','AUS','NZL','POL','FIN','IRL','LVA','LTU','NOR','DNK','SWE','CHE','AND','ISL','LIE','QAT','SMR'];
 const ID_REQUIRED_MAP={
   JPN:{name:'マイナンバー',required:false,regex:/^[0-9]{12}$/,max:12,ph:'(例) 123456789012',note:'※12桁の数字を入力してください。不明な場合は空欄可。',dna:true},
   KOR:{name:'住民登録番号 (RRN)',required:true,regex:/^[0-9]{6}-?[0-9]{7}$/,max:14,ph:'(例) 990101-1234567'},
@@ -424,6 +428,11 @@ const ID_REQUIRED_MAP={
   LUX:{name:'Matricule',required:false,regex:/^[0-9]{13}$/,max:13,ph:'空欄でも可'},
   MLT:{name:'ID Card Number',required:false,regex:/^[0-9A-Z]{7,8}$/,max:8,ph:'空欄でも可'},
   MCO:{name:'ID Number',required:false,regex:/^[0-9A-Z]{5,10}$/,max:10,ph:'空欄でも可'},
+  AND:{name:'',required:false,regex:/^[0-9A-Z]{5,10}$/,max:10,ph:'空欄でも可'},
+  ISL:{name:'Kennitala',required:false,regex:/^[0-9]{10}$/,max:10,ph:'空欄でも可'},
+  LIE:{name:'',required:false,regex:/^[0-9A-Z]{5,10}$/,max:10,ph:'空欄でも可'},
+  QAT:{name:'QID',required:false,regex:/^[0-9]{11}$/,max:11,ph:'空欄でも可'},
+  SMR:{name:'',required:false,regex:/^[0-9A-Z]{5,10}$/,max:10,ph:'空欄でも可'},
   PRT:{name:'NIF',required:false,regex:/^[0-9]{9}$/,max:9,ph:'空欄でも可'},
   SVK:{name:'Rodné číslo',required:false,regex:/^[0-9]{9,10}$/,max:10,ph:'空欄でも可'},
   SVN:{name:'EMŠO',required:false,regex:/^[0-9]{13}$/,max:13,ph:'空欄でも可'},
@@ -487,16 +496,29 @@ function toHalf(s){return s.replace(/[\uff01-\uff5e]/g,c=>String.fromCharCode(c.
 
 // ===== JP Prefecture/City to Romaji =====
 const PREF_MAP={'北海道':'HOKKAIDO','青森県':'AOMORI','岩手県':'IWATE','宮城県':'MIYAGI','秋田県':'AKITA','山形県':'YAMAGATA','福島県':'FUKUSHIMA','茨城県':'IBARAKI','栃木県':'TOCHIGI','群馬県':'GUNMA','埼玉県':'SAITAMA','千葉県':'CHIBA','東京都':'TOKYO','神奈川県':'KANAGAWA','新潟県':'NIIGATA','富山県':'TOYAMA','石川県':'ISHIKAWA','福井県':'FUKUI','山梨県':'YAMANASHI','長野県':'NAGANO','岐阜県':'GIFU','静岡県':'SHIZUOKA','愛知県':'AICHI','三重県':'MIE','滋賀県':'SHIGA','京都府':'KYOTO','大阪府':'OSAKA','兵庫県':'HYOGO','奈良県':'NARA','和歌山県':'WAKAYAMA','鳥取県':'TOTTORI','島根県':'SHIMANE','岡山県':'OKAYAMA','広島県':'HIROSHIMA','山口県':'YAMAGUCHI','徳島県':'TOKUSHIMA','香川県':'KAGAWA','愛媛県':'EHIME','高知県':'KOCHI','福岡県':'FUKUOKA','佐賀県':'SAGA','長崎県':'NAGASAKI','熊本県':'KUMAMOTO','大分県':'OITA','宮崎県':'MIYAZAKI','鹿児島県':'KAGOSHIMA','沖縄県':'OKINAWA'};
-function jpToRomaji(str){
-  // Check prefecture map first
-  for(const[jp,en] of Object.entries(PREF_MAP)){if(str===jp)return en}
-  // For city/address, use wanakana-style conversion or just return uppercase
-  // Simple approach: check if string is Japanese, if so try romaji API
-  if(/[\u3000-\u9FFF]/.test(str)){
-    // Use a synchronous lookup table for common city suffixes, otherwise return as-is uppercase
-    return str.replace(/[^\x00-\x7F]/g,'').toUpperCase()||str;
+// Half-width katakana to romaji
+const KANA_MAP={'ｱ':'A','ｲ':'I','ｳ':'U','ｴ':'E','ｵ':'O','ｶ':'KA','ｷ':'KI','ｸ':'KU','ｹ':'KE','ｺ':'KO','ｻ':'SA','ｼ':'SHI','ｽ':'SU','ｾ':'SE','ｿ':'SO','ﾀ':'TA','ﾁ':'CHI','ﾂ':'TSU','ﾃ':'TE','ﾄ':'TO','ﾅ':'NA','ﾆ':'NI','ﾇ':'NU','ﾈ':'NE','ﾉ':'NO','ﾊ':'HA','ﾋ':'HI','ﾌ':'FU','ﾍ':'HE','ﾎ':'HO','ﾏ':'MA','ﾐ':'MI','ﾑ':'MU','ﾒ':'ME','ﾓ':'MO','ﾔ':'YA','ﾕ':'YU','ﾖ':'YO','ﾗ':'RA','ﾘ':'RI','ﾙ':'RU','ﾚ':'RE','ﾛ':'RO','ﾜ':'WA','ｦ':'WO','ﾝ':'N','ｯ':'','ｰ':''};
+const DAKUTEN_MAP={'ｶﾞ':'GA','ｷﾞ':'GI','ｸﾞ':'GU','ｹﾞ':'GE','ｺﾞ':'GO','ｻﾞ':'ZA','ｼﾞ':'JI','ｽﾞ':'ZU','ｾﾞ':'ZE','ｿﾞ':'ZO','ﾀﾞ':'DA','ﾁﾞ':'DI','ﾂﾞ':'DU','ﾃﾞ':'DE','ﾄﾞ':'DO','ﾊﾞ':'BA','ﾋﾞ':'BI','ﾌﾞ':'BU','ﾍﾞ':'BE','ﾎﾞ':'BO','ﾊﾟ':'PA','ﾋﾟ':'PI','ﾌﾟ':'PU','ﾍﾟ':'PE','ﾎﾟ':'PO'};
+const COMBO_MAP={'ｷｬ':'KYA','ｷｭ':'KYU','ｷｮ':'KYO','ｼｬ':'SHA','ｼｭ':'SHU','ｼｮ':'SHO','ﾁｬ':'CHA','ﾁｭ':'CHU','ﾁｮ':'CHO','ﾆｬ':'NYA','ﾆｭ':'NYU','ﾆｮ':'NYO','ﾋｬ':'HYA','ﾋｭ':'HYU','ﾋｮ':'HYO','ﾐｬ':'MYA','ﾐｭ':'MYU','ﾐｮ':'MYO','ﾘｬ':'RYA','ﾘｭ':'RYU','ﾘｮ':'RYO','ｷﾞｬ':'GYA','ｷﾞｭ':'GYU','ｷﾞｮ':'GYO','ｼﾞｬ':'JA','ｼﾞｭ':'JU','ｼﾞｮ':'JO','ﾋﾞｬ':'BYA','ﾋﾞｭ':'BYU','ﾋﾞｮ':'BYO','ﾋﾟｬ':'PYA','ﾋﾟｭ':'PYU','ﾋﾟｮ':'PYO'};
+function kanaToRomaji(s){
+  let r='',i=0;
+  while(i<s.length){
+    // 3-char combos (dakuten+small kana)
+    if(i+2<s.length&&COMBO_MAP[s[i]+s[i+1]+s[i+2]]){r+=COMBO_MAP[s[i]+s[i+1]+s[i+2]];i+=3;continue}
+    // 2-char combos
+    if(i+1<s.length&&COMBO_MAP[s[i]+s[i+1]]){r+=COMBO_MAP[s[i]+s[i+1]];i+=2;continue}
+    if(i+1<s.length&&DAKUTEN_MAP[s[i]+s[i+1]]){r+=DAKUTEN_MAP[s[i]+s[i+1]];i+=2;continue}
+    // Sokuon (っ) doubles next consonant
+    if(s[i]==='ｯ'&&i+1<s.length){
+      const next=KANA_MAP[s[i+1]]||DAKUTEN_MAP[s[i+1]+s[i+2]]||'';
+      if(next)r+=next[0];
+      i++;continue;
+    }
+    if(KANA_MAP[s[i]]){r+=KANA_MAP[s[i]];i++;continue}
+    if(s[i]===' '||s[i]==='　'){r+=' ';i++;continue}
+    r+=s[i];i++;
   }
-  return str.toUpperCase();
+  return r;
 }
 
 // ===== INIT =====
@@ -548,8 +570,16 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
   $('personalIdFields').classList.toggle('show',show);
   if(!show){$('personalId').value='';showErr('errPersonalId',false)}
   const idMap=ID_REQUIRED_MAP[v];
+  const reqClass=idMap&&idMap.required?'required':'optional';
+  const reqText=idMap&&idMap.required?'必須':'任意';
+  $('personalIdLabel').innerHTML='国民ID番号 <span class="en">/ National Identification Number</span> <span class="'+reqClass+'" id="personalIdReq">'+reqText+'</span>';
+  if(idMap&&idMap.name){
+    $('personalIdNameHint').textContent=idMap.name;
+    $('personalIdNameHint').style.display='';
+  }else{
+    $('personalIdNameHint').style.display='none';
+  }
   if(idMap){
-    $('personalIdLabel').innerHTML=idMap.name+' <span class="'+(idMap.required?'required':'optional')+'" id="personalIdReq">'+(idMap.required?'必須':'任意')+'</span>';
     $('personalId').placeholder=idMap.ph||'空欄でも可';
     $('personalId').maxLength=idMap.max||20;
     $('personalIdNote').style.display=idMap.note?'':'none';
@@ -557,7 +587,6 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
     $('personalIdDna').style.display=idMap.dna?'':'none';
     if(!idMap.dna)$('personalIdDnaCheck').checked=false;
   }else{
-    $('personalIdLabel').innerHTML='個人識別番号 <span class="optional" id="personalIdReq">任意</span>';
     $('personalId').placeholder='空欄でも可';
     $('personalIdNote').style.display='none';
     $('personalIdDna').style.display='none';
@@ -685,6 +714,35 @@ $('personalIdDnaCheck').addEventListener('change',function(){
   });
 });
 
+// ===== EMAIL DOMAIN SUGGEST =====
+const EMAIL_DOMAINS=['@gmail.com','@yahoo.co.jp','@outlook.jp','@icloud.com','@hotmail.com','@outlook.com','@yahoo.com','@docomo.ne.jp','@ezweb.ne.jp','@softbank.ne.jp'];
+function setupEmailSuggest(inputId,suggestId){
+  const inp=$(inputId),box=$(suggestId);
+  inp.addEventListener('input',function(){
+    const v=this.value;
+    const atIdx=v.indexOf('@');
+    if(atIdx<1){box.style.display='none';return}
+    const local=v.substring(0,atIdx);
+    const partial=v.substring(atIdx);
+    const matches=EMAIL_DOMAINS.filter(d=>d.startsWith(partial)&&d!==partial);
+    if(!matches.length){box.style.display='none';return}
+    box.innerHTML=matches.map(d=>'<div class="es-item">'+local+d+'</div>').join('');
+    box.style.display='block';
+    box.querySelectorAll('.es-item').forEach(item=>{
+      item.addEventListener('mousedown',function(e){
+        e.preventDefault();
+        inp.value=this.textContent;
+        box.style.display='none';
+        inp.dispatchEvent(new Event('input',{bubbles:true}));
+        inp.dispatchEvent(new Event('blur',{bubbles:true}));
+      });
+    });
+  });
+  inp.addEventListener('blur',function(){setTimeout(()=>box.style.display='none',150)});
+}
+setupEmailSuggest('email1','emailSuggest1');
+setupEmailSuggest('email2','emailSuggest2');
+
 // ===== PHONE (20 chars, digits only, fullwidth→half) =====
 $('phoneNumber').addEventListener('input',function(){
   this.value=toHalf(this.value).replace(/[\s\-]/g,'').replace(/[^0-9]/g,'').slice(0,20);
@@ -699,20 +757,12 @@ $('postalCode').addEventListener('input',function(){
   this.value=toHalf(this.value).replace(/\s/g,'').replace(/[^0-9]/g,'').slice(0,10);
   showErr('errPostal',false);showErr('errPostalInvalid',false);
   if(this.value.length>=7){
-    const zip=this.value;
-    // Use zipcloud for Japanese results, then convert prefecture via map
-    fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+zip)
+    fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+this.value)
       .then(r=>r.json()).then(d=>{
         if(d.results&&d.results[0]){
           const r=d.results[0];
-          const pref=PREF_MAP[r.address1]||r.address1.toUpperCase();
-          $('prefecture').value=pref;
-          // For city, use kana-to-romaji via secondary API
-          const city=(r.address2||'')+(r.address3||'');
-          fetch('https://api.excelapi.org/post/romaji?text='+encodeURIComponent(city))
-            .then(r2=>r2.text()).then(romaji=>{
-              $('municipality').value=(romaji||city).toUpperCase().trim();
-            }).catch(()=>{$('municipality').value=city.toUpperCase()});
+          $('prefecture').value=PREF_MAP[r.address1]||kanaToRomaji((r.kana1||'').trim());
+          $('municipality').value=kanaToRomaji(((r.kana2||'')+' '+(r.kana3||'')).trim());
           showErr('errPostalInvalid',false);
         }else{showErr('errPostalInvalid',true)}
       }).catch(()=>{});
