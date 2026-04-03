@@ -1261,14 +1261,16 @@ function checkSurnameDictionary(name){
   }
   return best;
 }
-// Surname alert element
-(function(){
-  const surnameField=$('surname');
+// Surname alert - attach to all surname fields
+function attachSurnameAlert(fieldId){
+  const field=$(fieldId);if(!field)return;
   const alertDiv=document.createElement('div');
-  alertDiv.id='surnameAlert';
+  alertDiv.id=fieldId+'Alert';
   alertDiv.style.cssText='display:none;background:#fff8e1;border:1px solid #f9a825;border-radius:6px;padding:10px 14px;margin-top:6px;font-size:13px;color:#5d4037;line-height:1.6';
-  surnameField.parentNode.insertBefore(alertDiv,surnameField.nextSibling.nextSibling);
-  surnameField.addEventListener('blur',function(){
+  const errEl=field.nextElementSibling;
+  if(errEl)field.parentNode.insertBefore(alertDiv,errEl.nextSibling);
+  else field.parentNode.appendChild(alertDiv);
+  field.addEventListener('blur',function(){
     const v=this.value.trim();
     const suggestion=checkSurnameDictionary(v);
     if(suggestion){
@@ -1278,8 +1280,9 @@ function checkSurnameDictionary(name){
       alertDiv.style.display='none';
     }
   });
-  surnameField.addEventListener('input',function(){alertDiv.style.display='none'});
-})();
+  field.addEventListener('input',function(){alertDiv.style.display='none'});
+}
+['surname','aliasSurname','emergSurname','fatherSurname','motherSurname'].forEach(attachSurnameAlert);
 
 // ===== 個人識別番号 (country-specific) =====
 $('personalId').addEventListener('input',function(){
