@@ -118,7 +118,7 @@
   <div class="card">
     <div class="section-header"><span class="section-title">申請者情報</span><button type="button" class="help-btn" onclick="showModal('helpApplicant')">？</button></div>
     <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="required">必須</span></label><input type="text" id="surname" placeholder="(例) YAMADA" required><div class="error" id="errSurname">半角英字で入力してください</div></div>
-    <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="required">必須</span></label><input type="text" id="givenName" placeholder="(例) TARO" required><div class="error" id="errGivenName">半角英字で入力してください</div></div>
+    <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="required">必須</span></label><input type="text" id="givenName" placeholder="(例) TARO" required><div class="hint">※パスポート記載と同じ綴りで、ミドルネームも含めて入力してください。</div><div class="error" id="errGivenName">半角英字で入力してください</div></div>
     <div class="form-group"><label>別名の有無 <span class="en">/ Aliases</span><span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="aliasYes" name="hasAlias" value="yes"><label for="aliasYes">別名があります</label><input type="radio" id="aliasNo" name="hasAlias" value="no" checked><label for="aliasNo">別名はありません</label></div>
       <div class="note">※上記以外の名前（別名・別称）はありますか？</div>
@@ -208,14 +208,17 @@
     <div class="form-group"><label>丁番地 <span class="en">/ Street</span><span class="required">必須</span></label>
       <input type="text" id="street" placeholder="(例) 1-1-1">
       <div class="hint">※ローマ字・数字にて入力してください。</div>
+      <div class="error" id="errStreet">半角英数字で入力してください</div>
     </div>
     <div class="form-group"><label>建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
       <input type="text" id="building" placeholder="(例) ABC HOUSE・空欄でも可">
       <div class="hint">※ローマ字・数字にて入力してください。</div>
+      <div class="error" id="errBuilding">半角英数字で入力してください</div>
     </div>
     <div class="form-group"><label>部屋番号 <span class="en">/ Unit</span><span class="optional">任意</span></label>
       <input type="text" id="unit" placeholder="(例) 101・空欄でも可">
       <div class="hint">※ローマ字・数字にて入力してください。</div>
+      <div class="error" id="errUnit">半角英数字で入力してください</div>
     </div>
   </div>
 
@@ -817,11 +820,23 @@ function fillYearsGrouped(sel,from,to){
 }
 const $=id=>document.getElementById(id);
 const showErr=(id,show)=>{const e=$(id);if(e)e.classList.toggle('show',!!show);updateBtn()};
-const nextBtn=()=>document.querySelector('.btn-next');
 function updateBtn(){
-  const errs=document.querySelectorAll('.error.show');
-  const btn=nextBtn();
-  if(btn)btn.classList.toggle('disabled',errs.length>0);
+  // Step 1
+  const s1=$('appForm');
+  if(s1&&s1.style.display!=='none'){
+    const errs=s1.querySelectorAll('.error.show');
+    const phoneEmpty=!$('phoneType').value;
+    const btn=s1.querySelector('.btn-next');
+    if(btn)btn.classList.toggle('disabled',errs.length>0||phoneEmpty);
+  }
+  // Step 3
+  const s3=$('step3Content');
+  if(s3&&s3.style.display!=='none'){
+    const errs=s3.querySelectorAll('.error.show');
+    const agreeOk=$('agreeDisclaimer')&&$('agreeDisclaimer').checked&&$('agreeTerms')&&$('agreeTerms').checked;
+    const btn=s3.querySelector('.btn-next');
+    if(btn)btn.classList.toggle('disabled',errs.length>0||!agreeOk);
+  }
 }
 
 // ===== Full-width to half-width =====
@@ -929,6 +944,21 @@ initCustomSelect('nationalityWrap','nationality','nationalityBtn',ESTA_ITEMS,'JP
   const icBtn=$('issuingCountryBtn');
   const icItem=WORLD_ITEMS.find(i=>i.value===v);
   if(icBtn&&icItem)icBtn.textContent=icItem.label;
+  // DEU: add Unspecified gender option
+  const genderGroup=$('genderMale').closest('.toggle-group');
+  const existingUnspec=$('genderUnspec');
+  if(v==='DEU'&&!existingUnspec){
+    const inp=document.createElement('input');inp.type='radio';inp.id='genderUnspec';inp.name='gender';inp.value='unspecified';
+    const lbl=document.createElement('label');lbl.htmlFor='genderUnspec';lbl.textContent='Unspecified';
+    genderGroup.appendChild(inp);genderGroup.appendChild(lbl);
+  }else if(v!=='DEU'&&existingUnspec){
+    const lbl=genderGroup.querySelector('label[for=genderUnspec]');
+    if(existingUnspec.checked){existingUnspec.checked=false}
+    existingUnspec.remove();if(lbl)lbl.remove();
+  }
+  // Restricted dual nationality check
+  const RESTRICTED_NATIONS=['IRN','IRQ','SDN','SYR','PRK'];
+  // (checked in other nationality sections)
   updateBtn();
 });
 initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'JPN',function(v){
@@ -967,8 +997,16 @@ initCustomSelect('addrCountryWrap','addrCountry','addrCountryBtn',WORLD_ITEMS,'J
 initCustomSelect('birthCountryWrap','birthCountry','birthCountryBtn',WORLD_ITEMS,'JPN');
 initCustomSelect('issuingCountryWrap','issuingCountry','issuingCountryBtn',WORLD_ITEMS,'JPN');
 initCustomSelect('otherPassCountryWrap','otherPassCountry','otherPassCountryBtn',WORLD_ITEMS);
-initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS);
-initCustomSelect('pastNatCountryWrap','pastNatCountry','pastNatCountryBtn',WORLD_ITEMS);
+const RESTRICTED_DUAL=['IRN','IRQ','SDN','SYR','PRK'];
+function checkDualRestriction(val,fieldId){
+  const errId='errDualRestrict_'+fieldId;
+  let errEl=$(errId);
+  if(!errEl){errEl=document.createElement('div');errEl.className='error';errEl.id=errId;errEl.textContent='この国籍を持つ方はVWP（ビザ免除プログラム）の対象外のため、ESTA申請はできません。大使館でビザを申請してください。';$(fieldId).closest('.form-group').appendChild(errEl)}
+  if(RESTRICTED_DUAL.includes(val)){errEl.classList.add('show');updateBtn()}
+  else{errEl.classList.remove('show');updateBtn()}
+}
+initCustomSelect('curNatCountryWrap','curNatCountry','curNatCountryBtn',WORLD_ITEMS,'',v=>checkDualRestriction(v,'curNatCountry'));
+initCustomSelect('pastNatCountryWrap','pastNatCountry','pastNatCountryBtn',WORLD_ITEMS,'',v=>checkDualRestriction(v,'pastNatCountry'));
 
 // Phone - custom (with phone-specific layout)
 (function(){
@@ -1026,15 +1064,20 @@ setupToggle('geYes','geNo','geFields',['passId']);
 
 // ===== NATIONALITY → 個人識別番号 (handled by custom select onSelect callback) =====
 
-// ===== NAME FIELDS (alpha only, 45 chars, trim) =====
+// ===== UMLAUT / SPECIAL CHAR CONVERSION =====
+const UMLAUT_MAP={'Ä':'AE','Ö':'OE','Ü':'UE','ß':'SS','Ñ':'N','Ø':'O','Å':'AA','Æ':'AE','Ð':'D','Þ':'TH',
+'ä':'AE','ö':'OE','ü':'UE','ñ':'N','ø':'O','å':'AA','æ':'AE','ð':'D','þ':'TH'};
+function convertUmlaut(s){return s.replace(/[ÄÖÜßÑØÅÆÐÞäöüñøåæðþ]/g,c=>UMLAUT_MAP[c]||c)}
+
+// ===== NAME FIELDS (alpha, apostrophe, 45 chars, trim, space normalize) =====
 function setupNameField(id){
   const el=$(id);
   el.addEventListener('input',function(){
-    this.value=toHalf(this.value).replace(/[^a-zA-Z\s]/g,'').toUpperCase().slice(0,45);
+    this.value=convertUmlaut(toHalf(this.value)).replace(/[^a-zA-Z\s']/g,'').toUpperCase().replace(/\s{2,}/g,' ').slice(0,45);
     showErr('err'+id.charAt(0).toUpperCase()+id.slice(1),false);
   });
   el.addEventListener('blur',function(){
-    this.value=this.value.trim();
+    this.value=this.value.trim().replace(/\s{2,}/g,' ');
     const empty=!this.value;
     showErr('err'+id.charAt(0).toUpperCase()+id.slice(1),empty&&(this===document.activeElement||this.closest('.collapsible.show')||!this.closest('.collapsible')));
   });
@@ -1045,7 +1088,7 @@ function setupNameField(id){
 $('personalId').addEventListener('input',function(){
   let v=toHalf(this.value).replace(/\s/g,'').replace(/[^a-zA-Z0-9\-]/g,'').toUpperCase();
   const idMap=ID_REQUIRED_MAP[natSel.value];
-  const max=idMap?idMap.max:20;
+  const max=idMap?idMap.max:14;
   this.value=v.slice(0,max);
   showErr('errPersonalId',false);
 });
@@ -1053,11 +1096,25 @@ $('personalId').addEventListener('blur',function(){
   const v=this.value;const nat=natSel.value;
   const idMap=ID_REQUIRED_MAP[nat];
   if($('personalIdDnaCheck').checked){showErr('errPersonalId',false);return}
+  // TWN check digit: weighted sum mod 10 = 0
+  if(nat==='TWN'&&v&&/^[A-Z][0-9]{9}$/.test(v)){
+    const letterVal='ABCDEFGHJKLMNPQRSTUVXYWZIO'.indexOf(v[0]);
+    if(letterVal>=0){
+      const n1=Math.floor((letterVal+10)/10),n2=(letterVal+10)%10;
+      const weights=[1,9,8,7,6,5,4,3,2,1,1];
+      const digits=[n1,n2,...v.slice(1).split('').map(Number)];
+      const sum=digits.reduce((s,d,i)=>s+d*weights[i],0);
+      if(sum%10!==0){
+        $('errPersonalId').textContent='個人識別番号のチェックデジットが正しくありません';
+        showErr('errPersonalId',true);return;
+      }
+    }
+  }
   if(v&&idMap&&idMap.regex&&!idMap.regex.test(v)){
-    $('errPersonalId').textContent='入力形式に誤りがあります';
+    $('errPersonalId').textContent=natSel.value==='TWN'?'10桁の半角英数字で入力してください':'半角英数字で入力してください';
     showErr('errPersonalId',true);
   }else if(!v&&idMap&&idMap.required){
-    $('errPersonalId').textContent='この項目は必須です';
+    $('errPersonalId').textContent=natSel.value==='TWN'?'10桁の半角英数字で入力してください':'この項目は必須です';
     showErr('errPersonalId',true);
   }else{
     showErr('errPersonalId',false);
@@ -1121,6 +1178,8 @@ $('phoneNumber').addEventListener('input',function(){
 });
 $('phoneNumber').addEventListener('blur',function(){
   if(this.value&&/[^0-9]/.test(this.value))showErr('errPhone',true);
+  // Remove leading zeros for registration
+  this.dataset.cleaned=this.value.replace(/^0+/,'');
 });
 
 // ===== POSTAL CODE (10 chars, digits only, auto-lookup) =====
@@ -1183,6 +1242,15 @@ $('selfieFile').addEventListener('change',function(){
     if(file.size>10*1024*1024){
       showErr('errSelfieFile',true);$('selfieFileName').textContent='';this.value='';return;
     }
+    // Resolution check (600-2400px)
+    const img=new Image();
+    img.onload=function(){
+      if(img.width<600||img.height<600||img.width>2400||img.height>2400){
+        $('errSelfieFile').textContent='画像の解像度は600px〜2400pxの範囲にしてください（現在: '+img.width+'×'+img.height+'px）';
+        showErr('errSelfieFile',true);
+      }
+    };
+    img.src=URL.createObjectURL(file);
     $('selfieFileName').textContent='✓ '+file.name;
   }else{$('selfieFileName').textContent=''}
 });
@@ -1211,8 +1279,10 @@ function getDob(){
 }
 function checkDob(){
   const dob=getDob();
-  if(dob&&dob>new Date())showErr('errDob',true);
-  else showErr('errDob',false);
+  if(dob&&dob>new Date()){
+    showErr('errDob',true);
+    $('dobMonth').value='';$('dobDay').value='';
+  }else{showErr('errDob',false)}
   updateBtn();
 }
 ['dobYear','dobMonth','dobDay'].forEach(id=>$(id).addEventListener('change',checkDob));
@@ -1545,6 +1615,14 @@ function initStep3(){
   s3alphaUp('fatherGivenName','errFatherGiven');
   s3alphaUp('motherSurname','errMotherSurname');
   s3alphaUp('motherGivenName','errMotherGiven');
+
+  // Agreement checkboxes → update button state
+  ['agreeDisclaimer','agreeTerms'].forEach(id=>{
+    $(id).addEventListener('change',updateBtn);
+  });
+
+  // Phone type → update button
+  $('phoneType').addEventListener('change',updateBtn);
 }
 </script>
 </body>
