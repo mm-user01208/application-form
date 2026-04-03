@@ -117,7 +117,7 @@
   </style>
 </head>
 <body>
-<div class="header"><h1>申請者情報入力</h1><p>Enter Applicant Information</p></div>
+<div class="header"><h1>ESTA申請フォーム</h1><p>ESTA Application Form</p></div>
 <div class="container">
   <div class="steps">
     <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div><span class="step-arrow">→</span>
@@ -136,7 +136,7 @@
   <form id="appForm" novalidate>
   <!-- ========== 申請者情報 ========== -->
   <div class="card">
-    <div class="section-header"><span class="section-title">申請者情報</span><button type="button" class="help-btn" onclick="showModal('helpApplicant')">？</button></div>
+    <div class="section-header" id="secApplicant"><span class="section-title">申請者情報</span><button type="button" class="help-btn" onclick="showModal('helpApplicant')">？</button></div>
     <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="required">必須</span></label><input type="text" id="surname" placeholder="(例) YAMADA" required><div class="error" id="errSurname">半角英字で入力してください</div></div>
     <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="required">必須</span></label><input type="text" id="givenName" placeholder="(例) TARO" required><div class="hint">※パスポート記載と同じ綴りで、ミドルネームも含めて入力してください。</div><div class="error" id="errGivenName">半角英字で入力してください</div></div>
     <div class="form-group"><label>別名の有無 <span class="en">/ Aliases</span><span class="required">必須</span></label>
@@ -172,7 +172,7 @@
 
   <!-- ========== 連絡先情報 ========== -->
   <div class="card">
-    <div class="section-header"><span class="section-title">連絡先情報</span><button type="button" class="help-btn" onclick="showModal('helpContact')">？</button></div>
+    <div class="section-header" id="secContact"><span class="section-title">連絡先情報</span><button type="button" class="help-btn" onclick="showModal('helpContact')">？</button></div>
     <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="required">必須</span></label>
       <div style="position:relative"><input type="email" id="email1" placeholder="(例) yamada_taro@example.co.jp" autocomplete="off"><div class="email-suggest" id="emailSuggest1"></div></div>
       <div class="note">※申請結果をメールにて送信します。迷惑メールフォルダに振り分けられる場合がありますのでご注意ください。</div>
@@ -204,7 +204,7 @@
 
   <!-- ========== 住所情報 ========== -->
   <div class="card">
-    <div class="section-header"><span class="section-title">住所情報</span><button type="button" class="help-btn" onclick="showModal('helpAddress')">？</button></div>
+    <div class="section-header" id="secAddress"><span class="section-title">住所情報</span><button type="button" class="help-btn" onclick="showModal('helpAddress')">？</button></div>
     <div class="form-group"><label>郵便番号 <span class="en">/ Postal Code</span><span class="required">必須</span></label>
       <div class="postal-row"><input type="text" id="postalCode" placeholder="(例) 1000000"><a href="https://www.post.japanpost.jp/zipcode/index.html" target="_blank">🔍 郵便番号を検索</a></div>
       <div class="hint">※ハイフンを除いた数字のみ入力してください。</div>
@@ -244,7 +244,7 @@
 
   <!-- ========== パスポート情報 ========== -->
   <div class="card">
-    <div class="section-header"><span class="section-title">パスポート情報</span><button type="button" class="help-btn" onclick="showModal('helpPassport')">？</button></div>
+    <div class="section-header" id="secPassport"><span class="section-title">パスポート情報</span><button type="button" class="help-btn" onclick="showModal('helpPassport')">？</button></div>
     <div class="form-group"><label>パスポートのアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpPassportUpload')">？</button></label>
       <div class="upload-box" onclick="document.getElementById('passportFile').click()"><span class="upload-text">画像を選択してください</span><input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif"></div>
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
@@ -393,7 +393,7 @@
 
   <!-- 渡航情報 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">渡航情報</span><button type="button" class="help-btn" onclick="showModal('helpTravel')">？</button></div>
+    <div class="section-header" id="secTravel"><span class="section-title">渡航情報</span><button type="button" class="help-btn" onclick="showModal('helpTravel')">？</button></div>
     <div class="form-group"><label>米国への渡航目的は、他国へ乗り継ぐためですか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no" checked><label for="transitNo">いいえ</label></div>
       <div class="hint">※米国にて滞在する方は「いいえ」、乗り継ぎの方は「はい」を選択してください。</div>
@@ -416,7 +416,7 @@
 
   <!-- 滞在先情報 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">滞在先情報</span><button type="button" class="help-btn" onclick="showModal('helpStay')">？</button></div>
+    <div class="section-header" id="secStay"><span class="section-title">滞在先情報</span><button type="button" class="help-btn" onclick="showModal('helpStay')">？</button></div>
     <div class="form-group"><label>米国での滞在先の住所を登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="stayYes" name="hasStay" value="yes"><label for="stayYes">はい</label><input type="radio" id="stayNo" name="hasStay" value="no" checked><label for="stayNo">いいえ</label></div>
       <div class="hint">※不明な場合や未定の場合は「いいえ」を選択してください。</div>
@@ -495,7 +495,7 @@
 
   <!-- 就労経験 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">就労情報</span><button type="button" class="help-btn" onclick="showModal('helpEmploy')">？</button></div>
+    <div class="section-header" id="secEmploy"><span class="section-title">就労情報</span><button type="button" class="help-btn" onclick="showModal('helpEmploy')">？</button></div>
     <div class="form-group"><label>現在または過去に就労経験はありますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="employYes" name="hasEmploy" value="yes"><label for="employYes">はい</label><input type="radio" id="employNo" name="hasEmploy" value="no"><label for="employNo">いいえ</label></div>
     </div>
@@ -545,7 +545,7 @@
 
   <!-- SNSアカウント（複数対応） -->
   <div class="card">
-    <div class="section-header"><span class="section-title">SNS情報</span><button type="button" class="help-btn" onclick="showModal('helpSns')">？</button></div>
+    <div class="section-header" id="secSns"><span class="section-title">SNS情報</span><button type="button" class="help-btn" onclick="showModal('helpSns')">？</button></div>
     <div class="form-group"><label>SNSアカウントを登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="snsYes" name="hasSns" value="yes"><label for="snsYes">はい</label><input type="radio" id="snsNo" name="hasSns" value="no"><label for="snsNo">いいえ</label></div>
     </div>
@@ -566,7 +566,7 @@
 
   <!-- 緊急連絡先 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">緊急連絡先</span><button type="button" class="help-btn" onclick="showModal('helpEmerg')">？</button></div>
+    <div class="section-header" id="secEmerg"><span class="section-title">緊急連絡先</span><button type="button" class="help-btn" onclick="showModal('helpEmerg')">？</button></div>
     <div class="form-group"><label>緊急連絡先を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="emergYes" name="hasEmerg" value="yes"><label for="emergYes">はい</label><input type="radio" id="emergNo" name="hasEmerg" value="no" checked><label for="emergNo">いいえ</label></div>
     </div>
@@ -590,7 +590,7 @@
 
   <!-- 両親の名前（Unknown対応） -->
   <div class="card">
-    <div class="section-header"><span class="section-title">両親の情報</span><button type="button" class="help-btn" onclick="showModal('helpParent')">？</button></div>
+    <div class="section-header" id="secParent"><span class="section-title">両親の情報</span><button type="button" class="help-btn" onclick="showModal('helpParent')">？</button></div>
     <div class="form-group"><label>両親の名前を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="parentYes" name="hasParent" value="yes"><label for="parentYes">はい</label><input type="radio" id="parentNo" name="hasParent" value="no" checked><label for="parentNo">いいえ</label></div>
     </div>
@@ -621,7 +621,7 @@
 
   <!-- 適格性質問 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">適格性に関する質問</span><button type="button" class="help-btn" onclick="showModal('helpEligibility')">？</button></div>
+    <div class="section-header" id="secEligibility"><span class="section-title">適格性に関する質問</span><button type="button" class="help-btn" onclick="showModal('helpEligibility')">？</button></div>
     <div class="notice-box" style="margin-bottom:20px"><strong>⚠ 注意：</strong>以下の質問にはすべて正直にお答えください。虚偽の回答は申請の却下や入国拒否の原因となります。</div>
     <div class="form-group"><label>① 身体的・精神的疾患を患っている、または薬物乱用者・薬物中毒者ですか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="eq1Yes" name="eq1" value="yes"><label for="eq1Yes">はい</label><input type="radio" id="eq1No" name="eq1" value="no"><label for="eq1No">いいえ</label></div></div>
@@ -689,41 +689,41 @@
       <div class="card-header"><h2>入力内容の確認</h2></div>
       <div class="notice-box">⚠ 入力内容をよくご確認ください。誤りがある場合は「修正する」ボタンで該当ステップに戻れます。</div>
 
-      <div class="confirm-section-title">申請者情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">申請者情報 <span class="confirm-edit" onclick="editFromConfirm(1,'secApplicant')">修正する</span></div>
       <table class="confirm-table" id="confirmApplicant"></table>
 
-      <div class="confirm-section-title">連絡先情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">連絡先情報 <span class="confirm-edit" onclick="editFromConfirm(1,'secContact')">修正する</span></div>
       <table class="confirm-table" id="confirmContact"></table>
 
-      <div class="confirm-section-title">住所情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">住所情報 <span class="confirm-edit" onclick="editFromConfirm(1,'secAddress')">修正する</span></div>
       <table class="confirm-table" id="confirmAddress"></table>
 
-      <div class="confirm-section-title">パスポート情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">パスポート情報 <span class="confirm-edit" onclick="editFromConfirm(1,'secPassport')">修正する</span></div>
       <div id="confirmPassportImages" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
         <div style="text-align:center"><p style="font-size:12px;color:#666;margin-bottom:4px">パスポート画像</p><img id="confirmPassportImg" style="max-width:200px;max-height:140px;border-radius:8px;border:1px solid #d0d5dd;display:none"></div>
         <div style="text-align:center"><p style="font-size:12px;color:#666;margin-bottom:4px">顔写真</p><img id="confirmSelfieImg" style="max-width:140px;max-height:140px;border-radius:8px;border:1px solid #d0d5dd;display:none"></div>
       </div>
       <table class="confirm-table" id="confirmPassport"></table>
 
-      <div class="confirm-section-title">渡航情報 <span class="confirm-edit" onclick="goToStep2FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">渡航情報 <span class="confirm-edit" onclick="editFromConfirm(2,'secTravel')">修正する</span></div>
       <table class="confirm-table" id="confirmTravel"></table>
 
-      <div class="confirm-section-title">滞在先情報 <span class="confirm-edit" onclick="goToStep2FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">滞在先情報 <span class="confirm-edit" onclick="editFromConfirm(2,'secStay')">修正する</span></div>
       <table class="confirm-table" id="confirmStay"></table>
 
-      <div class="confirm-section-title">就労情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">就労情報 <span class="confirm-edit" onclick="editFromConfirm(3,'secEmploy')">修正する</span></div>
       <table class="confirm-table" id="confirmEmploy"></table>
 
-      <div class="confirm-section-title">SNS情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">SNS情報 <span class="confirm-edit" onclick="editFromConfirm(3,'secSns')">修正する</span></div>
       <table class="confirm-table" id="confirmSns"></table>
 
-      <div class="confirm-section-title">緊急連絡先 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">緊急連絡先 <span class="confirm-edit" onclick="editFromConfirm(3,'secEmerg')">修正する</span></div>
       <table class="confirm-table" id="confirmEmergency"></table>
 
-      <div class="confirm-section-title">両親情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">両親情報 <span class="confirm-edit" onclick="editFromConfirm(3,'secParent')">修正する</span></div>
       <table class="confirm-table" id="confirmParents"></table>
 
-      <div class="confirm-section-title">適格性に関する質問 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <div class="confirm-section-title">適格性に関する質問 <span class="confirm-edit" onclick="editFromConfirm(3,'secEligibility')">修正する</span></div>
       <table class="confirm-table" id="confirmEligibility"></table>
     </div>
     <div class="btn-row">
@@ -1612,9 +1612,14 @@ function clearReturnMode(){
     delete b.dataset.returnConfirm;
   });
 }
-function goToStep1FromConfirm(){hideAllSteps();document.querySelectorAll('form .card').forEach(c=>c.style.display='');$('step1Btns').style.display='';showStep(0);setReturnMode()}
-function goToStep2FromConfirm(){hideAllSteps();$('step2Content').style.display='';showStep(1);setReturnMode()}
-function goToStep3FromConfirm(){hideAllSteps();$('step3Content').style.display='';showStep(2);setReturnMode()}
+function goToStep1FromConfirm(scrollTo){hideAllSteps();document.querySelectorAll('form .card').forEach(c=>c.style.display='');$('step1Btns').style.display='';showStep(0);setReturnMode();if(scrollTo)setTimeout(()=>{const el=$(scrollTo);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},100)}
+function goToStep2FromConfirm(scrollTo){hideAllSteps();$('step2Content').style.display='';showStep(1);setReturnMode();if(scrollTo)setTimeout(()=>{const el=$(scrollTo);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},100)}
+function goToStep3FromConfirm(scrollTo){hideAllSteps();$('step3Content').style.display='';showStep(2);setReturnMode();if(scrollTo)setTimeout(()=>{const el=$(scrollTo);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},100)}
+function editFromConfirm(step,sectionId){
+  if(step===1)goToStep1FromConfirm(sectionId);
+  else if(step===2)goToStep2FromConfirm(sectionId);
+  else if(step===3)goToStep3FromConfirm(sectionId);
+}
 function goToStep4FromPayment(){hideAllSteps();$('step4Content').style.display='';showStep(3)}
 function goToStep5(){
   hideAllSteps();
