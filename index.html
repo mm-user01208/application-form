@@ -127,7 +127,7 @@
     <div class="step-item"><span class="step-num">⑤</span> 申請料お支払い</div><span class="step-arrow">→</span>
     <div class="step-item"><span class="step-num">⑥</span> 申請完了</div>
   </div>
-  <div class="notice-box">
+  <div class="notice-box" id="mainNoticeBox">
     <p><strong>注意事項：</strong>すべての項目は<span style="color:#e74c3c;font-weight:700">英語(ローマ字)</span>で入力してください。</p>
     <p>申請方法に関する詳細は「<strong>？</strong>」ボタンをクリックしてください。</p>
   </div>
@@ -249,6 +249,7 @@
       <div class="upload-box" onclick="document.getElementById('passportFile').click()"><span class="upload-text">画像を選択してください</span><input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif"></div>
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
       <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+      <img id="passportPreview" style="display:none;max-width:300px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd;margin-top:8px">
       <div class="error" id="errPassportFile">ファイルサイズが上限の10MBを超えています</div>
     </div>
     <div class="form-group"><label>顔写真のアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpSelfieUpload')">？</button></label>
@@ -256,6 +257,7 @@
       <div class="hint">※肩から頭部までが写っている写真をアップロードしてください。</div>
       <div class="hint" style="color:#e74c3c">※パスポートの顔写真は使用できません。</div>
       <div id="selfieFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+      <img id="selfiePreview" style="display:none;max-width:200px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd;margin-top:8px">
       <div class="error" id="errSelfieFile">ファイルサイズが上限の10MBを超えています</div>
       <div class="error" id="errSelfieType">jpeg、pngファイルのみアップロード可能です</div>
     </div>
@@ -697,6 +699,10 @@
       <table class="confirm-table" id="confirmAddress"></table>
 
       <div class="confirm-section-title">パスポート情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <div id="confirmPassportImages" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+        <div style="text-align:center"><p style="font-size:12px;color:#666;margin-bottom:4px">パスポート画像</p><img id="confirmPassportImg" style="max-width:200px;max-height:140px;border-radius:8px;border:1px solid #d0d5dd;display:none"></div>
+        <div style="text-align:center"><p style="font-size:12px;color:#666;margin-bottom:4px">顔写真</p><img id="confirmSelfieImg" style="max-width:140px;max-height:140px;border-radius:8px;border:1px solid #d0d5dd;display:none"></div>
+      </div>
       <table class="confirm-table" id="confirmPassport"></table>
 
       <div class="confirm-section-title">渡航情報 <span class="confirm-edit" onclick="goToStep2FromConfirm()">修正する</span></div>
@@ -751,11 +757,29 @@
         <div id="stripeError" style="color:#e74c3c;font-size:12px;margin-top:8px;display:none"></div>
       </div>
 
-      <div style="background:#fff8e1;border:1px solid #f5c842;border-radius:8px;padding:14px;margin-bottom:24px;font-size:12px;color:#856404;line-height:1.6">
-        <strong>⚠ ご注意</strong><br>
-        ・お支払い完了後のキャンセル・返金はできません。<br>
-        ・申請結果はメールにてお知らせいたします。<br>
-        ・決済完了後、自動的に申請完了画面に遷移します。
+      <div style="background:#fef3f3;border:1px solid #e74c3c;border-radius:8px;padding:16px 20px;margin-bottom:24px;font-size:13px;color:#333;line-height:1.8">
+        <p style="font-weight:700;color:#e74c3c;margin-bottom:10px">エラーメッセージが表示される場合</p>
+        <p>ご入力いただいた内容に誤りがあることが考えられます。<br>エラーメッセージが表示された場合は下記の事例をご確認ください。</p>
+        <p style="font-weight:600;margin-top:12px">●事例1　数字を半角ではなく「全角」で入力している</p>
+        <p style="margin-left:16px">
+          <span style="color:#e74c3c">×　全角 ４９０６８８８８７７７７０１２３</span><br>
+          <span style="color:#27ae60">○　半角 4906888877770123</span>
+        </p>
+        <p>クレジットカード番号、有効期限、セキュリティコード(確認コード)は全て半角で入力してください。ハイフンの入力は不要です。</p>
+        <p style="font-weight:600;margin-top:12px">●事例2　有効期限の月と年を逆に入力している</p>
+        <p style="margin-left:16px">例)　2030年8月の場合 → <strong>08/2030</strong></p>
+        <p>クレジットカードの有効期限は　<strong>月/年</strong>　の順で入力してください。</p>
+        <p style="margin-top:12px">上記の事例に該当せずエラーメッセージが表示された場合は他の原因が考えられます。「お問い合わせ」欄よりエラーの内容を入力いただきご連絡をお願いします。</p>
+      </div>
+
+      <div style="background:#f0f4f8;border:1px solid #d0d5dd;border-radius:8px;padding:16px 20px;margin-bottom:24px;font-size:12px;color:#555;line-height:1.8">
+        <p style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:10px">お支払い方法について</p>
+        <p>お支払いはクレジットカード(Visa、Master Card、JCB、American Express、Diners Club)のみとなります。カード番号、有効期限、セキュリティコードをご入力いただいた後、「今すぐ支払う」をクリックしてください。クレジットカード番号はハイフンを入力せず半角数字での入力をお願いします。</p>
+        <p style="margin-top:8px">ESTAの審査結果は申請いただいた後、速やかに通知いたしますが最長72時間ほど要する場合がありますのでご了承ください。お申し込み完了後は、ご登録いただいたメールアドレスにESTA申請受付のお知らせや審査結果等のメールを送信します。受信が確認できない場合は、メールアドレスの入力間違いや迷惑メール防止フィルターなどの設定が考えられます。フリーメールアドレスを登録された方は、迷惑メールフォルダ等に振り分けられてしまう場合がありますのでご注意ください。メールの受信設定をされている場合は、ESTAの申請から審査結果が届くまで一時的に設定を解除くださいますようお願いします。</p>
+        <p style="margin-top:8px">決済手続きが完了次第、お申し込み完了の画面へ遷移します。当サイトはESTA申請代行サービスを提供する民間サイトであり、米国政府の公式サイトではありません。ESTA申請費用として申請代行手数料24,200円(税込)を申し受けます。なお、本料金にはアメリカ合衆国税関・国境警備局への公式申請料($40.27)が含まれています。</p>
+        <p style="margin-top:8px">ESTA申請の登録前にお問い合わせフォームよりキャンセルのご連絡をいただいた場合は、決済手数料900円を差し引いた金額を返金いたします。申請登録とは、アメリカ合衆国税関・国境警備局のESTAシステムへ申請情報を入力し申請状況(保留を含む)が反映された時点を指します。DHSシステムの仕様上、申請後に申請及び認証そのものを取り消す事ができないため申請登録後はキャンセルおよび返金をお受けできません。詳細は同意事項をご確認ください。</p>
+        <p style="margin-top:8px">適格性や国籍に関する質問などについてのご回答内容によっては、申請手続きの継続のため、メールにて追加の質問をさせて頂く場合がございます。この場合、お客様からご回答を頂戴するまで申請手続きを保留とさせて頂きます。なお、当サイトからの追加質問から2週間を経過しても当該質問に対するお客様からのご回答が確認出来ない場合は、当サイトサービスのお申込みをキャンセルとさせて頂き、頂戴しております料金については決済手数料900円を差し引いた代金を返金いたします。</p>
+        <p style="margin-top:8px">なお、お客様が受信した「渡航許可通知」にはアメリカ渡航に必要なESTA渡航申請番号と有効期限が記載されていますので必ずご確認をお願いします。ESTAを統括するDHS(アメリカ国土安全保障省)は、当該情報が記載されたメールの保存を推奨しています。渡航前は取得したESTA渡航申請番号と有効期限をあらためてご確認ください。</p>
       </div>
     </div>
     <div class="btn-row">
@@ -1366,18 +1390,22 @@ $('unit').addEventListener('input',function(){
 });
 
 // ===== FILE UPLOADS (10MB max) =====
-function setupFileUpload(inputId,nameId,errId){
+function setupFileUpload(inputId,nameId,errId,previewId){
   $(inputId).addEventListener('change',function(){
     const file=this.files[0];
+    const prev=previewId?$(previewId):null;
     if(file&&file.size>10*1024*1024){
       showErr(errId,true);$(nameId).textContent='';this.value='';
+      if(prev){prev.style.display='none';prev.src=''}
     }else{
       showErr(errId,false);
       $(nameId).textContent=file?'✓ '+file.name:'';
+      if(prev&&file){prev.src=URL.createObjectURL(file);prev.style.display='block'}
+      else if(prev){prev.style.display='none';prev.src=''}
     }
   });
 }
-setupFileUpload('passportFile','passportFileName','errPassportFile');
+setupFileUpload('passportFile','passportFileName','errPassportFile','passportPreview');
 // Selfie: jpeg/png only, 240KB max
 $('selfieFile').addEventListener('change',function(){
   const file=this.files[0];
@@ -1400,7 +1428,8 @@ $('selfieFile').addEventListener('change',function(){
     };
     img.src=URL.createObjectURL(file);
     $('selfieFileName').textContent='✓ '+file.name;
-  }else{$('selfieFileName').textContent=''}
+    $('selfiePreview').src=URL.createObjectURL(file);$('selfiePreview').style.display='block';
+  }else{$('selfieFileName').textContent='';$('selfiePreview').style.display='none';$('selfiePreview').src=''}
 });
 
 // ===== PASSPORT NUMBER (country-specific regex) =====
@@ -1548,6 +1577,8 @@ function hideAllSteps(){
 }
 function showStep(n){
   document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===n)});
+  // Hide main notice box on Steps 4/5/6
+  const nb=$('mainNoticeBox');if(nb)nb.style.display=n>=3?'none':'';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function goToStep1(){
@@ -1557,6 +1588,7 @@ function goToStep1(){
   showStep(0);
 }
 function goToStep2(){
+  if(returnToConfirm){clearReturnMode();goToStep4();return}
   hideAllSteps();
   $('step2Content').style.display='';
   showStep(1);
@@ -1568,20 +1600,41 @@ function goToStep2from3(){
   showStep(1);
 }
 function goToStep3(){
+  if(returnToConfirm){clearReturnMode();goToStep4();return}
   hideAllSteps();
   $('step3Content').style.display='';
   showStep(2);
   initStep3();
 }
 function goToStep4(){
+  if(returnToConfirm)clearReturnMode();
   hideAllSteps();
   $('step4Content').style.display='';
   showStep(3);
   buildConfirmation();
 }
-function goToStep1FromConfirm(){hideAllSteps();document.querySelectorAll('form .card').forEach(c=>c.style.display='');$('step1Btns').style.display='';showStep(0)}
-function goToStep2FromConfirm(){hideAllSteps();$('step2Content').style.display='';showStep(1)}
-function goToStep3FromConfirm(){hideAllSteps();$('step3Content').style.display='';showStep(2)}
+let returnToConfirm=false;
+function setReturnMode(){
+  returnToConfirm=true;
+  // Change all next buttons to "入力内容の確認へ戻る"
+  document.querySelectorAll('.btn-next').forEach(b=>{
+    if(!b.dataset.origText)b.dataset.origText=b.textContent;
+    if(!b.closest('#step4Content')&&!b.closest('#step5Content')&&!b.closest('#step6Content')){
+      b.textContent='入力内容の確認へ戻る';
+      b.dataset.returnConfirm='true';
+    }
+  });
+}
+function clearReturnMode(){
+  returnToConfirm=false;
+  document.querySelectorAll('.btn-next[data-return-confirm]').forEach(b=>{
+    b.textContent=b.dataset.origText||b.textContent;
+    delete b.dataset.returnConfirm;
+  });
+}
+function goToStep1FromConfirm(){hideAllSteps();document.querySelectorAll('form .card').forEach(c=>c.style.display='');$('step1Btns').style.display='';showStep(0);setReturnMode()}
+function goToStep2FromConfirm(){hideAllSteps();$('step2Content').style.display='';showStep(1);setReturnMode()}
+function goToStep3FromConfirm(){hideAllSteps();$('step3Content').style.display='';showStep(2);setReturnMode()}
 function goToStep4FromPayment(){hideAllSteps();$('step4Content').style.display='';showStep(3)}
 function goToStep5(){
   hideAllSteps();
@@ -1645,6 +1698,11 @@ function buildConfirmation(){
   const bld=v('building');if(bld)row(cad,'建物名',bld);
   const unt=v('unit');if(unt)row(cad,'部屋番号',unt);
 
+  // Passport images
+  const ppImg=$('passportPreview'),cpImg=$('confirmPassportImg');
+  if(ppImg&&ppImg.src&&ppImg.style.display!=='none'){cpImg.src=ppImg.src;cpImg.style.display='block'}else{cpImg.style.display='none'}
+  const sfImg=$('selfiePreview'),csImg=$('confirmSelfieImg');
+  if(sfImg&&sfImg.src&&sfImg.style.display!=='none'){csImg.src=sfImg.src;csImg.style.display='block'}else{csImg.style.display='none'}
   // Passport
   clear('confirmPassport');const cp=$('confirmPassport');
   row(cp,'パスポート番号',v('passportNum'));
