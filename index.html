@@ -398,19 +398,28 @@
     </div>
     <div class="collapsible" id="stayFields">
       <div class="form-group"><label>滞在先の名称 <span class="en">/ Accommodation Name</span><span class="optional">任意</span></label>
-        <input type="text" id="stayName" placeholder="(例) HILTON HOTEL"></div>
+        <input type="text" id="stayName" maxlength="60" placeholder="(例) HILTON HOTEL">
+        <div class="hint">※ホテル名や友人宅等の名称を英語で入力してください。</div>
+        <div class="error" id="errStayName">半角英数字で入力してください</div></div>
       <div class="form-group"><label>州 <span class="en">/ State</span><span class="optional">任意</span></label>
-        <input type="text" id="stayState" placeholder="(例) CALIFORNIA"></div>
+        <input type="text" id="stayState" maxlength="40" placeholder="(例) CALIFORNIA">
+        <div class="error" id="errStayState">半角英字で入力してください</div></div>
       <div class="form-group"><label>都市名 <span class="en">/ City</span><span class="optional">任意</span></label>
-        <input type="text" id="stayCity" placeholder="(例) LOS ANGELES"></div>
-      <div class="form-group"><label>通り名 <span class="en">/ Street</span><span class="optional">任意</span></label>
-        <input type="text" id="stayStreet" placeholder="(例) 123 MAIN ST"></div>
+        <input type="text" id="stayCity" maxlength="40" placeholder="(例) LOS ANGELES">
+        <div class="error" id="errStayCity">半角英字で入力してください</div></div>
+      <div class="form-group"><label>通り名・番地 <span class="en">/ Street Address</span><span class="optional">任意</span></label>
+        <input type="text" id="stayStreet" maxlength="60" placeholder="(例) 123 MAIN ST">
+        <div class="error" id="errStayStreet">半角英数字で入力してください</div></div>
       <div class="form-group"><label>建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
-        <input type="text" id="stayBuilding" placeholder="空欄でも可"></div>
+        <input type="text" id="stayBuilding" maxlength="60" placeholder="(例) TOWER A">
+        <div class="hint">※空欄でも可</div></div>
       <div class="form-group"><label>部屋番号 <span class="en">/ Room</span><span class="optional">任意</span></label>
-        <input type="text" id="stayRoom" placeholder="空欄でも可"></div>
+        <input type="text" id="stayRoom" maxlength="20" placeholder="(例) 1205">
+        <div class="hint">※空欄でも可</div></div>
       <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
-        <input type="text" id="stayPhone" placeholder="(例) 2125551234"></div>
+        <input type="text" id="stayPhone" maxlength="20" placeholder="(例) 2125551234">
+        <div class="hint">※滞在先の電話番号を数字のみで入力してください。</div>
+        <div class="error" id="errStayPhone">数字のみで入力してください</div></div>
     </div>
   </div>
 
@@ -421,20 +430,27 @@
       <div class="toggle-group"><input type="radio" id="usContactYes" name="hasUsContact" value="yes"><label for="usContactYes">はい</label><input type="radio" id="usContactNo" name="hasUsContact" value="no" checked><label for="usContactNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="usContactFields">
+      <div class="hint" style="margin-bottom:12px">※米国内で緊急時に連絡がとれる方の情報を入力してください。不明な場合は「いいえ」を選択してください。</div>
       <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactSurname" placeholder="(例) SMITH"></div>
+        <input type="text" id="usContactSurname" maxlength="40" placeholder="(例) SMITH">
+        <div class="error" id="errUsCSurname">半角英字で入力してください</div></div>
       <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactGivenName" placeholder="(例) JOHN"></div>
+        <input type="text" id="usContactGivenName" maxlength="40" placeholder="(例) JOHN">
+        <div class="error" id="errUsCGiven">半角英字で入力してください</div></div>
       <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactPhone" placeholder="(例) 2125551234"></div>
+        <input type="text" id="usContactPhone" maxlength="20" placeholder="(例) 2125551234">
+        <div class="error" id="errUsCPhone">数字のみで入力してください</div></div>
       <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="optional">任意</span></label>
-        <input type="email" id="usContactEmail" placeholder="(例) john@example.com"></div>
+        <input type="email" id="usContactEmail" maxlength="80" placeholder="(例) john@example.com"></div>
       <div class="form-group"><label>州 <span class="en">/ State</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactState" placeholder="(例) NEW YORK"></div>
+        <input type="text" id="usContactState" maxlength="40" placeholder="(例) NEW YORK">
+        <div class="error" id="errUsCState">半角英字で入力してください</div></div>
       <div class="form-group"><label>市 <span class="en">/ City</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactCity" placeholder="(例) NEW YORK"></div>
-      <div class="form-group"><label>通り名 <span class="en">/ Street</span><span class="optional">任意</span></label>
-        <input type="text" id="usContactStreet" placeholder="(例) 123 BROADWAY"></div>
+        <input type="text" id="usContactCity" maxlength="40" placeholder="(例) NEW YORK">
+        <div class="error" id="errUsCCity">半角英字で入力してください</div></div>
+      <div class="form-group"><label>通り名・番地 <span class="en">/ Street Address</span><span class="optional">任意</span></label>
+        <input type="text" id="usContactStreet" maxlength="60" placeholder="(例) 123 BROADWAY">
+        <div class="error" id="errUsCStreet">半角英数字で入力してください</div></div>
     </div>
   </div>
 
@@ -454,24 +470,33 @@
       <div class="toggle-group"><input type="radio" id="employYes" name="hasEmploy" value="yes"><label for="employYes">はい</label><input type="radio" id="employNo" name="hasEmploy" value="no"><label for="employNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="employFields">
-      <div class="form-group"><label>雇用者名または雇用状況 <span class="en">/ Employer</span><span class="required">必須</span></label>
-        <input type="text" id="employerName" placeholder="(例) ABC CORPORATION">
+      <div class="hint" style="margin-bottom:12px">※現在または直近の勤務先を英語で入力してください。</div>
+      <div class="form-group"><label>雇用者名 <span class="en">/ Employer Name</span><span class="required">必須</span></label>
+        <input type="text" id="employerName" maxlength="60" placeholder="(例) ABC CORPORATION">
+        <div class="hint">※会社名・組織名を英語で入力してください。</div>
         <div class="error" id="errEmployerName">半角英数字で入力してください</div></div>
       <div class="form-group"><label>雇用者 国 <span class="en">/ Country</span><span class="required">必須</span></label>
         <input type="hidden" id="employCountry" value="">
         <div class="custom-select" id="employCountryWrap"><button type="button" class="cs-btn" id="employCountryBtn">選択してください</button><div class="cs-list" id="employCountryList"><input type="text" class="cs-search" placeholder="国名を検索..."><div class="cs-items"></div></div></div></div>
       <div class="form-group"><label>雇用者 都道府県 <span class="en">/ State/Prefecture</span><span class="optional">任意</span></label>
-        <input type="text" id="employState" placeholder="(例) TOKYO"></div>
+        <input type="text" id="employState" maxlength="40" placeholder="(例) TOKYO">
+        <div class="error" id="errEmployState">半角英字で入力してください</div></div>
       <div class="form-group"><label>雇用者 市区町村 <span class="en">/ City</span><span class="optional">任意</span></label>
-        <input type="text" id="employCity" placeholder="(例) CHIYODA-KU"></div>
-      <div class="form-group"><label>雇用者 丁番地 <span class="en">/ Street</span><span class="optional">任意</span></label>
-        <input type="text" id="employStreet" placeholder="(例) 1-1-1 MARUNOUCHI"></div>
+        <input type="text" id="employCity" maxlength="40" placeholder="(例) CHIYODA-KU">
+        <div class="error" id="errEmployCity">半角英数字で入力してください</div></div>
+      <div class="form-group"><label>雇用者 丁番地 <span class="en">/ Street Address</span><span class="optional">任意</span></label>
+        <input type="text" id="employStreet" maxlength="60" placeholder="(例) 1-1-1 MARUNOUCHI">
+        <div class="error" id="errEmployStreet">半角英数字で入力してください</div></div>
       <div class="form-group"><label>雇用者 建物名 <span class="en">/ Building</span><span class="optional">任意</span></label>
-        <input type="text" id="employBuilding" placeholder="空欄でも可"></div>
+        <input type="text" id="employBuilding" maxlength="60" placeholder="(例) MARUNOUCHI BLDG">
+        <div class="hint">※空欄でも可</div></div>
       <div class="form-group"><label>雇用者 電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
-        <input type="text" id="employPhone" placeholder="(例) 0312345678"></div>
+        <input type="text" id="employPhone" maxlength="20" placeholder="(例) 0312345678">
+        <div class="hint">※数字のみで入力してください。先頭の0は登録時に省略されます。</div>
+        <div class="error" id="errEmployPhone">数字のみで入力してください</div></div>
       <div class="form-group"><label>職名 <span class="en">/ Job Title</span><span class="optional">任意</span></label>
-        <input type="text" id="employTitle" placeholder="(例) ENGINEER"></div>
+        <input type="text" id="employTitle" maxlength="40" placeholder="(例) ENGINEER">
+        <div class="error" id="errEmployTitle">半角英字で入力してください</div></div>
     </div>
     <!-- 就労なしの場合の雇用状況 -->
     <div class="collapsible" id="employStatusFields">
@@ -516,14 +541,20 @@
       <div class="toggle-group"><input type="radio" id="emergYes" name="hasEmerg" value="yes"><label for="emergYes">はい</label><input type="radio" id="emergNo" name="hasEmerg" value="no" checked><label for="emergNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="emergFields">
+      <div class="hint" style="margin-bottom:12px">※日本国内等、渡航先以外で緊急時に連絡がとれる方の情報を入力してください。</div>
       <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
-        <input type="text" id="emergSurname" placeholder="(例) YAMADA"></div>
+        <input type="text" id="emergSurname" maxlength="40" placeholder="(例) YAMADA">
+        <div class="error" id="errEmergSurname">半角英字で入力してください</div></div>
       <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
-        <input type="text" id="emergGivenName" placeholder="(例) HANAKO"></div>
+        <input type="text" id="emergGivenName" maxlength="40" placeholder="(例) HANAKO">
+        <div class="error" id="errEmergGiven">半角英字で入力してください</div></div>
       <div class="form-group"><label>メールアドレス <span class="en">/ Email</span><span class="optional">任意</span></label>
-        <input type="email" id="emergEmail" placeholder="(例) hanako@example.com"></div>
+        <input type="email" id="emergEmail" maxlength="80" placeholder="(例) hanako@example.com">
+        <div class="hint">※正しいメールアドレスを入力してください。</div></div>
       <div class="form-group"><label>電話番号 <span class="en">/ Phone</span><span class="optional">任意</span></label>
-        <input type="text" id="emergPhone" placeholder="(例) 09012345678"></div>
+        <input type="text" id="emergPhone" maxlength="20" placeholder="(例) 09012345678">
+        <div class="hint">※数字のみで入力してください。</div>
+        <div class="error" id="errEmergPhone">数字のみで入力してください</div></div>
     </div>
   </div>
 
@@ -534,21 +565,26 @@
       <div class="toggle-group"><input type="radio" id="parentYes" name="hasParent" value="yes"><label for="parentYes">はい</label><input type="radio" id="parentNo" name="hasParent" value="no" checked><label for="parentNo">いいえ</label></div>
     </div>
     <div class="collapsible" id="parentFields">
+      <div class="hint" style="margin-bottom:12px">※パスポートに記載されている通りに英語で入力してください。不明な場合はチェックを入れてください。</div>
       <p style="font-weight:600;color:#1a3a5c;margin-bottom:12px">父親 / Father</p>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;cursor:pointer"><input type="checkbox" id="fatherUnknown" style="width:16px;height:16px">不明 / Unknown</label>
       <div id="fatherFields">
         <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
-          <input type="text" id="fatherSurname" placeholder="(例) YAMADA"></div>
+          <input type="text" id="fatherSurname" maxlength="40" placeholder="(例) YAMADA">
+          <div class="error" id="errFatherSurname">半角英字で入力してください</div></div>
         <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
-          <input type="text" id="fatherGivenName" placeholder="(例) ICHIRO"></div>
+          <input type="text" id="fatherGivenName" maxlength="40" placeholder="(例) ICHIRO">
+          <div class="error" id="errFatherGiven">半角英字で入力してください</div></div>
       </div>
       <p style="font-weight:600;color:#1a3a5c;margin:16px 0 12px">母親 / Mother</p>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;cursor:pointer"><input type="checkbox" id="motherUnknown" style="width:16px;height:16px">不明 / Unknown</label>
       <div id="motherFields">
         <div class="form-group"><label>姓 <span class="en">/ Surname</span><span class="optional">任意</span></label>
-          <input type="text" id="motherSurname" placeholder="(例) SUZUKI"></div>
+          <input type="text" id="motherSurname" maxlength="40" placeholder="(例) SUZUKI">
+          <div class="error" id="errMotherSurname">半角英字で入力してください</div></div>
         <div class="form-group"><label>名 <span class="en">/ Given name</span><span class="optional">任意</span></label>
-          <input type="text" id="motherGivenName" placeholder="(例) YOKO"></div>
+          <input type="text" id="motherGivenName" maxlength="40" placeholder="(例) YOKO">
+          <div class="error" id="errMotherGiven">半角英字で入力してください</div></div>
       </div>
     </div>
   </div>
@@ -1346,17 +1382,47 @@ function initStep2(){
   });
   $('arrivalCity').addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
 
-  // Auto uppercase for other step2 text fields
-  ['stayName','stayState','stayCity','stayStreet','stayBuilding','stayRoom',
-   'usContactSurname','usContactGivenName','usContactState','usContactCity','usContactStreet'
-  ].forEach(id=>{
+  // Stay fields - alpha/num validation
+  function alphaNumUp(id,errId){
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase()});
-  });
-  ['stayPhone','usContactPhone'].forEach(id=>{
+    el.addEventListener('input',function(){
+      let v=toHalf(this.value).toUpperCase().replace(/[^\x20-\x7E]/g,'').replace(/\s+/g,' ');
+      this.value=v;
+      if(errId)s2err(errId,v.length>0&&!/^[A-Z0-9 &.,'\-\/]+$/.test(v));
+    });
+    el.addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+  }
+  function alphaOnlyUp(id,errId){
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20)});
-  });
+    el.addEventListener('input',function(){
+      let v=toHalf(this.value).toUpperCase().replace(/[^A-Z \-]/g,'').replace(/\s+/g,' ');
+      this.value=v;
+      if(errId)s2err(errId,v.length>0&&!/^[A-Z \-]+$/.test(v));
+    });
+    el.addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+  }
+  function digitsOnly(id,errId){
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){
+      this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20);
+      if(errId)s2err(errId,false);
+    });
+  }
+  alphaNumUp('stayName','errStayName');
+  alphaOnlyUp('stayState','errStayState');
+  alphaOnlyUp('stayCity','errStayCity');
+  alphaNumUp('stayStreet','errStayStreet');
+  alphaNumUp('stayBuilding',null);
+  alphaNumUp('stayRoom',null);
+  digitsOnly('stayPhone','errStayPhone');
+
+  // US Contact fields
+  alphaOnlyUp('usContactSurname','errUsCSurname');
+  alphaOnlyUp('usContactGivenName','errUsCGiven');
+  digitsOnly('usContactPhone','errUsCPhone');
+  alphaOnlyUp('usContactState','errUsCState');
+  alphaOnlyUp('usContactCity','errUsCCity');
+  alphaNumUp('usContactStreet','errUsCStreet');
 }
 
 // SNS add entry
@@ -1404,17 +1470,49 @@ function initStep3(){
   // Employer country custom select
   initCustomSelect('employCountryWrap','employCountry','employCountryBtn',WORLD_ITEMS,'');
 
-  // Auto uppercase for step3 text fields
-  ['employerName','employState','employCity','employStreet','employBuilding','employTitle',
-   'emergSurname','emergGivenName','fatherSurname','fatherGivenName','motherSurname','motherGivenName'
-  ].forEach(id=>{
+  // Validation helpers for step3
+  function s3alphaNumUp(id,errId){
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^\x20-\x7E]/g,'').toUpperCase()});
-  });
-  ['employPhone','emergPhone'].forEach(id=>{
+    el.addEventListener('input',function(){
+      let v=toHalf(this.value).toUpperCase().replace(/[^\x20-\x7E]/g,'').replace(/\s+/g,' ');
+      this.value=v;
+      const e=$(errId);if(e)e.style.display=(v.length>0&&!/^[A-Z0-9 &.,'\-\/]+$/.test(v))?'block':'none';
+    });
+    el.addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+  }
+  function s3alphaUp(id,errId){
     const el=$(id);if(!el)return;
-    el.addEventListener('input',function(){this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20)});
-  });
+    el.addEventListener('input',function(){
+      let v=toHalf(this.value).toUpperCase().replace(/[^A-Z \-]/g,'').replace(/\s+/g,' ');
+      this.value=v;
+      const e=$(errId);if(e)e.style.display=(v.length>0&&!/^[A-Z \-]+$/.test(v))?'block':'none';
+    });
+    el.addEventListener('blur',function(){this.value=this.value.trim().replace(/\s+/g,' ')});
+  }
+  function s3digits(id,errId){
+    const el=$(id);if(!el)return;
+    el.addEventListener('input',function(){
+      this.value=toHalf(this.value).replace(/[^0-9]/g,'').slice(0,20);
+      const e=$(errId);if(e)e.style.display='none';
+    });
+  }
+  // Employment
+  s3alphaNumUp('employerName','errEmployerName');
+  s3alphaUp('employState','errEmployState');
+  s3alphaNumUp('employCity','errEmployCity');
+  s3alphaNumUp('employStreet','errEmployStreet');
+  s3alphaNumUp('employBuilding',null);
+  s3digits('employPhone','errEmployPhone');
+  s3alphaUp('employTitle','errEmployTitle');
+  // Emergency
+  s3alphaUp('emergSurname','errEmergSurname');
+  s3alphaUp('emergGivenName','errEmergGiven');
+  s3digits('emergPhone','errEmergPhone');
+  // Parents
+  s3alphaUp('fatherSurname','errFatherSurname');
+  s3alphaUp('fatherGivenName','errFatherGiven');
+  s3alphaUp('motherSurname','errMotherSurname');
+  s3alphaUp('motherGivenName','errMotherGiven');
 }
 </script>
 </body>
