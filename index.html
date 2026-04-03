@@ -793,42 +793,22 @@
     <div class="card">
       <div class="card-header"><h2>申請完了</h2></div>
 
-      <div class="complete-icon">✅</div>
-      <div class="complete-title">ESTA申請が正常に受理されました</div>
-      <div class="complete-msg">
-        申請内容を審査いたします。審査結果はご登録のメールアドレスにお送りいたします。<br>
-        通常72時間以内に結果をお知らせいたしますが、追加確認が必要な場合はお時間をいただくことがあります。
+      <div style="background:#fff8e1;border:1px solid #f9a825;border-radius:8px;padding:14px 20px;margin-bottom:28px">
+        <p style="font-size:13px;line-height:1.7;color:#5d4037"><strong>Note：</strong>Gmailなどのフリーメールアドレスは迷惑メールフォルダに振り分けられる場合があります。迷惑メールフォルダもご確認ください。</p>
       </div>
 
-      <div class="complete-box">
-        <table>
-          <tr><td>申請番号</td><td id="appNumber">—</td></tr>
-          <tr><td>申請日時</td><td id="appDate">—</td></tr>
-          <tr><td>申請者名</td><td id="appName">—</td></tr>
-          <tr><td>パスポート番号</td><td id="appPassport">—</td></tr>
-          <tr><td>国籍</td><td id="appNationality">—</td></tr>
-          <tr><td>メールアドレス</td><td id="appEmail">—</td></tr>
-          <tr><td>お支払い金額</td><td>¥24,200（税込）</td></tr>
-          <tr><td>お支払い状況</td><td style="color:#27ae60;font-weight:700">✓ 決済完了</td></tr>
-        </table>
-      </div>
+      <h3 style="font-size:22px;font-weight:700;color:#1a3a5c;margin-bottom:24px">Application completed</h3>
 
-      <div style="background:#e8f5e9;border:1px solid #81c784;border-radius:8px;padding:16px;margin-bottom:24px;font-size:13px;color:#2e7d32;line-height:1.7">
-        <strong>📧 確認メールを送信しました</strong><br>
-        ご登録のメールアドレスに申請受付確認メールを送信しました。<br>
-        メールが届かない場合は、迷惑メールフォルダをご確認ください。
-      </div>
+      <p style="font-size:14px;font-weight:600;color:#333;margin-bottom:16px">Notification for Completion of Application</p>
 
-      <div style="background:#f0f4f8;border-radius:8px;padding:16px;font-size:12px;color:#666;line-height:1.7">
-        <strong>ご注意事項</strong><br>
-        ・ESTA渡航認証の有効期限は承認日から2年間、またはパスポートの有効期限のいずれか早い日付までです。<br>
-        ・渡航認証が承認された場合でも、入国を保証するものではありません。最終的な入国許可はCBP職員が判断します。<br>
-        ・パスポートの更新、氏名・国籍の変更、性別変更があった場合は新規申請が必要です。<br>
-        ・申請内容に虚偽が判明した場合、認証が取り消される場合があります。
-      </div>
+      <p style="font-size:14px;color:#333;line-height:1.8;margin-bottom:20px">お支払い手続きが完了し、ESTA申請が受理されました。</p>
+
+      <p style="font-size:14px;color:#333;line-height:1.8;margin-bottom:20px">審査結果はご登録のメールアドレスにお送りいたします。申請後72時間を経過しても通知メールが届かない場合は、当サイトトップページの「お問い合わせ」より必要事項をご記入の上、ご連絡ください。</p>
+
+      <p style="font-size:14px;color:#333;line-height:1.8;margin-bottom:24px">なお、ESTA申請の審査においては、システムメンテナンスの実施や申請者のステータスが「渡航認証保留」となった場合など、審査結果の通知までに最長72時間を要する場合がございますので、あらかじめご了承ください。</p>
     </div>
     <div class="btn-row" style="justify-content:center">
-      <button type="button" class="btn-next" style="max-width:300px" onclick="window.print()">申請内容を印刷する</button>
+      <button type="button" class="btn-next" style="max-width:400px" onclick="location.reload()">Home</button>
     </div>
   </div><!-- /step6Content -->
 
@@ -1645,14 +1625,6 @@ function goToStep6(){
   hideAllSteps();
   $('step6Content').style.display='';
   showStep(5);
-  // Fill completion info
-  const now=new Date();
-  $('appNumber').textContent='ESTA-'+now.getFullYear()+'-'+String(Math.floor(Math.random()*9000000)+1000000);
-  $('appDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  $('appName').textContent=($('surname').value||'')+' '+($('givenName').value||'');
-  $('appPassport').textContent=$('passportNum').value||'—';
-  $('appNationality').textContent=$('nationalityBtn').textContent||'—';
-  $('appEmail').textContent=$('email1').value||'—';
 }
 function processPayment(){
   const btn=$('payBtn');
