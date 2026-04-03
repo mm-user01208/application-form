@@ -88,6 +88,26 @@
     .top-error{background:#fdeaea;border:2px solid #e74c3c;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:none;color:#c0392b;font-weight:600;font-size:14px}
     .top-error.show{display:block}
     .footer{text-align:center;padding:24px;font-size:12px;color:#aaa}
+    .confirm-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    .confirm-table th{text-align:left;background:#f0f4f8;padding:10px 14px;font-size:13px;color:#1a3a5c;border:1px solid #e0e0e0;width:35%;vertical-align:top;font-weight:600}
+    .confirm-table td{padding:10px 14px;font-size:13px;color:#333;border:1px solid #e0e0e0;word-break:break-all}
+    .confirm-section-title{font-size:16px;font-weight:700;color:#1a3a5c;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1a3a5c}
+    .confirm-section-title:first-child{margin-top:0}
+    .confirm-edit{display:inline-block;margin-left:12px;font-size:12px;color:#2d5f8a;cursor:pointer;text-decoration:underline}
+    .payment-amount{font-size:32px;font-weight:700;color:#1a3a5c;text-align:center;margin:20px 0}
+    .payment-detail{background:#f0f4f8;border-radius:8px;padding:16px 20px;margin-bottom:24px}
+    .payment-detail table{width:100%;font-size:14px}
+    .payment-detail td{padding:6px 0}
+    .payment-detail td:last-child{text-align:right;font-weight:600}
+    .payment-total{border-top:2px solid #1a3a5c;font-size:16px;font-weight:700;color:#1a3a5c}
+    .complete-icon{text-align:center;font-size:80px;margin:20px 0}
+    .complete-title{text-align:center;font-size:24px;font-weight:700;color:#1a3a5c;margin-bottom:16px}
+    .complete-msg{text-align:center;font-size:14px;color:#555;line-height:1.8;margin-bottom:24px}
+    .complete-box{background:#f0f4f8;border-radius:8px;padding:20px;margin-bottom:24px}
+    .complete-box table{width:100%;font-size:14px}
+    .complete-box td{padding:6px 0}
+    .complete-box td:first-child{color:#666;width:40%}
+    .complete-box td:last-child{font-weight:600;color:#1a3a5c}
     .passport-example{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
     .passport-example img,.passport-example .placeholder-img{width:200px;height:140px;object-fit:cover;border-radius:8px;background:#e0e0e0;display:flex;align-items:center;justify-content:center;color:#888;font-size:12px;border:1px solid #ddd}
     .photo-example{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
@@ -661,6 +681,133 @@
   </div>
   </div><!-- /step3Content -->
 
+  <!-- ===== STEP 4: CONFIRMATION ===== -->
+  <div id="step4Content" style="display:none">
+    <div class="card">
+      <div class="card-header"><h2>入力内容の確認</h2></div>
+      <div class="notice-box">⚠ 入力内容をよくご確認ください。誤りがある場合は「修正する」ボタンで該当ステップに戻れます。</div>
+
+      <div class="confirm-section-title">申請者情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmApplicant"></table>
+
+      <div class="confirm-section-title">連絡先情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmContact"></table>
+
+      <div class="confirm-section-title">住所情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmAddress"></table>
+
+      <div class="confirm-section-title">パスポート情報 <span class="confirm-edit" onclick="goToStep1FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmPassport"></table>
+
+      <div class="confirm-section-title">渡航情報 <span class="confirm-edit" onclick="goToStep2FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmTravel"></table>
+
+      <div class="confirm-section-title">滞在先情報 <span class="confirm-edit" onclick="goToStep2FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmStay"></table>
+
+      <div class="confirm-section-title">就労情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmEmploy"></table>
+
+      <div class="confirm-section-title">SNS情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmSns"></table>
+
+      <div class="confirm-section-title">緊急連絡先 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmEmergency"></table>
+
+      <div class="confirm-section-title">両親情報 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmParents"></table>
+
+      <div class="confirm-section-title">適格性に関する質問 <span class="confirm-edit" onclick="goToStep3FromConfirm()">修正する</span></div>
+      <table class="confirm-table" id="confirmEligibility"></table>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn-back" onclick="goToStep3FromConfirm()">個人情報の入力へ戻る</button>
+      <button type="button" class="btn-next" onclick="goToStep5()">申請料お支払いへ進む</button>
+    </div>
+  </div><!-- /step4Content -->
+
+  <!-- ===== STEP 5: PAYMENT ===== -->
+  <div id="step5Content" style="display:none">
+    <div class="card">
+      <div class="card-header"><h2>申請料お支払い</h2></div>
+      <div class="notice-box">💳 お支払い手続きが完了すると、申請が正式に受理されます。</div>
+
+      <div class="payment-detail">
+        <table>
+          <tr><td>ESTA申請代行手数料</td><td>¥22,000</td></tr>
+          <tr><td>消費税（10%）</td><td>¥2,200</td></tr>
+          <tr class="payment-total"><td>合計（税込）</td><td>¥24,200</td></tr>
+        </table>
+      </div>
+
+      <div class="payment-amount">¥24,200<span style="font-size:14px;font-weight:400;color:#888">（税込）</span></div>
+
+      <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:20px;margin-bottom:24px">
+        <p style="font-size:14px;font-weight:600;color:#1a3a5c;margin-bottom:12px">💳 クレジットカード / デビットカード</p>
+        <p style="font-size:12px;color:#888;margin-bottom:16px">Visa / Mastercard / American Express / JCB / Diners Club に対応</p>
+        <div id="stripeCardElement" style="background:#fff;border:1px solid #d0d5dd;border-radius:8px;padding:14px;min-height:44px">
+          <p style="color:#aaa;font-size:13px;text-align:center">Stripe決済フォーム読み込み中...</p>
+        </div>
+        <div id="stripeError" style="color:#e74c3c;font-size:12px;margin-top:8px;display:none"></div>
+      </div>
+
+      <div style="background:#fff8e1;border:1px solid #f5c842;border-radius:8px;padding:14px;margin-bottom:24px;font-size:12px;color:#856404;line-height:1.6">
+        <strong>⚠ ご注意</strong><br>
+        ・お支払い完了後のキャンセル・返金はできません。<br>
+        ・申請結果はメールにてお知らせいたします。<br>
+        ・決済完了後、自動的に申請完了画面に遷移します。
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn-back" onclick="goToStep4FromPayment()">入力内容の確認へ戻る</button>
+      <button type="button" class="btn-next" id="payBtn" onclick="processPayment()">¥24,200 を支払う</button>
+    </div>
+  </div><!-- /step5Content -->
+
+  <!-- ===== STEP 6: COMPLETE ===== -->
+  <div id="step6Content" style="display:none">
+    <div class="card">
+      <div class="card-header"><h2>申請完了</h2></div>
+
+      <div class="complete-icon">✅</div>
+      <div class="complete-title">ESTA申請が正常に受理されました</div>
+      <div class="complete-msg">
+        申請内容を審査いたします。審査結果はご登録のメールアドレスにお送りいたします。<br>
+        通常72時間以内に結果をお知らせいたしますが、追加確認が必要な場合はお時間をいただくことがあります。
+      </div>
+
+      <div class="complete-box">
+        <table>
+          <tr><td>申請番号</td><td id="appNumber">—</td></tr>
+          <tr><td>申請日時</td><td id="appDate">—</td></tr>
+          <tr><td>申請者名</td><td id="appName">—</td></tr>
+          <tr><td>パスポート番号</td><td id="appPassport">—</td></tr>
+          <tr><td>国籍</td><td id="appNationality">—</td></tr>
+          <tr><td>メールアドレス</td><td id="appEmail">—</td></tr>
+          <tr><td>お支払い金額</td><td>¥24,200（税込）</td></tr>
+          <tr><td>お支払い状況</td><td style="color:#27ae60;font-weight:700">✓ 決済完了</td></tr>
+        </table>
+      </div>
+
+      <div style="background:#e8f5e9;border:1px solid #81c784;border-radius:8px;padding:16px;margin-bottom:24px;font-size:13px;color:#2e7d32;line-height:1.7">
+        <strong>📧 確認メールを送信しました</strong><br>
+        ご登録のメールアドレスに申請受付確認メールを送信しました。<br>
+        メールが届かない場合は、迷惑メールフォルダをご確認ください。
+      </div>
+
+      <div style="background:#f0f4f8;border-radius:8px;padding:16px;font-size:12px;color:#666;line-height:1.7">
+        <strong>ご注意事項</strong><br>
+        ・ESTA渡航認証の有効期限は承認日から2年間、またはパスポートの有効期限のいずれか早い日付までです。<br>
+        ・渡航認証が承認された場合でも、入国を保証するものではありません。最終的な入国許可はCBP職員が判断します。<br>
+        ・パスポートの更新、氏名・国籍の変更、性別変更があった場合は新規申請が必要です。<br>
+        ・申請内容に虚偽が判明した場合、認証が取り消される場合があります。
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center">
+      <button type="button" class="btn-next" style="max-width:300px" onclick="window.print()">申請内容を印刷する</button>
+    </div>
+  </div><!-- /step6Content -->
+
   <div class="footer">© 2026 Application Form</div>
 </div>
 
@@ -833,7 +980,8 @@ function updateBtn(){
   const s3=$('step3Content');
   if(s3&&s3.style.display!=='none'){
     const errs=s3.querySelectorAll('.error.show');
-    const agreeOk=$('agreeDisclaimer')&&$('agreeDisclaimer').checked&&$('agreeTerms')&&$('agreeTerms').checked;
+    const ad=$('agreeDisclaimer'),at=$('agreeTerms');
+    const agreeOk=ad&&ad.checked&&at&&at.checked;
     const btn=s3.querySelector('.btn-next');
     if(btn)btn.classList.toggle('disabled',errs.length>0||!agreeOk);
   }
@@ -1396,8 +1544,7 @@ document.getElementById('appForm').addEventListener('submit',function(e){
 function hideAllSteps(){
   document.querySelectorAll('form .card').forEach(c=>c.style.display='none');
   $('step1Btns').style.display='none';
-  $('step2Content').style.display='none';
-  $('step3Content').style.display='none';
+  ['step2Content','step3Content','step4Content','step5Content','step6Content'].forEach(id=>{if($(id))$(id).style.display='none'});
 }
 function showStep(n){
   document.querySelectorAll('.step-item').forEach((s,i)=>{s.classList.toggle('active',i===n)});
@@ -1427,7 +1574,172 @@ function goToStep3(){
   initStep3();
 }
 function goToStep4(){
-  alert('入力内容の確認画面は現在準備中です。');
+  hideAllSteps();
+  $('step4Content').style.display='';
+  showStep(3);
+  buildConfirmation();
+}
+function goToStep1FromConfirm(){hideAllSteps();document.querySelectorAll('form .card').forEach(c=>c.style.display='');$('step1Btns').style.display='';showStep(0)}
+function goToStep2FromConfirm(){hideAllSteps();$('step2Content').style.display='';showStep(1)}
+function goToStep3FromConfirm(){hideAllSteps();$('step3Content').style.display='';showStep(2)}
+function goToStep4FromPayment(){hideAllSteps();$('step4Content').style.display='';showStep(3)}
+function goToStep5(){
+  hideAllSteps();
+  $('step5Content').style.display='';
+  showStep(4);
+}
+function goToStep6(){
+  hideAllSteps();
+  $('step6Content').style.display='';
+  showStep(5);
+  // Fill completion info
+  const now=new Date();
+  $('appNumber').textContent='ESTA-'+now.getFullYear()+'-'+String(Math.floor(Math.random()*9000000)+1000000);
+  $('appDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  $('appName').textContent=($('surname').value||'')+' '+($('givenName').value||'');
+  $('appPassport').textContent=$('passportNum').value||'—';
+  $('appNationality').textContent=$('nationalityBtn').textContent||'—';
+  $('appEmail').textContent=$('email1').value||'—';
+}
+function processPayment(){
+  const btn=$('payBtn');
+  btn.textContent='決済処理中...';btn.disabled=true;btn.style.opacity='.5';
+  setTimeout(()=>{goToStep6()},2000);
+}
+
+// ===== BUILD CONFIRMATION =====
+function buildConfirmation(){
+  const row=(t,label,val)=>{if(!val&&val!==0)return;const tr=document.createElement('tr');tr.innerHTML='<th>'+label+'</th><td>'+(val||'—')+'</td>';t.appendChild(tr)};
+  const clear=(id)=>{$(id).innerHTML=''};
+  const v=(id)=>{const el=$(id);return el?(el.value||el.textContent||'').trim():''};
+  const sel=(id)=>{const el=$(id);if(!el)return'';if(el.tagName==='SELECT'){const o=el.options[el.selectedIndex];return o?o.text:''}return el.value||''};
+  const radio=(name)=>{const r=document.querySelector('input[name="'+name+'"]:checked');return r?r.value:''};
+  const yesNo=(val)=>val==='yes'||val==='true'?'はい':val==='no'||val==='false'?'いいえ':'—';
+  const dateVal=(d,m,y)=>{const dv=v(d),mv=v(m),yv=v(y);return(yv&&mv&&dv)?yv+'年'+mv+'月'+dv+'日':''};
+
+  // Applicant
+  clear('confirmApplicant');const ca=$('confirmApplicant');
+  row(ca,'姓 / Surname',v('surname'));
+  row(ca,'名 / Given name',v('givenName'));
+  const hasAlias=radio('alias')==='yes';
+  row(ca,'別名の有無',hasAlias?'あり':'なし');
+  if(hasAlias){row(ca,'姓（別名）',v('aliasSurname'));row(ca,'名（別名）',v('aliasGivenName'))}
+  row(ca,'性別',radio('gender')==='male'?'男性':radio('gender')==='female'?'女性':radio('gender')==='unspecified'?'Unspecified':'—');
+  row(ca,'生年月日',dateVal('dobDay','dobMonth','dobYear'));
+  row(ca,'国籍',v('nationalityBtn'));
+  const nid=v('personalId');if(nid)row(ca,'個人識別番号',nid);
+
+  // Contact
+  clear('confirmContact');const cc=$('confirmContact');
+  row(cc,'メールアドレス',v('email1'));
+  row(cc,'電話番号',v('phoneCountryBtn')+' '+v('phoneNumber'));
+  row(cc,'電話種別',sel('phoneType'));
+
+  // Address
+  clear('confirmAddress');const cad=$('confirmAddress');
+  row(cad,'郵便番号',v('postalCode'));
+  row(cad,'国',v('addrCountryBtn'));
+  row(cad,'都道府県',v('addrState'));
+  row(cad,'市区町村',v('addrCity'));
+  row(cad,'丁番地',v('street'));
+  const bld=v('building');if(bld)row(cad,'建物名',bld);
+  const unt=v('unit');if(unt)row(cad,'部屋番号',unt);
+
+  // Passport
+  clear('confirmPassport');const cp=$('confirmPassport');
+  row(cp,'パスポート番号',v('passportNum'));
+  row(cp,'発行年月日',dateVal('passIssuDay','passIssuMonth','passIssuYear'));
+  row(cp,'有効期間満了日',dateVal('passExpDay','passExpMonth','passExpYear'));
+  row(cp,'パスポート発行国',v('issuingCountryBtn'));
+  row(cp,'訂正旅券/官用旅券',radio('corrPass')==='yes'?'該当する':'該当しない');
+  row(cp,'出生国',v('birthCountryBtn'));
+  const bc=v('birthCity');if(bc)row(cp,'出生都市',bc);
+  const hasOtherPass=radio('otherPass')==='yes';
+  row(cp,'他国パスポート',hasOtherPass?'あり':'なし');
+  if(hasOtherPass){
+    row(cp,'他国パスポート（発給国）',v('otherPassCountryBtn'));
+    row(cp,'書類の種類',sel('docType'));
+    row(cp,'ID番号',v('docId'));
+  }
+  const hasCurNat=radio('curNat')==='yes';
+  row(cp,'他の国籍（現在）',hasCurNat?'あり':'なし');
+  if(hasCurNat){row(cp,'国籍',v('curNatCountryBtn'));row(cp,'取得経緯',sel('curNatHow'))}
+  const hasPastNat=radio('pastNat')==='yes';
+  row(cp,'他の国籍（過去）',hasPastNat?'あり':'なし');
+  if(hasPastNat){
+    row(cp,'国籍',v('pastNatCountryBtn'));
+    row(cp,'取得日',dateVal('pastNatAcqDay','pastNatAcqMonth','pastNatAcqYear'));
+    row(cp,'放棄日',dateVal('pastNatRenDay','pastNatRenMonth','pastNatRenYear'));
+  }
+  const hasGe=radio('geMember')==='yes';
+  row(cp,'GE/NEXUS/SENTRI',hasGe?'あり':'なし');
+  if(hasGe)row(cp,'PASS ID',v('passId'));
+
+  // Travel (Step2)
+  clear('confirmTravel');const ct=$('confirmTravel');
+  const isTransit=radio('transit')==='yes';
+  row(ct,'乗り継ぎ目的',isTransit?'はい（乗り継ぎのみ）':'いいえ（米国に滞在）');
+  if(!isTransit){
+    const arrDate=dateVal('arrDay','arrMonth','arrYear');if(arrDate)row(ct,'到着予定日',arrDate);
+    const airline=v('airline');if(airline)row(ct,'航空会社名',airline);
+    const flight=v('flightNo');if(flight)row(ct,'便名',flight);
+    const city=v('arrivalCity');if(city)row(ct,'到着都市',city);
+  }
+
+  // Stay
+  clear('confirmStay');const cs=$('confirmStay');
+  const hasStay=radio('stay')==='yes';
+  row(cs,'滞在先登録',hasStay?'あり':'なし');
+  if(hasStay){
+    row(cs,'滞在先名称',v('stayName'));row(cs,'州',v('stayState'));row(cs,'都市名',v('stayCity'));
+    row(cs,'通り名・番地',v('stayStreet'));
+    const sb=v('stayBuilding');if(sb)row(cs,'建物名',sb);
+    const sr=v('stayRoom');if(sr)row(cs,'部屋番号',sr);
+    const sp=v('stayPhone');if(sp)row(cs,'電話番号',sp);
+  }
+  const hasUsC=radio('usContact')==='yes';
+  if(hasUsC){
+    row(cs,'米国内連絡先 姓',v('usContactSurname'));
+    row(cs,'米国内連絡先 名',v('usContactGivenName'));
+  }
+
+  // Employment (Step3)
+  clear('confirmEmploy');const ce=$('confirmEmploy');
+  const hasEmploy=radio('employ')==='yes';
+  row(ce,'就労経験',hasEmploy?'あり':'なし');
+  if(hasEmploy){
+    row(ce,'雇用者名',v('employerName'));
+    row(ce,'職名',v('employTitle'));
+  }else{
+    row(ce,'現在の雇用状況',sel('employStatus'));
+  }
+
+  // SNS
+  clear('confirmSns');const csn=$('confirmSns');
+  const hasSns=radio('sns')==='yes';
+  row(csn,'SNS登録',hasSns?'あり':'なし');
+
+  // Emergency
+  clear('confirmEmergency');const cem=$('confirmEmergency');
+  const hasEmerg=radio('emerg')==='yes';
+  row(cem,'緊急連絡先',hasEmerg?'あり':'なし');
+  if(hasEmerg){row(cem,'姓',v('emergSurname'));row(cem,'名',v('emergGivenName'))}
+
+  // Parents
+  clear('confirmParents');const cpa=$('confirmParents');
+  const hasParent=radio('parent')==='yes';
+  row(cpa,'両親情報',hasParent?'あり':'なし');
+  if(hasParent){
+    row(cpa,'父 姓',v('fatherSurname'));row(cpa,'父 名',v('fatherGivenName'));
+    row(cpa,'母 姓',v('motherSurname'));row(cpa,'母 名',v('motherGivenName'));
+  }
+
+  // Eligibility
+  clear('confirmEligibility');const ceq=$('confirmEligibility');
+  for(let i=1;i<=9;i++){
+    const ans=radio('eq'+i);
+    row(ceq,'質問'+['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][i-1],ans==='yes'?'はい':ans==='no'?'いいえ':'—');
+  }
 }
 
 // ===== STEP 2 INIT =====
