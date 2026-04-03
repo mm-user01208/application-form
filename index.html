@@ -368,7 +368,7 @@
 
   <!-- 渡航情報 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">渡航情報</span></div>
+    <div class="section-header"><span class="section-title">渡航情報</span><button type="button" class="help-btn" onclick="showModal('helpTravel')">？</button></div>
     <div class="form-group"><label>米国への渡航目的は、他国へ乗り継ぐためですか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="transitYes" name="transit" value="yes"><label for="transitYes">はい</label><input type="radio" id="transitNo" name="transit" value="no" checked><label for="transitNo">いいえ</label></div>
       <div class="hint">※米国にて滞在する方は「いいえ」、乗り継ぎの方は「はい」を選択してください。</div>
@@ -391,7 +391,7 @@
 
   <!-- 滞在先情報 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">滞在先情報</span></div>
+    <div class="section-header"><span class="section-title">滞在先情報</span><button type="button" class="help-btn" onclick="showModal('helpStay')">？</button></div>
     <div class="form-group"><label>米国での滞在先の住所を登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="stayYes" name="hasStay" value="yes"><label for="stayYes">はい</label><input type="radio" id="stayNo" name="hasStay" value="no" checked><label for="stayNo">いいえ</label></div>
       <div class="hint">※不明な場合や未定の場合は「いいえ」を選択してください。</div>
@@ -425,7 +425,7 @@
 
   <!-- 米国内連絡先 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">米国内連絡先</span></div>
+    <div class="section-header"><span class="section-title">米国内連絡先</span><button type="button" class="help-btn" onclick="showModal('helpUsContact')">？</button></div>
     <div class="form-group"><label>米国内の連絡先を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="usContactYes" name="hasUsContact" value="yes"><label for="usContactYes">はい</label><input type="radio" id="usContactNo" name="hasUsContact" value="no" checked><label for="usContactNo">いいえ</label></div>
     </div>
@@ -465,7 +465,7 @@
 
   <!-- 就労経験 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">就労情報</span></div>
+    <div class="section-header"><span class="section-title">就労情報</span><button type="button" class="help-btn" onclick="showModal('helpEmploy')">？</button></div>
     <div class="form-group"><label>現在または過去に就労経験はありますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="employYes" name="hasEmploy" value="yes"><label for="employYes">はい</label><input type="radio" id="employNo" name="hasEmploy" value="no"><label for="employNo">いいえ</label></div>
     </div>
@@ -515,7 +515,7 @@
 
   <!-- SNSアカウント（複数対応） -->
   <div class="card">
-    <div class="section-header"><span class="section-title">SNS情報</span></div>
+    <div class="section-header"><span class="section-title">SNS情報</span><button type="button" class="help-btn" onclick="showModal('helpSns')">？</button></div>
     <div class="form-group"><label>SNSアカウントを登録しますか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="snsYes" name="hasSns" value="yes"><label for="snsYes">はい</label><input type="radio" id="snsNo" name="hasSns" value="no"><label for="snsNo">いいえ</label></div>
     </div>
@@ -536,7 +536,7 @@
 
   <!-- 緊急連絡先 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">緊急連絡先</span></div>
+    <div class="section-header"><span class="section-title">緊急連絡先</span><button type="button" class="help-btn" onclick="showModal('helpEmerg')">？</button></div>
     <div class="form-group"><label>緊急連絡先を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="emergYes" name="hasEmerg" value="yes"><label for="emergYes">はい</label><input type="radio" id="emergNo" name="hasEmerg" value="no" checked><label for="emergNo">いいえ</label></div>
     </div>
@@ -560,7 +560,7 @@
 
   <!-- 両親の名前（Unknown対応） -->
   <div class="card">
-    <div class="section-header"><span class="section-title">両親の情報</span></div>
+    <div class="section-header"><span class="section-title">両親の情報</span><button type="button" class="help-btn" onclick="showModal('helpParent')">？</button></div>
     <div class="form-group"><label>両親の名前を登録しますか？ <span class="optional">任意</span></label>
       <div class="toggle-group"><input type="radio" id="parentYes" name="hasParent" value="yes"><label for="parentYes">はい</label><input type="radio" id="parentNo" name="hasParent" value="no" checked><label for="parentNo">いいえ</label></div>
     </div>
@@ -591,7 +591,7 @@
 
   <!-- 適格性質問 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">適格性に関する質問</span></div>
+    <div class="section-header"><span class="section-title">適格性に関する質問</span><button type="button" class="help-btn" onclick="showModal('helpEligibility')">？</button></div>
     <div class="notice-box" style="margin-bottom:20px"><strong>⚠ 注意：</strong>以下の質問にはすべて正直にお答えください。虚偽の回答は申請の却下や入国拒否の原因となります。</div>
     <div class="form-group"><label>① 身体的・精神的疾患を患っている、または薬物乱用者・薬物中毒者ですか？ <span class="required">必須</span></label>
       <div class="toggle-group"><input type="radio" id="eq1Yes" name="eq1" value="yes"><label for="eq1Yes">はい</label><input type="radio" id="eq1No" name="eq1" value="no"><label for="eq1No">いいえ</label></div></div>
@@ -615,7 +615,7 @@
 
   <!-- 同意事項 -->
   <div class="card">
-    <div class="section-header"><span class="section-title">同意事項</span></div>
+    <div class="section-header"><span class="section-title">同意事項</span><button type="button" class="help-btn" onclick="showModal('helpAgreement')">？</button></div>
     <div class="form-group">
       <div style="background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:16px;max-height:200px;overflow-y:auto;font-size:13px;line-height:1.8;color:#444">
         <p style="font-weight:700;margin-bottom:8px">免責事項</p>
@@ -700,6 +700,26 @@
 <div class="modal-overlay" id="helpPassportUpload"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpPassportUpload')">×</button><h3>パスポート画像のアップロード</h3><div class="modal-text"><p>パスポートの顔写真ページ画像をアップロードしてください。</p><p>アップロードできる画像の種類は、jpg、jpeg、png、gifに限られ、ファイルサイズの上限は10MBです。</p><p>パスポート下部にある機械読み取り部分（MRZコード）を含むページ全体が映っている必要があります。</p><p>顔写真ページ全体が映っていない、ぼやけている、照明の反射で文字や画像が正しく識別できない場合は、申請受付後に再提出をお願いすることがあります。画像内で下記の項目がすべて映っていることをご確認ください。画像が用意できましたら「画像を選択してください」をクリックし、アップロードをお願いします。</p></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜良い画像の例＞</p><p style="font-size:13px;color:#666">パスポートの顔写真ページ全体が明瞭に映っている、画像の中心に撮影されている</p><img src="passport-sample.svg" alt="良い例 - パスポート画像" style="width:300px;border:2px solid #4caf50;border-radius:8px;margin:8px 0"></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜悪い画像の例＞</p><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="text-align:center"><img src="passport-bad-cropped.svg" alt="悪い例 - 見切れ" style="width:160px;border:2px solid #e74c3c;border-radius:8px"><p style="font-size:12px;color:#666;margin-top:4px">ページ全体が写っていない</p></div><div style="text-align:center"><img src="passport-bad-blurry.svg" alt="悪い例 - ぼやけ" style="width:160px;border:2px solid #e74c3c;border-radius:8px"><p style="font-size:12px;color:#666;margin-top:4px">ぼやけている</p></div><div style="text-align:center"><img src="passport-bad-flash.svg" alt="悪い例 - 反射" style="width:160px;border:2px solid #e74c3c;border-radius:8px"><p style="font-size:12px;color:#666;margin-top:4px">フラッシュ、照明の反射で<br>文字が見えない</p></div></div></div></div></div>
 
 <div class="modal-overlay" id="helpSelfieUpload"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpSelfieUpload')">×</button><h3>顔写真のアップロード</h3><div class="modal-text"><p>顔写真をアップロードしてください。</p><p>アップロードできる画像の種類はjpeg、pngで、ファイルサイズの上限は10MBです。</p><p>背景が無地で肩から頭部までが写っているカラー写真である必要があります。</p><p>肩から頭部までが写っていない、背景が無地でない、白黒写真、加工やフィルターを使用している場合は、申請受付後に再提出をお願いすることがあります。下記の＜悪い画像の例＞に当てはまっていないかご確認ください。写真が用意できましたら「写真を選択してください」をクリックし、アップロードをお願いします。</p></div><div style="margin:16px 0"><p style="font-weight:700;margin-bottom:8px">＜良い画像の例＞</p><p style="font-size:13px;color:#666;margin-bottom:8px">背景が無地で肩から頭部までが写っているカラー写真</p><img src="selfie-good.svg" alt="良い例" style="width:100px;border-radius:4px;margin-bottom:16px"></div><div><p style="font-weight:700;margin-bottom:8px">＜悪い画像の例＞</p><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="text-align:center"><img src="selfie-bad-cropped.svg" alt="悪い例" style="width:90px;border-radius:4px"><p style="font-size:11px;color:#666;margin-top:4px">肩から頭部までが<br>写っていない</p></div><div style="text-align:center"><img src="selfie-bad-background.svg" alt="悪い例" style="width:90px;border-radius:4px"><p style="font-size:11px;color:#666;margin-top:4px">背景が無地ではない</p></div><div style="text-align:center"><img src="selfie-bad-filter.svg" alt="悪い例" style="width:90px;border-radius:4px"><p style="font-size:11px;color:#666;margin-top:4px">白黒写真、加工や<br>フィルター使用</p></div><div style="text-align:center"><img src="selfie-bad-mask.svg" alt="悪い例" style="width:90px;border-radius:4px"><p style="font-size:11px;color:#666;margin-top:4px">帽子やサングラス、<br>マスク等の装飾品</p></div><div style="text-align:center"><img src="selfie-bad-passport.svg" alt="悪い例" style="width:90px;border-radius:4px"><p style="font-size:11px;color:#666;margin-top:4px">パスポートの顔写真を<br>切り取ったもの</p></div></div><p style="font-size:12px;color:#666;margin-top:12px">※帽子やサングラス、マスク、マフラーの装飾品は不可<br>※パスポートの顔写真は使用できません。使用した場合は申請が取り消されます。<br>※画像の種類はjpeg、pngで、ファイルサイズの上限は10MBです。</p></div></div></div>
+
+<!-- Step 2 Modals -->
+<div class="modal-overlay" id="helpTravel"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpTravel')">×</button><h3>渡航情報の入力方法</h3><div class="modal-row"><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:12px"><div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:8px">渡航情報</p><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">乗り継ぎ目的 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:2px;border:1px solid #d0d5dd;border-radius:5px;overflow:hidden"><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">はい</span><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#1a3a5c;color:#fff">いいえ</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">米国到着予定日</span><div style="display:flex;gap:3px;margin-top:2px"><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Year</div><span style="font-size:9px;line-height:28px">年</span><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Month</div><span style="font-size:9px;line-height:28px">月</span><div style="flex:1;border:1px solid #d0d5dd;border-radius:5px;padding:4px 6px;font-size:10px;color:#b0b8c1">Day</div><span style="font-size:9px;line-height:28px">日</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">航空会社名</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) JAPAN AIRLINES</div></div><div><span style="font-size:10px;font-weight:600">便名</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) JL001</div></div></div></div></div><div class="modal-text"><p>米国にて滞在する方は「いいえ」、他国への乗り継ぎのみの方は「はい」を選択してください。</p><p>到着日・航空会社・便名は任意項目です。わかる範囲でご入力ください。不明な場合は空欄のままで問題ありません。</p><p>航空会社名は半角英字で入力してください。便名は航空会社コード（英字2文字）＋数字の形式です。</p><p>渡航情報は出発前に変更することも可能です。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpStay"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpStay')">×</button><h3>滞在先情報の入力方法</h3><div class="modal-row"><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:12px"><div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:8px">滞在先情報</p><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">登録の有無 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:2px;border:1px solid #d0d5dd;border-radius:5px;overflow:hidden"><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">はい</span><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#1a3a5c;color:#fff">いいえ</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">滞在先の名称</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) HILTON HOTEL</div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">州 / State</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) CALIFORNIA</div></div><div><span style="font-size:10px;font-weight:600">都市名 / City</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) LOS ANGELES</div></div></div></div></div><div class="modal-text"><p>米国での滞在先情報を入力してください。ホテル名、友人宅、Airbnb等、実際に滞在する場所の情報を入力します。</p><p>不明な場合や未定の場合は「いいえ」を選択してください。審査に影響はありません。</p><p>全ての項目はローマ字（半角英数字）で入力してください。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpUsContact"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpUsContact')">×</button><h3>米国内連絡先の入力方法</h3><div class="modal-row"><div class="modal-text"><p>米国内で緊急時に連絡がとれる方の情報を入力してください。</p><p>知人・友人・ビジネス関係者・ホテルのフロントなど、米国内の連絡先であればどなたでも構いません。</p><p>不明な場合は「いいえ」を選択してください。審査に影響はありません。</p><p>姓名はローマ字（半角英字）、電話番号は数字のみで入力してください。</p></div></div></div></div>
+
+<!-- Step 3 Modals -->
+<div class="modal-overlay" id="helpEmploy"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpEmploy')">×</button><h3>就労情報の入力方法</h3><div class="modal-row"><div class="modal-screenshot"><div style="background:#f0f2f5;border-radius:8px;padding:12px"><div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e0e0e0"><p style="font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:8px">就労情報</p><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">就労経験の有無 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="display:flex;margin-top:2px;border:1px solid #d0d5dd;border-radius:5px;overflow:hidden"><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#1a3a5c;color:#fff">はい</span><span style="flex:1;text-align:center;padding:4px;font-size:10px;background:#f8f9fa">いいえ</span></div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">雇用者名 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) ABC CORPORATION</div></div><div style="margin-bottom:6px"><span style="font-size:10px;font-weight:600">雇用者 国 <span style="background:#e74c3c;color:#fff;font-size:8px;padding:1px 3px;border-radius:3px">必須</span></span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;font-size:11px">選択してください</div></div><div><span style="font-size:10px;font-weight:600">職名</span><div style="border:1px solid #d0d5dd;border-radius:5px;padding:5px 8px;margin-top:2px;color:#b0b8c1;font-size:11px">(例) ENGINEER</div></div></div></div></div><div class="modal-text"><p>現在または直近の勤務先の情報を入力してください。退職・離職されている場合は直近の勤務先を入力します。</p><p>就労経験がない方は「いいえ」を選択し、現在の雇用状況（学生・無職・退職・主婦/主夫・子供・その他）を選択してください。</p><p>雇用者名（会社名・組織名）は英語（ローマ字）で入力してください。職名は英語で入力します（例: ENGINEER, TEACHER, MANAGER等）。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpSns"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpSns')">×</button><h3>SNS情報の入力方法</h3><div class="modal-row"><div class="modal-text"><p>利用しているソーシャルメディアのアカウント情報を入力してください。</p><p>Facebook、Instagram、X (Twitter)、LinkedIn、YouTube、TikTok、Weibo等から選択し、アカウント名を入力します。</p><p>複数のSNSアカウントをお持ちの場合は「＋ SNSアカウントを追加」ボタンから追加登録できます。</p><p>SNSアカウントをお持ちでない方、登録を希望しない方は「いいえ」を選択してください。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpEmerg"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpEmerg')">×</button><h3>緊急連絡先の入力方法</h3><div class="modal-row"><div class="modal-text"><p>渡航先以外（日本国内等）で緊急時に連絡がとれる方の情報を入力してください。</p><p>ご家族・親族・友人など、万が一の際に連絡がとれる方であればどなたでも構いません。</p><p>姓名はローマ字（半角英字）、電話番号は数字のみで入力してください。</p><p>登録は任意です。登録しない場合は「いいえ」を選択してください。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpParent"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpParent')">×</button><h3>両親情報の入力方法</h3><div class="modal-row"><div class="modal-text"><p>父母の氏名をパスポートに記載されている通りにローマ字で入力してください。</p><p>父母が不明な場合は「不明 / Unknown」にチェックを入れてください。チェックを入れると入力欄が非表示になります。</p><p>登録は任意です。登録しない場合は「いいえ」を選択してください。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpEligibility"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpEligibility')">×</button><h3>適格性に関する質問について</h3><div class="modal-row"><div class="modal-text"><p>以下の質問は、米国入国の適格性を判断するために必要な質問です。すべての質問に正直にお答えください。</p><p>虚偽の回答は申請の却下や入国拒否の原因となります。また、将来のビザ申請にも影響を及ぼす可能性があります。</p><p>「はい」と回答した場合でも、必ずしも申請が却下されるわけではありません。詳細な審査が行われます。</p><p>質問⑨の特定国（イラン、イラク、リビア、北朝鮮、ソマリア、スーダン、シリア、イエメン、キューバ）への渡航歴がある場合は「はい」を選択してください。業務渡航・人道支援等の正当な理由がある場合は審査で考慮されます。</p></div></div></div></div>
+
+<div class="modal-overlay" id="helpAgreement"><div class="modal-content"><button class="modal-close" onclick="closeModal('helpAgreement')">×</button><h3>同意事項について</h3><div class="modal-row"><div class="modal-text"><p>申請を完了するには、免責事項と利用規約の両方に同意いただく必要があります。</p><p><strong>免責事項：</strong>電子渡航認証（ESTA）の性質、法的効力、虚偽申告に対する罰則について記載しています。ESTA承認は渡航資格を示すものであり、米国入国を保証するものではありません。</p><p><strong>利用規約：</strong>当サイトのサービス内容、料金、キャンセルポリシー、知的財産権等について記載しています。</p><p>各テキストボックス内をスクロールして内容をご確認の上、チェックボックスにチェックを入れてください。</p></div></div></div></div>
 
 <script>
 // ===== DATA =====
@@ -1281,6 +1301,7 @@ checkPastNatDate('pastNatRelDay','pastNatRelMonth','pastNatRelYear','errPastNatR
 
 // ===== MODALS =====
 function showModal(id){$(id).classList.add('show')}
+function openModal(id){$(id).classList.add('show')}
 function closeModal(id){$(id).classList.remove('show')}
 // Modals close only via × button (no backdrop click);
 
