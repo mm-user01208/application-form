@@ -1767,8 +1767,8 @@ function evaluateConditions(face,bright,vw,vh){
 // ===== Human silhouette guide (single connected path) =====
 function drawHumanGuide(ctx,vw,vh,borderColor){
   const cx=vw/2;
-  // Head
-  const headR=Math.min(vw*0.19,vh*0.19);
+  // Head — perfect circle (arc only, no ellipse, no scale)
+  const headR=Math.min(vw,vh)*0.18;
   const headCY=vh*0.26;
   const chinY=headCY+headR;
   // Neck
