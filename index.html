@@ -274,8 +274,8 @@
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
       <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
       <div id="ocrBtnWrap" style="display:none;margin-top:6px">
-        <button type="button" id="ocrBtn" onclick="runPassportOCR(window._passportOrigFile)" style="padding:7px 14px;background:#2d5f8a;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">📋 パスポートを読み取って自動入力</button>
-        <div id="ocrStatus" style="display:none;font-size:12px;margin-top:4px;font-weight:600"></div>
+        <div id="ocrStatus" style="display:none;font-size:12px;font-weight:600"></div>
+        <button type="button" id="ocrBtn" onclick="runPassportOCR(window._passportOrigFile)" style="display:none;margin-top:4px;padding:6px 12px;background:#2d5f8a;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🔄 再読み取り</button>
       </div>
       <div id="passportPreviewWrap" style="display:none;margin-top:8px">
         <img id="passportPreview" style="max-width:300px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd">
@@ -1731,8 +1731,11 @@ function handleUpload(file,type){
     uploadArea.style.display='none';
     nameEl.textContent='✓ '+file.name;
     infoEl.textContent='元画像: '+origW+'×'+origH+'px → '+info;
-    // Show OCR button for passport
-    if(type==='passport'){var w=document.getElementById('ocrBtnWrap');if(w)w.style.display='block';}
+    // Auto-run OCR for passport
+    if(type==='passport'){
+      var w=document.getElementById('ocrBtnWrap');if(w)w.style.display='block';
+      runPassportOCR(file);
+    }
   });
 }
 
@@ -2951,6 +2954,9 @@ function fillFromOCR(data){
 function showOCRStatus(msg,color){
   var el=document.getElementById('ocrStatus');
   if(el){el.textContent=msg;el.style.color=color;el.style.display='block';}
+  // Show retry button after completion
+  var btn=document.getElementById('ocrBtn');
+  if(btn&&(color==='#27ae60'||color==='#e74c3c'))btn.style.display='inline-block';
 }
 
 async function runPassportOCR(file){
