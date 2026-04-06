@@ -1906,9 +1906,34 @@ function showQualityCheck(canvas,bright){
   },'image/jpeg',0.92);
 }
 
+// spTransferConn: set in SP receiver mode — sends blob to PC instead of local store
+window.spTransferConn=null;
+
 function useCapture(){
   if(!camCapturedBlob)return;
   const blob=camCapturedBlob;
+
+  if(window.spTransferConn){
+    // SP mode: send to PC via WebRTC
+    closeCameraModal();
+    const statusEl=document.getElementById('spStatus');
+    if(statusEl)statusEl.textContent='⏳ PCに送信中...';
+    blob.arrayBuffer().then(function(buf){
+      window.spTransferConn.send(buf);
+      if(statusEl)statusEl.textContent='✅ 送信完了！このページを閉じてください。';
+      const prevEl=document.getElementById('spPreview');
+      if(prevEl){prevEl.src=URL.createObjectURL(blob);prevEl.style.display='block';}
+      setTimeout(function(){
+        if(window.spTransferConn){try{window.spTransferConn.close();}catch(e){}}
+        window.spTransferConn=null;
+      },1000);
+    }).catch(function(e){
+      if(statusEl)statusEl.textContent='❌ 送信失敗: '+e.message;
+    });
+    return;
+  }
+
+  // Normal mode: store locally
   processedImages['selfie']=blob;
   $('selfiePreview').src=URL.createObjectURL(blob);
   $('selfiePreviewWrap').style.display='block';
@@ -2673,43 +2698,28 @@ document.addEventListener('DOMContentLoaded',function(){
       const conn=spPeer.connect(peerId,{reliable:true,serialization:'binary'});
 
       conn.on('open',function(){
-        document.getElementById('spStatus').textContent='✅ 接続完了！写真を撮影して送信してください';
+        document.getElementById('spStatus').textContent='✅ 接続完了！下のボタンで撮影してください';
         spShootBtn.style.opacity='1';
         spShootBtn.disabled=false;
+        // Store conn for useCapture() to send
+        window.spTransferConn=conn;
+        // Update camera "use" button label
+        const useBtn=document.getElementById('camUseBtn');
+        if(useBtn)useBtn.textContent='📤 この写真をPCに送信する';
+      });
+
+      conn.on('close',function(){
+        if(window.spTransferConn===conn)window.spTransferConn=null;
       });
 
       conn.on('error',function(e){
         document.getElementById('spStatus').textContent='❌ 接続エラー: '+(e.message||e.type||e);
+        window.spTransferConn=null;
       });
 
-      spShootBtn.onclick=function(){document.getElementById('spCameraInput').click();};
-
-      document.getElementById('spCameraInput').onchange=function(){
-        const file=this.files[0];
-        if(!file)return;
-        spShootBtn.disabled=true;
-        spShootBtn.style.opacity='0.5';
-        document.getElementById('spStatus').textContent='⏳ 画像を処理中...';
-        processImage(file,type,function(blob,info){
-          if(!blob){
-            document.getElementById('spStatus').textContent='❌ 処理失敗';
-            spShootBtn.disabled=false;spShootBtn.style.opacity='1';return;
-          }
-          const prevEl=document.getElementById('spPreview');
-          prevEl.src=URL.createObjectURL(blob);
-          prevEl.style.display='block';
-          document.getElementById('spStatus').textContent='⏳ PCに送信中...';
-          blob.arrayBuffer().then(function(buf){
-            conn.send(buf);
-            document.getElementById('spStatus').textContent='✅ 送信完了！このページを閉じてください。';
-            const qr=document.getElementById('spQualityResult');
-            qr.textContent='📊 '+info;qr.style.display='block';
-            setTimeout(function(){spPeer.destroy();},1000);
-          }).catch(function(e){
-            document.getElementById('spStatus').textContent='❌ 送信失敗: '+e.message;
-            spShootBtn.disabled=false;spShootBtn.style.opacity='1';
-          });
-        });
+      // Launch camera modal (with guide) instead of raw file input
+      spShootBtn.onclick=function(){
+        openCameraModal();
       };
     });
 
