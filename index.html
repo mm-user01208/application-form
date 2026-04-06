@@ -11,11 +11,20 @@
     .header h1{font-size:24px;font-weight:600;letter-spacing:1px}.header p{font-size:13px;opacity:.8;margin-top:6px}
     .container{max-width:680px;margin:32px auto;padding:0 16px}
     .card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:32px;margin-bottom:24px}
-    .steps{display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:28px;flex-wrap:nowrap}
+    .steps{display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:28px;flex-wrap:nowrap;overflow-x:auto;padding:4px 0}
     .step-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#999;white-space:nowrap}
     .step-item.active{color:#1a3a5c;font-weight:600}
-    .step-num{width:22px;height:22px;line-height:22px;border-radius:50%;background:#ddd;color:#fff;text-align:center;font-size:11px;font-weight:600}
-    .step-item.active .step-num{background:#1a3a5c}.step-arrow{color:#ccc;font-size:12px}
+    .step-num{width:22px;height:22px;line-height:22px;border-radius:50%;background:#ddd;color:#fff;text-align:center;font-size:11px;font-weight:600;flex-shrink:0}
+    .step-item.active .step-num{background:#1a3a5c}.step-arrow{color:#ccc;font-size:12px;flex-shrink:0}
+    .step-label{display:inline}
+    @media(max-width:600px){
+      .steps{justify-content:flex-start;gap:2px;padding:4px 8px}
+      .step-label{display:none}
+      .step-item{gap:0}
+      .step-arrow{font-size:10px;margin:0 2px}
+      .step-num{width:26px;height:26px;line-height:26px;font-size:12px}
+      .step-item.active .step-num{box-shadow:0 0 0 3px rgba(26,58,92,0.2)}
+    }
     .email-suggest{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d0d5dd;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:50;max-height:180px;overflow-y:auto}
     .email-suggest .es-item{padding:8px 12px;cursor:pointer;font-size:13px;color:#333}
     .email-suggest .es-item:hover,.email-suggest .es-item.active{background:#e8f0fe;color:#1a3a5c}
@@ -126,12 +135,12 @@
 <div class="header"><h1>ESTA申請フォーム</h1><p>ESTA Application Form</p></div>
 <div class="container">
   <div class="steps">
-    <div class="step-item active"><span class="step-num">①</span> 必須項目の入力</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">②</span> 渡航・滞在先情報</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">③</span> 個人情報の入力</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">④</span> 入力内容の確認</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">⑤</span> 申請料お支払い</div><span class="step-arrow">→</span>
-    <div class="step-item"><span class="step-num">⑥</span> 申請完了</div>
+    <div class="step-item active"><span class="step-num">①</span><span class="step-label"> 必須項目の入力</span></div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">②</span><span class="step-label"> 渡航・滞在先情報</span></div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">③</span><span class="step-label"> 個人情報の入力</span></div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">④</span><span class="step-label"> 入力内容の確認</span></div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">⑤</span><span class="step-label"> 申請料お支払い</span></div><span class="step-arrow">→</span>
+    <div class="step-item"><span class="step-num">⑥</span><span class="step-label"> 申請完了</span></div>
   </div>
   <div class="notice-box" id="mainNoticeBox">
     <p><strong>注意事項：</strong>すべての項目は<span style="color:#e74c3c;font-weight:700">英語(ローマ字)</span>で入力してください。</p>
