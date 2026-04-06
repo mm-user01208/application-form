@@ -1699,15 +1699,8 @@ function startCamLoop(){
     if(!video.videoWidth)return;
     canvas.width=video.videoWidth;canvas.height=video.videoHeight;
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    // Draw guide oval
     const cx=canvas.width/2,cy=canvas.height/2;
-    const ow=canvas.width*0.4,oh=canvas.height*0.6;
-    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
-    ctx.strokeStyle='rgba(255,255,255,0.7)';ctx.lineWidth=3;ctx.stroke();
-    ctx.fillStyle='rgba(0,0,0,0.25)';
-    ctx.beginPath();ctx.rect(0,0,canvas.width,canvas.height);
-    ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
-    ctx.fill('evenodd');
+    drawHumanGuide(ctx,canvas.width,canvas.height);
 
     // Brightness from center area
     const tmpC=document.createElement('canvas');
@@ -1727,7 +1720,8 @@ function startCamLoop(){
 
     // Evaluate conditions
     const conditions=evaluateConditions(lastFaceResult,bright,canvas.width,canvas.height);
-    drawFeedback(ctx,conditions,lastFaceResult,canvas.width,canvas.height,cx,cy,ow,oh);
+    if(conditions.allOk){ctx.clearRect(0,0,canvas.width,canvas.height);drawHumanGuide(ctx,canvas.width,canvas.height,'rgba(46,213,115,0.95)')}
+    drawFeedback(ctx,conditions,lastFaceResult,canvas.width,canvas.height,cx,cy,0,0);
 
     const allOk=conditions.allOk;
     if(allOk&&!camAutoFired){
@@ -1770,16 +1764,56 @@ function evaluateConditions(face,bright,vw,vh){
   return{allOk,message,issues};
 }
 
+// ===== Human silhouette guide =====
+function humanGuidePath(ctx,vw,vh){
+  // Head
+  const hcx=vw/2, hcy=vh*0.30;
+  const hrx=vw*0.17, hry=vh*0.21;
+  // Neck / Shoulders
+  const nw=vw*0.08;
+  const nty=hcy+hry*0.75;
+  const nby=hcy+hry+vh*0.03;
+  const sw=vw*0.43;
+  const sty=nby+vh*0.02;
+  const sby=vh; // extend to bottom edge
+  ctx.ellipse(hcx,hcy,hrx,hry,0,0,Math.PI*2);
+  ctx.moveTo(hcx-nw,nty);
+  ctx.bezierCurveTo(hcx-nw,nby,hcx-sw*0.45,sty,hcx-sw,sty);
+  ctx.lineTo(hcx-sw,sby);
+  ctx.lineTo(hcx+sw,sby);
+  ctx.lineTo(hcx+sw,sty);
+  ctx.bezierCurveTo(hcx+sw*0.45,sty,hcx+nw,nby,hcx+nw,nty);
+  ctx.closePath();
+}
+function drawHumanGuide(ctx,vw,vh,borderColor){
+  // Dark overlay outside silhouette
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,0.38)';
+  ctx.beginPath();
+  ctx.rect(0,0,vw,vh);
+  humanGuidePath(ctx,vw,vh);
+  ctx.fill('evenodd');
+  ctx.restore();
+  // Silhouette border
+  const hcx=vw/2,hcy=vh*0.30,hrx=vw*0.17,hry=vh*0.21;
+  const nw=vw*0.08,nty=hcy+hry*0.75,nby=hcy+hry+vh*0.03;
+  const sw=vw*0.43,sty=nby+vh*0.02;
+  ctx.strokeStyle=borderColor||'rgba(255,255,255,0.85)';ctx.lineWidth=3;
+  ctx.beginPath();ctx.ellipse(hcx,hcy,hrx,hry,0,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(hcx-nw,nty);
+  ctx.bezierCurveTo(hcx-nw,nby,hcx-sw*0.45,sty,hcx-sw,sty);
+  ctx.moveTo(hcx+nw,nty);
+  ctx.bezierCurveTo(hcx+nw,nby,hcx+sw*0.45,sty,hcx+sw,sty);
+  ctx.stroke();
+}
+
 function drawFeedback(ctx,conditions,face,vw,vh,cx,cy,ow,oh){
   if(face){
     const fb=face.boundingBox;
     ctx.beginPath();ctx.rect(fb.x,fb.y,fb.width,fb.height);
     ctx.strokeStyle=conditions.allOk?'rgba(46,213,115,0.9)':'rgba(255,165,0,0.9)';
     ctx.lineWidth=2;ctx.stroke();
-  }
-  if(conditions.allOk){
-    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
-    ctx.strokeStyle='rgba(46,213,115,0.9)';ctx.lineWidth=4;ctx.stroke();
   }
 }
 
@@ -1884,16 +1918,8 @@ function startCamLoop(){
     canvas.width=video.videoWidth;canvas.height=video.videoHeight;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     const cx=canvas.width/2,cy=canvas.height/2;
-    const ow=canvas.width*0.4,oh=canvas.height*0.6;
-    // Darkened outside oval
-    ctx.save();
-    ctx.beginPath();ctx.rect(0,0,canvas.width,canvas.height);
-    ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.fill('evenodd');
-    ctx.restore();
-    // Oval border
-    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
-    ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=3;ctx.stroke();
+    const cond_color=undefined; // updated after evaluation
+    drawHumanGuide(ctx,canvas.width,canvas.height);
     // Brightness
     const tmpC=document.createElement('canvas');tmpC.width=60;tmpC.height=60;
     const tmpCtx=tmpC.getContext('2d');
@@ -1906,7 +1932,12 @@ function startCamLoop(){
       catch(e){lastFaceResult=null}
     }
     const cond=evaluateConditions(lastFaceResult,bright,canvas.width,canvas.height);
-    drawFeedback(ctx,cond,lastFaceResult,canvas.width,canvas.height,cx,cy,ow,oh);
+    if(cond.allOk){
+      // Redraw guide with green border
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawHumanGuide(ctx,canvas.width,canvas.height,'rgba(46,213,115,0.95)');
+    }
+    drawFeedback(ctx,cond,lastFaceResult,canvas.width,canvas.height,cx,cy,0,0);
     $('camFeedbackText').textContent=cond.message;
     $('camFeedbackText').style.background=cond.allOk?'rgba(39,174,96,0.8)':'rgba(0,0,0,0.65)';
     if(cond.allOk&&!camAutoFired){
