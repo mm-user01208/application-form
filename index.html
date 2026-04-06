@@ -2646,60 +2646,67 @@ function closeQRModal(){
 }
 
 // ===== SP RECEIVER MODE (triggered by ?peer= URL param) =====
-(function initSPReceiverMode(){
+// Deferred to DOMContentLoaded so HTML elements exist before running
+document.addEventListener('DOMContentLoaded',function(){
   const params=new URLSearchParams(location.search);
   const peerId=params.get('peer');
   const type=params.get('type')||'selfie';
   if(!peerId)return;
 
-  // Hide main form, show SP UI
-  document.querySelectorAll('.container,.notice-box,#step-indicator').forEach(function(el){
-    if(el)el.style.display='none';
+  // Hide entire page content, show SP receiver UI
+  document.body.style.background='#f0f4f8';
+  document.querySelectorAll('body>*:not(#spReceiverUI):not(script):not(style)').forEach(function(el){
+    el.style.display='none';
   });
-  const spUI=$('spReceiverUI');
+  const spUI=document.getElementById('spReceiverUI');
+  if(!spUI)return;
   spUI.style.display='flex';
-  $('spStatus').textContent='PCに接続中...';
+  document.getElementById('spStatus').textContent='PCに接続中...';
 
-  const spShootBtn=$('spShootBtn');
+  const spShootBtn=document.getElementById('spShootBtn');
   spShootBtn.style.opacity='0.5';
 
   loadPeerJS(function(){
     const spPeer=new Peer({debug:0});
 
     spPeer.on('open',function(){
-      const conn=spPeer.connect(peerId,{reliable:true});
+      const conn=spPeer.connect(peerId,{reliable:true,serialization:'binary'});
 
       conn.on('open',function(){
-        $('spStatus').textContent='✅ 接続完了！写真を撮影して送信してください';
+        document.getElementById('spStatus').textContent='✅ 接続完了！写真を撮影して送信してください';
         spShootBtn.style.opacity='1';
         spShootBtn.disabled=false;
       });
 
       conn.on('error',function(e){
-        $('spStatus').textContent='❌ 接続エラー: '+e.message;
+        document.getElementById('spStatus').textContent='❌ 接続エラー: '+(e.message||e.type||e);
       });
 
-      spShootBtn.onclick=function(){$('spCameraInput').click();};
+      spShootBtn.onclick=function(){document.getElementById('spCameraInput').click();};
 
-      $('spCameraInput').onchange=function(){
+      document.getElementById('spCameraInput').onchange=function(){
         const file=this.files[0];
         if(!file)return;
         spShootBtn.disabled=true;
         spShootBtn.style.opacity='0.5';
-        $('spStatus').textContent='⏳ 画像を処理中...';
+        document.getElementById('spStatus').textContent='⏳ 画像を処理中...';
         processImage(file,type,function(blob,info){
-          if(!blob){$('spStatus').textContent='❌ 処理失敗';spShootBtn.disabled=false;spShootBtn.style.opacity='1';return;}
-          $('spPreview').src=URL.createObjectURL(blob);
-          $('spPreview').style.display='block';
-          $('spStatus').textContent='⏳ PCに送信中...';
+          if(!blob){
+            document.getElementById('spStatus').textContent='❌ 処理失敗';
+            spShootBtn.disabled=false;spShootBtn.style.opacity='1';return;
+          }
+          const prevEl=document.getElementById('spPreview');
+          prevEl.src=URL.createObjectURL(blob);
+          prevEl.style.display='block';
+          document.getElementById('spStatus').textContent='⏳ PCに送信中...';
           blob.arrayBuffer().then(function(buf){
             conn.send(buf);
-            $('spStatus').textContent='✅ 送信完了！このページを閉じてください。';
-            $('spQualityResult').textContent='📊 '+info;
-            $('spQualityResult').style.display='block';
-            spPeer.destroy();
+            document.getElementById('spStatus').textContent='✅ 送信完了！このページを閉じてください。';
+            const qr=document.getElementById('spQualityResult');
+            qr.textContent='📊 '+info;qr.style.display='block';
+            setTimeout(function(){spPeer.destroy();},1000);
           }).catch(function(e){
-            $('spStatus').textContent='❌ 送信失敗: '+e.message;
+            document.getElementById('spStatus').textContent='❌ 送信失敗: '+e.message;
             spShootBtn.disabled=false;spShootBtn.style.opacity='1';
           });
         });
@@ -2707,10 +2714,10 @@ function closeQRModal(){
     });
 
     spPeer.on('error',function(err){
-      $('spStatus').textContent='❌ エラー('+err.type+') — PCの画面を確認してください';
+      document.getElementById('spStatus').textContent='❌ エラー('+err.type+') — PCの画面を確認してください';
     });
   });
-})();
+});
 </script>
 <!-- ===== QR TRANSFER MODAL (PC side) ===== -->
 <div id="qrModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9998;align-items:center;justify-content:center">
