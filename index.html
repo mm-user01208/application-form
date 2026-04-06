@@ -1771,48 +1771,52 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   const headR=Math.min(vw,vh)*0.18;
   const headCY=vh*0.26;
   const chinY=headCY+headR;
-  // Neck
-  const neckHW=vw*0.065;
-  const neckBotY=chinY+vh*0.025;
-  // Shoulders
-  const shW=vw*0.46;
-  const shY=neckBotY+vh*0.07;
+  // Shoulder end points (2.5× radius from center = ~2.5× face半幅)
+  const shW=headR*2.5;
+  const shY=headCY+headR*1.8;
   const botY=vh;
 
   // 1. Dark overlay
   ctx.fillStyle='rgba(0,0,0,0.50)';
   ctx.fillRect(0,0,vw,vh);
 
-  // 2. Build combined path: head circle + body (trapezoid with curved shoulders)
+  // 2. Combined path: head circle + body with outward-expanding shoulder curves
   ctx.beginPath();
   // Head circle
   ctx.arc(cx,headCY,headR,0,Math.PI*2);
-  // Body — starts at chin, curves out to shoulders, goes to bottom
-  ctx.moveTo(cx-neckHW,chinY+headR*0.05);
-  ctx.bezierCurveTo(cx-neckHW,neckBotY, cx-shW*0.5,shY, cx-shW,shY);
+  // Body — left side: curves outward (control points pushed outside)
+  ctx.moveTo(cx-headR*0.4,chinY);
+  ctx.bezierCurveTo(
+    cx-headR*1.5, headCY+headR*0.8,  // CP1: outside left
+    cx-headR*2.5, headCY+headR*1.2,  // CP2: further outside
+    cx-shW,       shY                 // end: shoulder edge
+  );
   ctx.lineTo(cx-shW,botY);
   ctx.lineTo(cx+shW,botY);
   ctx.lineTo(cx+shW,shY);
-  ctx.bezierCurveTo(cx+shW*0.5,shY, cx+neckHW,neckBotY, cx+neckHW,chinY+headR*0.05);
+  // Right side: mirror
+  ctx.bezierCurveTo(
+    cx+headR*2.5, headCY+headR*1.2,  // CP1: outside right
+    cx+headR*1.5, headCY+headR*0.8,  // CP2
+    cx+headR*0.4, chinY               // end: right chin
+  );
   ctx.closePath();
 
-  // 3. Cut out (shows camera through)
+  // 3. Cut out silhouette
   ctx.globalCompositeOperation='destination-out';
   ctx.fillStyle='rgba(0,0,0,1)';
   ctx.fill();
 
-  // 4. Border outline
+  // 4. Border
   ctx.globalCompositeOperation='source-over';
   const bc=borderColor||'rgba(255,255,255,0.85)';
   ctx.strokeStyle=bc;ctx.lineWidth=3;ctx.lineJoin='round';
-  // Head border
   ctx.beginPath();ctx.arc(cx,headCY,headR,0,Math.PI*2);ctx.stroke();
-  // Shoulder border (left side + right side only — not the bottom/neck)
   ctx.beginPath();
-  ctx.moveTo(cx-neckHW,chinY+headR*0.05);
-  ctx.bezierCurveTo(cx-neckHW,neckBotY,cx-shW*0.5,shY,cx-shW,shY);
-  ctx.moveTo(cx+neckHW,chinY+headR*0.05);
-  ctx.bezierCurveTo(cx+neckHW,neckBotY,cx+shW*0.5,shY,cx+shW,shY);
+  ctx.moveTo(cx-headR*0.4,chinY);
+  ctx.bezierCurveTo(cx-headR*1.5,headCY+headR*0.8,cx-headR*2.5,headCY+headR*1.2,cx-shW,shY);
+  ctx.moveTo(cx+headR*0.4,chinY);
+  ctx.bezierCurveTo(cx+headR*1.5,headCY+headR*0.8,cx+headR*2.5,headCY+headR*1.2,cx+shW,shY);
   ctx.stroke();
 }
 
