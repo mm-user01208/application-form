@@ -1525,6 +1525,124 @@ function calcBrightness(imageData){
   return sum/(d.length/4);
 }
 
+// ===== PHASE 4: Background correction, Quality score, Analytics =====
+
+// ① Background correction: push non-face pixels toward white, lift shadows
+function applyBgCorrection(ctx,w,h,faceBox){
+  const id=ctx.getImageData(0,0,w,h);
+  const d=id.data;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const i=(y*w+x)*4;
+      const inFace=faceBox&&x>=faceBox.x-10&&x<=faceBox.x+faceBox.width+10
+                           &&y>=faceBox.y-10&&y<=faceBox.y+faceBox.height+10;
+      if(!inFace){
+        // Blend toward white
+        const blend=0.35;
+        d[i]  =Math.min(255,d[i]  +(255-d[i]  )*blend)|0;
+        d[i+1]=Math.min(255,d[i+1]+(255-d[i+1])*blend)|0;
+        d[i+2]=Math.min(255,d[i+2]+(255-d[i+2])*blend)|0;
+        // Shadow lift: extra boost for dark pixels
+        const lum=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;
+        if(lum<80){
+          const lift=(80-lum)*0.6|0;
+          d[i]  =Math.min(255,d[i]  +lift);
+          d[i+1]=Math.min(255,d[i+1]+lift);
+          d[i+2]=Math.min(255,d[i+2]+lift);
+        }
+      }
+    }
+  }
+  ctx.putImageData(id,0,0);
+}
+
+// ③ Quality score 0-100
+function calcQualityScore(bright,faceBox,canvasW,canvasH,bgVariance){
+  let score=0;
+  // Brightness (0-25)
+  if(bright>=90&&bright<=200)score+=25;
+  else if(bright>=70&&bright<=220)score+=15;
+  else score+=0;
+  // Face size (0-25)
+  if(faceBox){
+    const ratio=faceBox.height/canvasH;
+    if(ratio>=0.45&&ratio<=0.70)score+=25;
+    else if(ratio>=0.35&&ratio<=0.78)score+=15;
+    else score+=5;
+  }else score+=12;
+  // Face position (0-25)
+  if(faceBox){
+    const fcx=faceBox.x+faceBox.width/2,fcy=faceBox.y+faceBox.height/2;
+    const dx=Math.abs(fcx-canvasW/2)/(canvasW/2);
+    const dy=Math.abs(fcy-canvasH/2)/(canvasH/2);
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<0.1)score+=25;
+    else if(dist<0.2)score+=15;
+    else score+=5;
+  }else score+=12;
+  // Background uniformity (0-25): lower variance = more uniform = higher score
+  if(bgVariance<1000)score+=25;
+  else if(bgVariance<3000)score+=15;
+  else if(bgVariance<6000)score+=8;
+  else score+=0;
+  return Math.min(100,Math.round(score));
+}
+
+function calcBgVariance(ctx,w,h,faceBox){
+  // Sample border pixels to estimate background variance
+  const samples=[];
+  const step=Math.max(1,Math.floor(w/20));
+  for(let x=0;x<w;x+=step){
+    // Top and bottom rows
+    [[x,0],[x,h-1]].forEach(function([sx,sy]){
+      const d=ctx.getImageData(sx,sy,1,1).data;
+      samples.push(d[0]*0.299+d[1]*0.587+d[2]*0.114);
+    });
+  }
+  if(!samples.length)return 0;
+  const mean=samples.reduce(function(a,b){return a+b},0)/samples.length;
+  return samples.reduce(function(acc,v){return acc+(v-mean)*(v-mean)},0)/samples.length;
+}
+
+// ④ Analytics (localStorage)
+const ANA_KEY='esta_cam_log';
+function logEvent(event,data){
+  try{
+    const logs=JSON.parse(localStorage.getItem(ANA_KEY)||'[]');
+    logs.push(Object.assign({ts:Date.now(),event:event},data||{}));
+    if(logs.length>200)logs.splice(0,logs.length-200);
+    localStorage.setItem(ANA_KEY,JSON.stringify(logs));
+  }catch(e){}
+}
+function getAnalytics(){
+  try{return JSON.parse(localStorage.getItem(ANA_KEY)||'[]')}catch(e){return[];}
+}
+function showDebugPanel(){
+  const logs=getAnalytics();
+  const opens=logs.filter(function(l){return l.event==='camera_open'}).length;
+  const captures=logs.filter(function(l){return l.event==='capture'});
+  const accepted=logs.filter(function(l){return l.event==='photo_accepted'}).length;
+  const retaken=logs.filter(function(l){return l.event==='photo_retaken'}).length;
+  const scores=captures.map(function(l){return l.score||0});
+  const avgScore=scores.length?Math.round(scores.reduce(function(a,b){return a+b},0)/scores.length):'-';
+  const panel=document.createElement('div');
+  panel.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#eee;padding:12px 16px;font-size:12px;z-index:99999;border-top:2px solid #2d5f8a;max-height:50vh;overflow-y:auto';
+  panel.innerHTML='<strong style="color:#4fc3f7">📊 撮影分析ログ</strong> <button onclick="this.parentElement.remove()" style="float:right;background:none;border:none;color:#aaa;cursor:pointer">✕</button>'
+    +'<br>カメラ起動: '+opens+' 回 | 撮影試行: '+captures.length+' 回 | 採用: '+accepted+' 回 | 再撮影: '+retaken+' 回 | 平均スコア: '+avgScore
+    +'<br><br><strong>直近の撮影スコア：</strong><br>'
+    +captures.slice(-10).reverse().map(function(l){
+      const sc=l.score||0;
+      const col=sc>=90?'#27ae60':sc>=60?'#e67e22':'#e74c3c';
+      return '<span style="color:'+col+'">'+sc+'点</span> ('+new Date(l.ts).toLocaleTimeString()+')'
+        +(l.reason?' — '+l.reason:'');
+    }).join('<br>');
+  document.body.appendChild(panel);
+}
+// Show debug panel if ?debug=1
+if(new URLSearchParams(location.search).get('debug')==='1'){
+  document.addEventListener('DOMContentLoaded',showDebugPanel);
+}
+
 // ===== Image processor =====
 function processImageData(imgEl,faceBox,oriW,oriH,orientation,callback){
   let sx,sy,size;
@@ -1650,6 +1768,7 @@ function toggleAutoShutter(){
 }
 
 function openCameraModal(){
+  logEvent('camera_open');
   const modal=$('cameraModal');
   modal.style.display='flex';
   $('camQualityResult').style.display='none';
@@ -1762,7 +1881,7 @@ function startCamLoop(){
       lastDetectTime=ts;
       try{
         const faces=await camFaceDetector.detect(video);
-        lastFaceResult=faces.length>0?faces[0]:null;
+        lastFaceResult=faces.length>0?faces[0]:null;window._lastCamFace=lastFaceResult;
       }catch(e){lastFaceResult=null}
     }
 
@@ -1873,9 +1992,24 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
 function drawFeedback(ctx,conditions,face,vw,vh,cx,cy,ow,oh){
   if(face){
     const fb=face.boundingBox;
-    ctx.beginPath();ctx.rect(fb.x,fb.y,fb.width,fb.height);
-    ctx.strokeStyle=conditions.allOk?'rgba(46,213,115,0.9)':'rgba(255,165,0,0.9)';
-    ctx.lineWidth=2;ctx.stroke();
+    const ok=conditions.allOk;
+    // White face frame with corner accents
+    const pad=8;
+    const fx=fb.x-pad,fy=fb.y-pad,fw=fb.width+pad*2,fh=fb.height+pad*2;
+    ctx.strokeStyle=ok?'rgba(46,213,115,0.95)':'rgba(255,255,255,0.85)';
+    ctx.lineWidth=ok?3:2;
+    // Corner-only brackets
+    const cs=Math.min(fw,fh)*0.25;
+    ctx.beginPath();
+    // TL
+    ctx.moveTo(fx,fy+cs);ctx.lineTo(fx,fy);ctx.lineTo(fx+cs,fy);
+    // TR
+    ctx.moveTo(fx+fw-cs,fy);ctx.lineTo(fx+fw,fy);ctx.lineTo(fx+fw,fy+cs);
+    // BR
+    ctx.moveTo(fx+fw,fy+fh-cs);ctx.lineTo(fx+fw,fy+fh);ctx.lineTo(fx+fw-cs,fy+fh);
+    // BL
+    ctx.moveTo(fx+cs,fy+fh);ctx.lineTo(fx,fy+fh);ctx.lineTo(fx,fy+fh-cs);
+    ctx.stroke();
   }
 }
 
@@ -1884,46 +2018,78 @@ function captureFrame(){
   const video=$('camVideo');
   if(!video.videoWidth)return;
   stopCamLoop();
+  logEvent('capture_attempt');
   const canvas=document.createElement('canvas');
   canvas.width=video.videoWidth;canvas.height=video.videoHeight;
   const ctx=canvas.getContext('2d');
-  // Mirror front camera horizontally
+  // Mirror front camera
   ctx.translate(canvas.width,0);ctx.scale(-1,1);
   ctx.drawImage(video,0,0);
   ctx.setTransform(1,0,0,1,0,0);
-  // Get face box for crop
-  let faceBox=null;
-  // Assess quality
   const bright=calcBrightness(ctx.getImageData(0,0,canvas.width,canvas.height));
-  showQualityCheck(canvas,bright);
+  // Use last known face from loop
+  const faceBox=window._lastCamFace?window._lastCamFace.boundingBox:null;
+  showQualityCheck(canvas,bright,faceBox);
 }
 
 function stopCamLoop(){
   if(camRaf){cancelAnimationFrame(camRaf);camRaf=null}
 }
 
-function showQualityCheck(canvas,bright){
-  // Process to 600x600
+function showQualityCheck(canvas,bright,faceBox){
   const smallC=document.createElement('canvas');
   smallC.width=600;smallC.height=600;
   const sctx=smallC.getContext('2d');
   const size=Math.min(canvas.width,canvas.height);
   const sx=(canvas.width-size)/2,sy=(canvas.height-size)/2;
   sctx.drawImage(canvas,sx,sy,size,size,0,0,600,600);
+
+  // ① Background correction
+  const scaledFace=faceBox?{
+    x:(faceBox.x-sx)*(600/size),y:(faceBox.y-sy)*(600/size),
+    width:faceBox.width*(600/size),height:faceBox.height*(600/size)
+  }:null;
+  applyBgCorrection(sctx,600,600,scaledFace);
+
+  // Recalculate brightness after correction
+  const corrBright=calcBrightness(sctx.getImageData(0,0,600,600));
+  const bgVar=calcBgVariance(sctx,600,600,scaledFace);
+  const score=calcQualityScore(corrBright,scaledFace,600,600,bgVar);
+
   smallC.toBlob(function(blob){
     camCapturedBlob=blob;
-    // Quality items
+
+    // Log capture event
+    const reason=corrBright<70?'暗い':corrBright>220?'明るすぎ':!faceBox?'顔未検出':'';
+    logEvent('capture',{score:score,bright:Math.round(corrBright),reason:reason});
+
+    // ③ Quality score display
+    const brightOk=corrBright>=70&&corrBright<=220;
+    const brightWarn=corrBright<80||corrBright>200;
     const items=[
-      {label:'明るさ',ok:bright>=70&&bright<=220,warn:bright<80||bright>200,detail:bright<70?'暗すぎます':bright>220?'明るすぎます':'良好（輝度:'+Math.round(bright)+'）'},
+      {label:'明るさ',ok:brightOk,warn:brightOk&&brightWarn,
+        detail:corrBright<70?'暗すぎます':corrBright>220?'明るすぎます':'良好（輝度:'+Math.round(corrBright)+'）'},
+      {label:'顔サイズ',ok:!scaledFace||(scaledFace.height/600>=0.35),warn:false,
+        detail:scaledFace?Math.round(scaledFace.height/600*100)+'%（推奨45〜70%）':'検出なし'},
       {label:'解像度',ok:true,warn:false,detail:'600×600px'},
-      {label:'形式',ok:true,warn:false,detail:'JPEG'},
     ];
-    const ngCount=items.filter(i=>!i.ok).length;
-    const warnCount=items.filter(i=>i.warn&&i.ok).length;
-    const overall=ngCount>0?{icon:'❌',text:'再撮影を推奨します',color:'#c0392b',bg:'#fdf0f0'}
-      :warnCount>0?{icon:'⚠️',text:'注意して使用してください',color:'#e67e22',bg:'#fff8f0'}
-      :{icon:'✅',text:'そのまま使用できます',color:'#27ae60',bg:'#f0fdf4'};
+    const ngCount=items.filter(function(i){return !i.ok}).length;
+    const warnCount=items.filter(function(i){return i.warn&&i.ok}).length;
+    // Score-based overall
+    const overall=score>=90?{icon:'✅',text:'高品質 — そのまま使用できます',color:'#27ae60',bg:'#f0fdf4'}
+      :score>=60?{icon:'⚠️',text:'使用できますが改善を推奨',color:'#e67e22',bg:'#fff8f0'}
+      :{icon:'❌',text:'再撮影を推奨します',color:'#c0392b',bg:'#fdf0f0'};
+
     const qItems=$('camQualityItems');qItems.innerHTML='';
+    // Score gauge
+    const gaugeColor=score>=90?'#27ae60':score>=60?'#e67e22':'#e74c3c';
+    const scoreDiv=document.createElement('div');
+    scoreDiv.style.cssText='margin-bottom:8px;text-align:center';
+    scoreDiv.innerHTML='<span style="font-size:28px;font-weight:900;color:'+gaugeColor+'">'+score+'</span>'
+      +'<span style="font-size:13px;color:#aaa;margin-left:4px">/ 100点</span>'
+      +'<div style="background:#333;border-radius:4px;height:6px;margin-top:4px;overflow:hidden">'
+      +'<div style="background:'+gaugeColor+';width:'+score+'%;height:100%;transition:width .5s"></div></div>';
+    qItems.appendChild(scoreDiv);
     items.forEach(function(it){
       const icon=!it.ok?'❌':it.warn?'⚠️':'✅';
       const div=document.createElement('div');
@@ -1933,15 +2099,12 @@ function showQualityCheck(canvas,bright){
     });
     const overall_el=$('camQualityOverall');
     overall_el.textContent=overall.icon+' '+overall.text;
-    overall_el.style.cssText='margin-top:10px;font-size:15px;font-weight:700;padding:8px;border-radius:8px;text-align:center;background:'+overall.bg+';color:'+overall.color;
-    $('camUseBtn').style.display=ngCount===0?'block':'none';
+    overall_el.style.cssText='margin-top:8px;font-size:14px;font-weight:700;padding:8px;border-radius:8px;text-align:center;background:'+overall.bg+';color:'+overall.color;
+    $('camUseBtn').style.display=score>=60?'block':'none';
     $('camControls').style.display='none';
     $('camFeedbackBox').style.display='none';
     $('camQualityResult').style.display='block';
-    // Show captured frame preview
-    const previewUrl=URL.createObjectURL(blob);
-    const video=$('camVideo');
-    video.style.opacity='0.4';
+    $('camVideo').style.opacity='0.4';
     const ovCanvas=$('camOverlay');
     const ovCtx=ovCanvas.getContext('2d');
     ovCtx.clearRect(0,0,ovCanvas.width,ovCanvas.height);
@@ -1975,6 +2138,7 @@ function useCapture(){
     return;
   }
 
+  logEvent('photo_accepted');
   // Normal mode: store locally
   processedImages['selfie']=blob;
   $('selfiePreview').src=URL.createObjectURL(blob);
@@ -1986,6 +2150,7 @@ function useCapture(){
 }
 
 function retakePhoto(){
+  logEvent('photo_retaken');
   camCapturedBlob=null;camOkStart=null;camAutoFired=false;
   $('camQualityResult').style.display='none';
   $('camControls').style.display='flex';
@@ -2020,7 +2185,7 @@ function startCamLoop(){
     // Face detection throttle
     if(camFaceDetector&&ts-lastDetectTime>250){
       lastDetectTime=ts;
-      try{const faces=await camFaceDetector.detect(video);lastFaceResult=faces.length>0?faces[0]:null}
+      try{const faces=await camFaceDetector.detect(video);lastFaceResult=faces.length>0?faces[0]:null;window._lastCamFace=lastFaceResult;}
       catch(e){lastFaceResult=null}
     }
     const cond=evaluateConditions(lastFaceResult,bright,canvas.width,canvas.height);
