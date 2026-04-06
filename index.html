@@ -1630,6 +1630,24 @@ function resetUpload(type){
 // ===== CAMERA MODAL (selfie phase2) =====
 let camStream=null,camRaf=null,camFaceDetector=null;
 let camOkStart=null,camAutoFired=false,camCapturedBlob=null,camCapturedFace=null;
+let camAutoShutterOn=false;
+
+function toggleAutoShutter(){
+  camAutoShutterOn=!camAutoShutterOn;
+  camOkStart=null;camAutoFired=false;
+  const btn=document.getElementById('camAutoToggle');
+  if(camAutoShutterOn){
+    btn.textContent='🟢 自動 ON';
+    btn.style.background='rgba(39,174,96,0.25)';
+    btn.style.borderColor='rgba(39,174,96,0.8)';
+    btn.style.color='#2ecc71';
+  }else{
+    btn.textContent='🔴 自動 OFF';
+    btn.style.background='#333';
+    btn.style.borderColor='#666';
+    btn.style.color='#aaa';
+  }
+}
 
 function openCameraModal(){
   const modal=$('cameraModal');
@@ -1639,6 +1657,9 @@ function openCameraModal(){
   $('camFeedbackBox').style.display='block';
   $('camAutoPopup').style.display='none';
   camOkStart=null;camAutoFired=false;camCapturedBlob=null;camCapturedFace=null;
+  camAutoShutterOn=false;
+  const tog=document.getElementById('camAutoToggle');
+  if(tog){tog.textContent='🔴 自動 OFF';tog.style.background='#333';tog.style.borderColor='#666';tog.style.color='#aaa';}
   startCamStream();
 }
 
@@ -1751,10 +1772,9 @@ function startCamLoop(){
     drawFeedback(ctx,conditions,lastFaceResult,canvas.width,canvas.height,cx,cy,0,0);
 
     const allOk=conditions.allOk;
-    if(allOk&&!camAutoFired){
+    if(camAutoShutterOn&&allOk&&!camAutoFired){
       if(!camOkStart)camOkStart=ts;
-      const elapsed=ts-camOkStart;
-      if(elapsed>=500){
+      if(ts-camOkStart>=500){
         camAutoFired=true;
         $('camAutoPopup').style.display='block';
         setTimeout(function(){$('camAutoPopup').style.display='none';captureFrame();},600);
@@ -1771,24 +1791,27 @@ function startCamLoop(){
 function evaluateConditions(face,bright,vw,vh){
   const issues=[];
   let allOk=true;
-  // Brightness
-  if(bright<70){issues.push({key:'bright',msg:'☀️ 明るい場所で撮影してください'});allOk=false}
-  else if(bright>220){issues.push({key:'bright',msg:'💡 眩しすぎます。照明を調整してください'});allOk=false}
+  const brightOk=bright>=70&&bright<=220;
+  if(!brightOk){
+    issues.push({key:'bright',msg:bright<70?'☀️ 明るい場所で撮影してください':'💡 眩しすぎます。照明を調整してください'});
+    allOk=false;
+  }
   if(face){
     const fb=face.boundingBox;
-    const fcx=fb.x+fb.width/2;const fcy=fb.y+fb.height/2;
-    // Position
-    const dx=Math.abs(fcx-vw/2)/(vw/2);
-    const dy=Math.abs(fcy-vh/2)/(vh/2);
+    const fcx=fb.x+fb.width/2,fcy=fb.y+fb.height/2;
+    const dx=Math.abs(fcx-vw/2)/(vw/2),dy=Math.abs(fcy-vh/2)/(vh/2);
     if(dx>0.2||dy>0.2){issues.push({key:'pos',msg:'😐 顔を中央に合わせてください'});allOk=false}
-    // Size ratio
     const ratio=fb.height/vh;
     if(ratio<0.4){issues.push({key:'size',msg:'🔍 もう少し近づいてください'});allOk=false}
     else if(ratio>0.75){issues.push({key:'size',msg:'↩️ 少し離れてください'});allOk=false}
   }
-  const message=issues.length>0?issues[0].msg:(face?'✅ 撮影できます！':'😐 顔を楕円内に合わせてください');
-  if(!face&&allOk)allOk=false;
-  return{allOk,message,issues};
+  // FaceDetector非対応時: 明るさOKだけで allOk=true（顔判定スキップ）
+  const hasFaceDetector=!!camFaceDetector;
+  if(!face&&hasFaceDetector)allOk=false; // 対応ブラウザで顔未検出はNG
+  // 非対応時は顔チェックなし → brightOkのみで判定済み
+  const message=issues.length>0?issues[0].msg:
+    (face?'✅ 撮影できます！':hasFaceDetector?'😐 顔をガイドに合わせてください':'✅ 撮影できます！');
+  return{allOk,message,issues,brightOk};
 }
 
 // ===== Human silhouette guide (single connected path) =====
@@ -2009,7 +2032,7 @@ function startCamLoop(){
     drawFeedback(ctx,cond,lastFaceResult,canvas.width,canvas.height,cx,cy,0,0);
     $('camFeedbackText').textContent=cond.message;
     $('camFeedbackText').style.background=cond.allOk?'rgba(39,174,96,0.8)':'rgba(0,0,0,0.65)';
-    if(cond.allOk&&!camAutoFired){
+    if(camAutoShutterOn&&cond.allOk&&!camAutoFired){
       if(!camOkStart)camOkStart=ts;
       if(ts-camOkStart>=500){
         camAutoFired=true;
@@ -2839,7 +2862,8 @@ document.addEventListener('DOMContentLoaded',function(){
       <button onclick="retakePhoto()" style="flex:1;padding:10px;background:#444;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">再撮影する</button>
     </div>
   </div>
-  <div id="camControls" style="background:rgba(0,0,0,0.85);padding:16px;display:flex;justify-content:center;align-items:center;flex-shrink:0">
+  <div id="camControls" style="background:rgba(0,0,0,0.85);padding:16px;display:flex;justify-content:center;align-items:center;gap:20px;flex-shrink:0">
+    <button id="camAutoToggle" onclick="toggleAutoShutter()" style="padding:8px 14px;border-radius:20px;background:#333;border:2px solid #666;color:#aaa;font-size:12px;font-weight:700;cursor:pointer;min-width:90px">🔴 自動 OFF</button>
     <button id="camShutterBtn" onclick="captureFrame()" style="width:72px;height:72px;border-radius:50%;background:#fff;border:5px solid #aaa;cursor:pointer;font-size:11px;font-weight:700;color:#333;transition:transform .1s;box-shadow:0 0 0 3px rgba(255,255,255,0.3)">撮影</button>
   </div>
 </div>
