@@ -1764,48 +1764,29 @@ function evaluateConditions(face,bright,vw,vh){
   return{allOk,message,issues};
 }
 
-// ===== Human silhouette guide =====
-function humanGuidePath(ctx,vw,vh){
-  // Head
-  const hcx=vw/2, hcy=vh*0.30;
-  const hrx=vw*0.17, hry=vh*0.21;
-  // Neck / Shoulders
-  const nw=vw*0.08;
-  const nty=hcy+hry*0.75;
-  const nby=hcy+hry+vh*0.03;
-  const sw=vw*0.43;
-  const sty=nby+vh*0.02;
-  const sby=vh; // extend to bottom edge
-  ctx.ellipse(hcx,hcy,hrx,hry,0,0,Math.PI*2);
-  ctx.moveTo(hcx-nw,nty);
-  ctx.bezierCurveTo(hcx-nw,nby,hcx-sw*0.45,sty,hcx-sw,sty);
-  ctx.lineTo(hcx-sw,sby);
-  ctx.lineTo(hcx+sw,sby);
-  ctx.lineTo(hcx+sw,sty);
-  ctx.bezierCurveTo(hcx+sw*0.45,sty,hcx+nw,nby,hcx+nw,nty);
-  ctx.closePath();
-}
+// ===== Human silhouette guide (head circle + body ellipse) =====
 function drawHumanGuide(ctx,vw,vh,borderColor){
-  // Dark overlay outside silhouette
-  ctx.save();
-  ctx.fillStyle='rgba(0,0,0,0.38)';
-  ctx.beginPath();
-  ctx.rect(0,0,vw,vh);
-  humanGuidePath(ctx,vw,vh);
-  ctx.fill('evenodd');
-  ctx.restore();
-  // Silhouette border
-  const hcx=vw/2,hcy=vh*0.30,hrx=vw*0.17,hry=vh*0.21;
-  const nw=vw*0.08,nty=hcy+hry*0.75,nby=hcy+hry+vh*0.03;
-  const sw=vw*0.43,sty=nby+vh*0.02;
-  ctx.strokeStyle=borderColor||'rgba(255,255,255,0.85)';ctx.lineWidth=3;
-  ctx.beginPath();ctx.ellipse(hcx,hcy,hrx,hry,0,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(hcx-nw,nty);
-  ctx.bezierCurveTo(hcx-nw,nby,hcx-sw*0.45,sty,hcx-sw,sty);
-  ctx.moveTo(hcx+nw,nty);
-  ctx.bezierCurveTo(hcx+nw,nby,hcx+sw*0.45,sty,hcx+sw,sty);
-  ctx.stroke();
+  const cx=vw/2;
+  const headR=Math.min(vw*0.20,vh*0.22);
+  const headCY=vh*0.27;
+  const bodyCY=headCY+headR*0.88;
+  const bodyRX=vw*0.38;
+  const bodyRY=vh*0.42;
+  // 1. Dark overlay
+  ctx.fillStyle='rgba(0,0,0,0.45)';
+  ctx.fillRect(0,0,vw,vh);
+  // 2. Cut out silhouette (destination-out = transparent = shows video)
+  ctx.globalCompositeOperation='destination-out';
+  ctx.fillStyle='rgba(0,0,0,1)';
+  ctx.beginPath();ctx.arc(cx,headCY,headR,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx,bodyCY,bodyRX,bodyRY,0,0,Math.PI*2);ctx.fill();
+  // 3. Border
+  ctx.globalCompositeOperation='source-over';
+  const bc=borderColor||'rgba(255,255,255,0.85)';
+  ctx.strokeStyle=bc;ctx.lineWidth=3;
+  ctx.beginPath();ctx.arc(cx,headCY,headR,0,Math.PI*2);ctx.stroke();
+  // Only top arc of body ellipse visible (shoulder line)
+  ctx.beginPath();ctx.ellipse(cx,bodyCY,bodyRX,bodyRY,0,Math.PI,Math.PI*2);ctx.stroke();
 }
 
 function drawFeedback(ctx,conditions,face,vw,vh,cx,cy,ow,oh){
