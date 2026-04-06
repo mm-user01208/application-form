@@ -1779,7 +1779,7 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   const headCY=vh*0.26;
   const chinY=headCY+headR;
   // Shoulder end points — ESTA規定に準拠（肩が画像幅の大半をカバー）
-  const shW=headR*3.8;
+  const shW=headR*3.2;
   const shY=headCY+headR*2.0;
   const botY=vh;
 
@@ -1795,7 +1795,7 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   ctx.moveTo(cx-headR*0.4,chinY);
   ctx.bezierCurveTo(
     cx-headR*1.8, headCY+headR*0.9,  // CP1: outside left
-    cx-headR*3.8, headCY+headR*1.4,  // CP2: further outside
+    cx-headR*3.2, headCY+headR*1.4,  // CP2: further outside
     cx-shW,       shY                 // end: shoulder edge
   );
   ctx.lineTo(cx-shW,botY);
@@ -1803,7 +1803,7 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   ctx.lineTo(cx+shW,shY);
   // Right side: mirror
   ctx.bezierCurveTo(
-    cx+headR*3.8, headCY+headR*1.4,  // CP1: outside right
+    cx+headR*3.2, headCY+headR*1.4,  // CP1: outside right
     cx+headR*1.8, headCY+headR*0.9,  // CP2
     cx+headR*0.4, chinY               // end: right chin
   );
@@ -1821,9 +1821,9 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   ctx.beginPath();ctx.arc(cx,headCY,headR,0,Math.PI*2);ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(cx-headR*0.4,chinY);
-  ctx.bezierCurveTo(cx-headR*1.8,headCY+headR*0.9,cx-headR*3.8,headCY+headR*1.4,cx-shW,shY);
+  ctx.bezierCurveTo(cx-headR*1.8,headCY+headR*0.9,cx-headR*3.2,headCY+headR*1.4,cx-shW,shY);
   ctx.moveTo(cx+headR*0.4,chinY);
-  ctx.bezierCurveTo(cx+headR*1.8,headCY+headR*0.9,cx+headR*3.8,headCY+headR*1.4,cx+shW,shY);
+  ctx.bezierCurveTo(cx+headR*1.8,headCY+headR*0.9,cx+headR*3.2,headCY+headR*1.4,cx+shW,shY);
   ctx.stroke();
 }
 
