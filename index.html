@@ -1465,42 +1465,121 @@ const isMobile=/Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.
 document.querySelectorAll('.upload-btns-sp').forEach(el=>{if(isMobile)el.style.display='flex'});
 document.querySelectorAll('.upload-btns-pc').forEach(el=>{if(!isMobile)el.style.display='block'});
 
-function triggerCamera(type){$(type+'Camera').click()}
 function triggerFile(type){$(type+'File').click()}
+function triggerCamera(type){
+  if(type==='selfie'){openCameraModal()}
+  else{$(type+'Camera').click()}
+}
 
 // Processed image data store
 const processedImages={passport:null,selfie:null};
 
-// Image processor: center-crop square → 600×600 → JPEG → ≤2MB
-function processImage(file,type,callback){
-  const img=new Image();
-  img.onload=function(){
-    const origW=img.width,origH=img.height;
-    // Center crop to square
-    const size=Math.min(origW,origH);
-    const sx=(origW-size)/2, sy=(origH-size)/2;
-    // Draw to 600×600 canvas
-    const canvas=document.createElement('canvas');
-    canvas.width=600;canvas.height=600;
-    const ctx=canvas.getContext('2d');
-    ctx.drawImage(img,sx,sy,size,size,0,0,600,600);
-    // Compress to JPEG ≤2MB, start at quality 0.92
-    let quality=0.92;
-    function tryCompress(){
-      canvas.toBlob(function(blob){
-        if(blob.size>2*1024*1024 && quality>0.1){
-          quality-=0.05;
-          tryCompress();
-        }else{
-          const info='JPEG 600×600 / '+Math.round(blob.size/1024)+'KB'+(quality<0.92?' (圧縮率: '+Math.round(quality*100)+'%)':'');
-          callback(blob,info,origW,origH);
+// ===== EXIF orientation =====
+function readExifOrientation(buf){
+  try{
+    const v=new DataView(buf);
+    if(v.getUint16(0,false)!==0xFFD8)return 1;
+    let off=2;
+    while(off<v.byteLength-2){
+      const mk=v.getUint16(off,false);off+=2;
+      if(mk===0xFFE1){
+        if(off+6>v.byteLength)break;
+        if(v.getUint32(off+2,false)!==0x45786966)break;
+        const le=v.getUint16(off+8,false)===0x4949;
+        const ifdBase=off+8;
+        const ifdOff=v.getUint32(ifdBase+4,le);
+        const entries=v.getUint16(ifdBase+ifdOff,le);
+        for(let i=0;i<entries;i++){
+          const tagOff=ifdBase+ifdOff+2+i*12;
+          if(tagOff+12>v.byteLength)break;
+          if(v.getUint16(tagOff,le)===0x0112)return v.getUint16(tagOff+8,le);
         }
-      },'image/jpeg',quality);
+        break;
+      }
+      if((mk&0xFF00)!==0xFF00)break;
+      if(off+2>v.byteLength)break;
+      off+=v.getUint16(off,false);
     }
-    tryCompress();
+  }catch(e){}
+  return 1;
+}
+function drawWithOrientation(ctx,img,ori,w,h){
+  ctx.save();
+  if(ori===2){ctx.transform(-1,0,0,1,w,0)}
+  else if(ori===3){ctx.transform(-1,0,0,-1,w,h)}
+  else if(ori===4){ctx.transform(1,0,0,-1,0,h)}
+  else if(ori===5){ctx.transform(0,1,1,0,0,0)}
+  else if(ori===6){ctx.transform(0,1,-1,0,h,0)}
+  else if(ori===7){ctx.transform(0,-1,-1,0,h,w)}
+  else if(ori===8){ctx.transform(0,-1,1,0,0,w)}
+  if(ori>=5&&ori<=8)ctx.drawImage(img,0,0,h,w);
+  else ctx.drawImage(img,0,0,w,h);
+  ctx.restore();
+}
+
+// ===== Brightness =====
+function calcBrightness(imageData){
+  const d=imageData.data;let sum=0;
+  for(let i=0;i<d.length;i+=4)sum+=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;
+  return sum/(d.length/4);
+}
+
+// ===== Image processor =====
+function processImageData(imgEl,faceBox,oriW,oriH,orientation,callback){
+  let sx,sy,size;
+  if(faceBox){
+    // face-center crop
+    const fcx=faceBox.x+faceBox.width/2;
+    const fcy=faceBox.y+faceBox.height/2;
+    size=Math.max(faceBox.width,faceBox.height)*1.6;
+    size=Math.min(size,oriW,oriH);
+    sx=Math.max(0,Math.min(fcx-size/2,oriW-size));
+    sy=Math.max(0,Math.min(fcy-size/2,oriH-size));
+  }else{
+    size=Math.min(oriW,oriH);
+    sx=(oriW-size)/2;sy=(oriH-size)/2;
+  }
+  const canvas=document.createElement('canvas');
+  canvas.width=600;canvas.height=600;
+  const ctx=canvas.getContext('2d');
+  // draw with EXIF correction
+  const tmp=document.createElement('canvas');
+  const sw=(orientation>=5&&orientation<=8)?oriH:oriW;
+  const sh=(orientation>=5&&orientation<=8)?oriW:oriH;
+  tmp.width=sw;tmp.height=sh;
+  const tctx=tmp.getContext('2d');
+  drawWithOrientation(tctx,imgEl,orientation,oriW,oriH);
+  ctx.drawImage(tmp,sx,sy,size,size,0,0,600,600);
+  // brightness check
+  const bdata=ctx.getImageData(0,0,600,600);
+  const bright=calcBrightness(bdata);
+  let quality=0.92;
+  function tryCompress(){
+    canvas.toBlob(function(blob){
+      if(blob&&blob.size>2*1024*1024&&quality>0.1){quality-=0.05;tryCompress();return}
+      callback(blob,'JPEG 600×600 / '+(blob?Math.round(blob.size/1024):'?')+'KB',bright);
+    },'image/jpeg',quality);
+  }
+  tryCompress();
+}
+
+function processImage(file,type,callback){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const orientation=readExifOrientation(e.target.result);
+    const blob2=new Blob([e.target.result],{type:file.type});
+    const url=URL.createObjectURL(blob2);
+    const img=new Image();
+    img.onload=function(){
+      const w=img.naturalWidth,h=img.naturalHeight;
+      processImageData(img,null,w,h,orientation,function(blob,info,bright){
+        URL.revokeObjectURL(url);
+        callback(blob,info,w,h,bright);
+      });
+    };
+    img.src=url;
   };
-  img.onerror=function(){callback(null,'画像の読み込みに失敗しました')};
-  img.src=URL.createObjectURL(file);
+  reader.readAsArrayBuffer(file);
 }
 
 function handleUpload(file,type){
@@ -1512,23 +1591,17 @@ function handleUpload(file,type){
   const uploadArea=$(type+'UploadArea');
   showErr(errEl.id,false);
   if(type==='selfie')showErr('errSelfieType',false);
-
   if(!file){nameEl.textContent='';previewWrap.style.display='none';processedImages[type]=null;uploadArea.style.display='';return}
-
-  // Selfie: only jpeg/png
   if(type==='selfie'){
     const valid=['image/jpeg','image/png'];
     if(!valid.includes(file.type)){showErr('errSelfieType',true);nameEl.textContent='';return}
   }
-  // Size check (10MB raw)
   if(file.size>10*1024*1024){showErr(errEl.id,true);nameEl.textContent='';return}
-
   nameEl.textContent='⏳ 画像を処理中...';
-  processImage(file,type,function(blob,info,origW,origH){
+  processImage(file,type,function(blob,info,origW,origH,bright){
     if(!blob){nameEl.textContent='❌ 処理失敗';return}
     processedImages[type]=blob;
-    const url=URL.createObjectURL(blob);
-    previewImg.src=url;
+    previewImg.src=URL.createObjectURL(blob);
     previewWrap.style.display='block';
     uploadArea.style.display='none';
     nameEl.textContent='✓ '+file.name;
@@ -1546,13 +1619,307 @@ function resetUpload(type){
   processedImages[type]=null;
 }
 
-// Wire up change events for both file and camera inputs
 ['passport','selfie'].forEach(function(type){
   [type+'File',type+'Camera'].forEach(function(inputId){
     var el=$(inputId);
     if(el)el.addEventListener('change',function(){handleUpload(this.files[0],type)});
   });
 });
+
+// ===== CAMERA MODAL (selfie phase2) =====
+let camStream=null,camRaf=null,camFaceDetector=null;
+let camOkStart=null,camAutoFired=false,camCapturedBlob=null,camCapturedFace=null;
+
+function openCameraModal(){
+  const modal=$('cameraModal');
+  modal.style.display='flex';
+  $('camQualityResult').style.display='none';
+  $('camControls').style.display='flex';
+  $('camFeedbackBox').style.display='block';
+  $('camAutoPopup').style.display='none';
+  camOkStart=null;camAutoFired=false;camCapturedBlob=null;camCapturedFace=null;
+  startCamStream();
+}
+
+function closeCameraModal(){
+  stopCamStream();
+  $('cameraModal').style.display='none';
+}
+
+function startCamStream(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    alert('このブラウザはカメラをサポートしていません。ファイルを選択してください。');
+    closeCameraModal();return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}})
+    .then(function(stream){
+      camStream=stream;
+      const video=$('camVideo');
+      video.srcObject=stream;
+      video.onloadedmetadata=function(){
+        video.play();
+        setupOverlayCanvas();
+        initFaceDetector();
+        startCamLoop();
+      };
+    })
+    .catch(function(err){
+      alert('カメラの起動に失敗しました: '+err.message+'\nファイルを選択してください。');
+      closeCameraModal();
+    });
+}
+
+function stopCamStream(){
+  if(camRaf){cancelAnimationFrame(camRaf);camRaf=null}
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+}
+
+function setupOverlayCanvas(){
+  const video=$('camVideo');
+  const canvas=$('camOverlay');
+  canvas.width=video.videoWidth||640;
+  canvas.height=video.videoHeight||480;
+}
+
+function initFaceDetector(){
+  if('FaceDetector' in window){
+    try{camFaceDetector=new FaceDetector({fastMode:true,maxDetectedFaces:1})}catch(e){camFaceDetector=null}
+  }
+}
+
+function startCamLoop(){
+  const video=$('camVideo');
+  const canvas=$('camOverlay');
+  const ctx=canvas.getContext('2d');
+  let lastFaceResult=null;
+  let lastDetectTime=0;
+
+  async function loop(ts){
+    camRaf=requestAnimationFrame(loop);
+    if(!video.videoWidth)return;
+    canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // Draw guide oval
+    const cx=canvas.width/2,cy=canvas.height/2;
+    const ow=canvas.width*0.4,oh=canvas.height*0.6;
+    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.7)';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    ctx.beginPath();ctx.rect(0,0,canvas.width,canvas.height);
+    ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
+    ctx.fill('evenodd');
+
+    // Brightness from center area
+    const tmpC=document.createElement('canvas');
+    tmpC.width=80;tmpC.height=80;
+    const tmpCtx=tmpC.getContext('2d');
+    tmpCtx.drawImage(video,cx-40,cy-40,80,80,0,0,80,80);
+    const bright=calcBrightness(tmpCtx.getImageData(0,0,80,80));
+
+    // Face detection (throttle to every 200ms)
+    if(camFaceDetector&&ts-lastDetectTime>200){
+      lastDetectTime=ts;
+      try{
+        const faces=await camFaceDetector.detect(video);
+        lastFaceResult=faces.length>0?faces[0]:null;
+      }catch(e){lastFaceResult=null}
+    }
+
+    // Evaluate conditions
+    const conditions=evaluateConditions(lastFaceResult,bright,canvas.width,canvas.height);
+    drawFeedback(ctx,conditions,lastFaceResult,canvas.width,canvas.height,cx,cy,ow,oh);
+
+    const allOk=conditions.allOk;
+    if(allOk&&!camAutoFired){
+      if(!camOkStart)camOkStart=ts;
+      const elapsed=ts-camOkStart;
+      if(elapsed>=500){
+        camAutoFired=true;
+        $('camAutoPopup').style.display='block';
+        setTimeout(function(){$('camAutoPopup').style.display='none';captureFrame();},600);
+      }
+    }else if(!allOk){camOkStart=null}
+
+    // Update feedback text
+    $('camFeedbackText').textContent=conditions.message;
+    $('camFeedbackText').style.background=allOk?'rgba(39,174,96,0.8)':'rgba(0,0,0,0.65)';
+  }
+  camRaf=requestAnimationFrame(loop);
+}
+
+function evaluateConditions(face,bright,vw,vh){
+  const issues=[];
+  let allOk=true;
+  // Brightness
+  if(bright<70){issues.push({key:'bright',msg:'☀️ 明るい場所で撮影してください'});allOk=false}
+  else if(bright>220){issues.push({key:'bright',msg:'💡 眩しすぎます。照明を調整してください'});allOk=false}
+  if(face){
+    const fb=face.boundingBox;
+    const fcx=fb.x+fb.width/2;const fcy=fb.y+fb.height/2;
+    // Position
+    const dx=Math.abs(fcx-vw/2)/(vw/2);
+    const dy=Math.abs(fcy-vh/2)/(vh/2);
+    if(dx>0.2||dy>0.2){issues.push({key:'pos',msg:'😐 顔を中央に合わせてください'});allOk=false}
+    // Size ratio
+    const ratio=fb.height/vh;
+    if(ratio<0.4){issues.push({key:'size',msg:'🔍 もう少し近づいてください'});allOk=false}
+    else if(ratio>0.75){issues.push({key:'size',msg:'↩️ 少し離れてください'});allOk=false}
+  }
+  const message=issues.length>0?issues[0].msg:(face?'✅ 撮影できます！':'😐 顔を楕円内に合わせてください');
+  if(!face&&allOk)allOk=false;
+  return{allOk,message,issues};
+}
+
+function drawFeedback(ctx,conditions,face,vw,vh,cx,cy,ow,oh){
+  if(face){
+    const fb=face.boundingBox;
+    ctx.beginPath();ctx.rect(fb.x,fb.y,fb.width,fb.height);
+    ctx.strokeStyle=conditions.allOk?'rgba(46,213,115,0.9)':'rgba(255,165,0,0.9)';
+    ctx.lineWidth=2;ctx.stroke();
+  }
+  if(conditions.allOk){
+    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(46,213,115,0.9)';ctx.lineWidth=4;ctx.stroke();
+  }
+}
+
+function captureFrame(){
+  if(!camStream)return;
+  const video=$('camVideo');
+  if(!video.videoWidth)return;
+  stopCamLoop();
+  const canvas=document.createElement('canvas');
+  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+  const ctx=canvas.getContext('2d');
+  // Mirror front camera horizontally
+  ctx.translate(canvas.width,0);ctx.scale(-1,1);
+  ctx.drawImage(video,0,0);
+  ctx.setTransform(1,0,0,1,0,0);
+  // Get face box for crop
+  let faceBox=null;
+  // Assess quality
+  const bright=calcBrightness(ctx.getImageData(0,0,canvas.width,canvas.height));
+  showQualityCheck(canvas,bright);
+}
+
+function stopCamLoop(){
+  if(camRaf){cancelAnimationFrame(camRaf);camRaf=null}
+}
+
+function showQualityCheck(canvas,bright){
+  // Process to 600x600
+  const smallC=document.createElement('canvas');
+  smallC.width=600;smallC.height=600;
+  const sctx=smallC.getContext('2d');
+  const size=Math.min(canvas.width,canvas.height);
+  const sx=(canvas.width-size)/2,sy=(canvas.height-size)/2;
+  sctx.drawImage(canvas,sx,sy,size,size,0,0,600,600);
+  smallC.toBlob(function(blob){
+    camCapturedBlob=blob;
+    // Quality items
+    const items=[
+      {label:'明るさ',ok:bright>=70&&bright<=220,warn:bright<80||bright>200,detail:bright<70?'暗すぎます':bright>220?'明るすぎます':'良好（輝度:'+Math.round(bright)+'）'},
+      {label:'解像度',ok:true,warn:false,detail:'600×600px'},
+      {label:'形式',ok:true,warn:false,detail:'JPEG'},
+    ];
+    const ngCount=items.filter(i=>!i.ok).length;
+    const warnCount=items.filter(i=>i.warn&&i.ok).length;
+    const overall=ngCount>0?{icon:'❌',text:'再撮影を推奨します',color:'#c0392b',bg:'#fdf0f0'}
+      :warnCount>0?{icon:'⚠️',text:'注意して使用してください',color:'#e67e22',bg:'#fff8f0'}
+      :{icon:'✅',text:'そのまま使用できます',color:'#27ae60',bg:'#f0fdf4'};
+    const qItems=$('camQualityItems');qItems.innerHTML='';
+    items.forEach(function(it){
+      const icon=!it.ok?'❌':it.warn?'⚠️':'✅';
+      const div=document.createElement('div');
+      div.style.cssText='display:flex;align-items:center;gap:8px;font-size:13px;color:#ddd;padding:2px 0';
+      div.innerHTML='<span>'+icon+'</span><strong style="color:#fff">'+it.label+'</strong><span>'+it.detail+'</span>';
+      qItems.appendChild(div);
+    });
+    const overall_el=$('camQualityOverall');
+    overall_el.textContent=overall.icon+' '+overall.text;
+    overall_el.style.cssText='margin-top:10px;font-size:15px;font-weight:700;padding:8px;border-radius:8px;text-align:center;background:'+overall.bg+';color:'+overall.color;
+    $('camUseBtn').style.display=ngCount===0?'block':'none';
+    $('camControls').style.display='none';
+    $('camFeedbackBox').style.display='none';
+    $('camQualityResult').style.display='block';
+    // Show captured frame preview
+    const previewUrl=URL.createObjectURL(blob);
+    const video=$('camVideo');
+    video.style.opacity='0.4';
+    const ovCanvas=$('camOverlay');
+    const ovCtx=ovCanvas.getContext('2d');
+    ovCtx.clearRect(0,0,ovCanvas.width,ovCanvas.height);
+  },'image/jpeg',0.92);
+}
+
+function useCapture(){
+  if(!camCapturedBlob)return;
+  const blob=camCapturedBlob;
+  processedImages['selfie']=blob;
+  $('selfiePreview').src=URL.createObjectURL(blob);
+  $('selfiePreviewWrap').style.display='block';
+  $('selfieUploadArea').style.display='none';
+  $('selfieFileName').textContent='✓ カメラ撮影';
+  $('selfieProcessInfo').textContent='JPEG 600×600 / '+Math.round(blob.size/1024)+'KB';
+  closeCameraModal();
+}
+
+function retakePhoto(){
+  camCapturedBlob=null;camOkStart=null;camAutoFired=false;
+  $('camQualityResult').style.display='none';
+  $('camControls').style.display='flex';
+  $('camFeedbackBox').style.display='block';
+  $('camVideo').style.opacity='1';
+  startCamLoop();
+}
+
+function startCamLoop(){
+  const video=$('camVideo');
+  const canvas=$('camOverlay');
+  const ctx=canvas.getContext('2d');
+  let lastFaceResult=null,lastDetectTime=0;
+  async function loop(ts){
+    camRaf=requestAnimationFrame(loop);
+    if(!video.videoWidth||!camStream)return;
+    canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const cx=canvas.width/2,cy=canvas.height/2;
+    const ow=canvas.width*0.4,oh=canvas.height*0.6;
+    // Darkened outside oval
+    ctx.save();
+    ctx.beginPath();ctx.rect(0,0,canvas.width,canvas.height);
+    ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.fill('evenodd');
+    ctx.restore();
+    // Oval border
+    ctx.beginPath();ctx.ellipse(cx,cy,ow,oh,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=3;ctx.stroke();
+    // Brightness
+    const tmpC=document.createElement('canvas');tmpC.width=60;tmpC.height=60;
+    const tmpCtx=tmpC.getContext('2d');
+    tmpCtx.drawImage(video,cx-30,cy-30,60,60,0,0,60,60);
+    const bright=calcBrightness(tmpCtx.getImageData(0,0,60,60));
+    // Face detection throttle
+    if(camFaceDetector&&ts-lastDetectTime>250){
+      lastDetectTime=ts;
+      try{const faces=await camFaceDetector.detect(video);lastFaceResult=faces.length>0?faces[0]:null}
+      catch(e){lastFaceResult=null}
+    }
+    const cond=evaluateConditions(lastFaceResult,bright,canvas.width,canvas.height);
+    drawFeedback(ctx,cond,lastFaceResult,canvas.width,canvas.height,cx,cy,ow,oh);
+    $('camFeedbackText').textContent=cond.message;
+    $('camFeedbackText').style.background=cond.allOk?'rgba(39,174,96,0.8)':'rgba(0,0,0,0.65)';
+    if(cond.allOk&&!camAutoFired){
+      if(!camOkStart)camOkStart=ts;
+      if(ts-camOkStart>=500){
+        camAutoFired=true;
+        $('camAutoPopup').style.display='block';
+        setTimeout(function(){$('camAutoPopup').style.display='none';captureFrame();},600);
+      }
+    }else if(!cond.allOk){camOkStart=null}
+  }
+  camRaf=requestAnimationFrame(loop);
+}
 
 // ===== PASSPORT NUMBER (country-specific regex) =====
 $('passportNum').addEventListener('input',function(){
@@ -2114,5 +2481,35 @@ function initStep3(){
   $('phoneType').addEventListener('change',updateBtn);
 }
 </script>
+<!-- ===== CAMERA MODAL (selfie) ===== -->
+<div id="cameraModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;flex-direction:column">
+  <div style="background:rgba(0,0,0,0.85);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <span style="color:#fff;font-size:16px;font-weight:700">顔写真を撮影</span>
+    <button onclick="closeCameraModal()" style="color:#fff;background:none;border:none;font-size:28px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+  </div>
+  <div style="flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#111">
+    <video id="camVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"></video>
+    <canvas id="camOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+    <div id="camFeedbackBox" style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);white-space:nowrap">
+      <div id="camFeedbackText" style="background:rgba(0,0,0,0.65);color:#fff;font-size:14px;font-weight:600;padding:8px 20px;border-radius:20px"></div>
+    </div>
+    <div id="camAutoPopup" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(26,58,92,0.92);color:#fff;padding:20px 32px;border-radius:16px;text-align:center;font-size:18px;font-weight:700;min-width:180px">
+      自動撮影します！<br><span id="camCountdownNum" style="font-size:36px;font-weight:900"></span>
+    </div>
+  </div>
+  <!-- Quality check result (shown after capture) -->
+  <div id="camQualityResult" style="display:none;background:#1a1a1a;padding:12px 16px;flex-shrink:0;max-height:50vh;overflow-y:auto">
+    <div style="color:#fff;font-weight:700;margin-bottom:8px;font-size:14px">📊 撮影品質チェック</div>
+    <div id="camQualityItems" style="display:flex;flex-direction:column;gap:4px"></div>
+    <div id="camQualityOverall" style="margin-top:10px;font-size:15px;font-weight:700;padding:8px;border-radius:8px;text-align:center"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="camUseBtn" onclick="useCapture()" style="flex:1;padding:10px;background:#2d5f8a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">この写真を使用する</button>
+      <button onclick="retakePhoto()" style="flex:1;padding:10px;background:#444;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">再撮影する</button>
+    </div>
+  </div>
+  <div id="camControls" style="background:rgba(0,0,0,0.85);padding:16px;display:flex;justify-content:center;align-items:center;flex-shrink:0">
+    <button id="camShutterBtn" onclick="captureFrame()" style="width:72px;height:72px;border-radius:50%;background:#fff;border:5px solid #aaa;cursor:pointer;font-size:11px;font-weight:700;color:#333;transition:transform .1s;box-shadow:0 0 0 3px rgba(255,255,255,0.3)">撮影</button>
+  </div>
+</div>
 </body>
 </html>
