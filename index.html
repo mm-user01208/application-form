@@ -1648,13 +1648,19 @@ function closeCameraModal(){
 }
 
 function startCamStream(){
+  const spStatusEl=document.getElementById('spStatus');
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    alert('このブラウザはカメラをサポートしていません。ファイルを選択してください。');
-    closeCameraModal();return;
+    closeCameraModal();
+    if(spStatusEl)spStatusEl.textContent='⚠️ このブラウザはgetUserMediaに非対応です。下のボタンをお試しください。';
+    const fb=document.getElementById('spFallbackBtn');
+    if(fb){fb.disabled=false;fb.style.opacity='1';}
+    return;
   }
+  if(spStatusEl)spStatusEl.textContent='カメラ許可を要求中...';
   navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}})
     .then(function(stream){
       camStream=stream;
+      if(spStatusEl)spStatusEl.textContent='カメラ起動成功 — ガイドを表示中';
       const video=$('camVideo');
       video.srcObject=stream;
       video.onloadedmetadata=function(){
@@ -1667,9 +1673,9 @@ function startCamStream(){
     .catch(function(err){
       console.warn('getUserMedia failed:',err);
       closeCameraModal();
-      // SP mode fallback: trigger native file/camera input
+      const errMsg='⚠️ カメラエラー('+err.name+'): '+err.message+' — 下のボタンをお試しください。';
+      if(spStatusEl)spStatusEl.textContent=errMsg;
       if(window.spTransferConn){
-        document.getElementById('spStatus').textContent='⚠️ カメラを起動できませんでした。下のボタンから写真を選んでください。';
         const fb=document.getElementById('spFallbackBtn');
         if(fb){fb.disabled=false;fb.style.opacity='1';}
         return;
@@ -2737,7 +2743,24 @@ document.addEventListener('DOMContentLoaded',function(){
       });
 
       // Launch camera modal (with guide)
-      spShootBtn.onclick=function(){openCameraModal();};
+      spShootBtn.onclick=function(){
+        const statusEl=document.getElementById('spStatus');
+        try{
+          if(statusEl)statusEl.textContent='カメラを起動中...';
+          openCameraModal();
+          // Check if modal actually appeared
+          setTimeout(function(){
+            const m=document.getElementById('cameraModal');
+            if(m&&m.style.display==='flex'){
+              if(statusEl)statusEl.textContent='✅ カメラ起動中';
+            } else {
+              if(statusEl)statusEl.textContent='⚠️ カメラモーダルが開きませんでした';
+            }
+          },500);
+        }catch(e){
+          if(statusEl)statusEl.textContent='❌ エラー: '+e.message;
+        }
+      };
 
       // Fallback: native camera/file input → process + send
       document.getElementById('spCameraInput').onchange=function(){
