@@ -273,6 +273,10 @@
       </div>
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
       <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
+      <div id="ocrBtnWrap" style="display:none;margin-top:6px">
+        <button type="button" id="ocrBtn" onclick="runPassportOCR(window._passportOrigFile)" style="padding:7px 14px;background:#2d5f8a;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">📋 パスポートを読み取って自動入力</button>
+        <div id="ocrStatus" style="display:none;font-size:12px;margin-top:4px;font-weight:600"></div>
+      </div>
       <div id="passportPreviewWrap" style="display:none;margin-top:8px">
         <img id="passportPreview" style="max-width:300px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd">
         <div id="passportProcessInfo" style="font-size:11px;color:#888;margin-top:4px"></div>
@@ -1716,6 +1720,8 @@ function handleUpload(file,type){
     if(!valid.includes(file.type)){showErr('errSelfieType',true);nameEl.textContent='';return}
   }
   if(file.size>10*1024*1024){showErr(errEl.id,true);nameEl.textContent='';return}
+  // Save original file for OCR (passport only)
+  if(type==='passport')window._passportOrigFile=file;
   nameEl.textContent='⏳ 画像を処理中...';
   processImage(file,type,function(blob,info,origW,origH,bright){
     if(!blob){nameEl.textContent='❌ 処理失敗';return}
@@ -1725,6 +1731,8 @@ function handleUpload(file,type){
     uploadArea.style.display='none';
     nameEl.textContent='✓ '+file.name;
     infoEl.textContent='元画像: '+origW+'×'+origH+'px → '+info;
+    // Show OCR button for passport
+    if(type==='passport'){var w=document.getElementById('ocrBtnWrap');if(w)w.style.display='block';}
   });
 }
 
@@ -2780,6 +2788,229 @@ function spLaunchCamera(){
   if(statusEl)statusEl.textContent='カメラを起動中...';
   openCameraModal();
 }
+
+// ===== PHASE 5: Auto-fill assistance =====
+
+// ─── 2. autofill attributes (applied via JS to avoid HTML clutter) ───
+document.addEventListener('DOMContentLoaded',function(){
+  var af={
+    surname:'family-name',givenName:'given-name',email1:'email',email2:'email',
+    phoneNumber:'tel-local',street:'address-line1',city:'address-level2',
+    zipCode:'postal-code',passportNum:'off'
+  };
+  Object.keys(af).forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.setAttribute('autocomplete',af[id]);
+  });
+});
+
+// ─── 3. localStorage session save/restore ───
+const LS_KEY='esta_form_draft';
+function saveFormDraft(){
+  try{
+    var fields=['surname','givenName','email1','email2','phoneNumber','passportNum',
+                'birthCity','street','city','zipCode','apartmentNum'];
+    var selects=['dobYear','dobMonth','dobDay','passExpYear','passExpMonth','passExpDay',
+                 'phoneType','addrState','gender'];
+    var hiddens=['nationality','birthCountry','addrCountry','phoneCountry'];
+    var draft={};
+    fields.forEach(function(id){var el=document.getElementById(id);if(el)draft[id]=el.value;});
+    selects.forEach(function(id){var el=document.getElementById(id);if(el)draft[id]=el.value;});
+    hiddens.forEach(function(id){var el=document.getElementById(id);if(el)draft[id]=el.value;});
+    // radio
+    ['male','female'].forEach(function(v){
+      var el=document.getElementById('gender'+v.charAt(0).toUpperCase()+v.slice(1));
+      if(el&&el.checked)draft['gender']=v;
+    });
+    draft._saved=Date.now();
+    localStorage.setItem(LS_KEY,JSON.stringify(draft));
+  }catch(e){}
+}
+function restoreFormDraft(draft){
+  var fields=['surname','givenName','email1','email2','phoneNumber','passportNum',
+              'birthCity','street','city','zipCode','apartmentNum'];
+  var selects=['dobYear','dobMonth','dobDay','passExpYear','passExpMonth','passExpDay',
+               'phoneType','addrState'];
+  fields.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&draft[id]){el.value=draft[id];el.dispatchEvent(new Event('input'));}
+  });
+  selects.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&draft[id])el.value=draft[id];
+  });
+  if(draft.gender){
+    var el=document.getElementById('gender'+draft.gender.charAt(0).toUpperCase()+draft.gender.slice(1));
+    if(el)el.checked=true;
+  }
+  // Custom selects (nationality etc.)
+  ['nationality','birthCountry','addrCountry'].forEach(function(id){
+    if(draft[id]){
+      var hidden=document.getElementById(id);
+      if(hidden&&hidden.value!==draft[id]){
+        hidden.value=draft[id];
+        hidden.dispatchEvent(new Event('change'));
+      }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    var raw=localStorage.getItem(LS_KEY);
+    if(!raw)return;
+    var draft=JSON.parse(raw);
+    // Offer restore if saved within 7 days
+    if(Date.now()-draft._saved>7*24*3600*1000){localStorage.removeItem(LS_KEY);return;}
+    var bar=document.createElement('div');
+    bar.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:12px 20px;border-radius:10px;z-index:9000;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,0.2);display:flex;gap:12px;align-items:center;max-width:90%';
+    bar.innerHTML='<span>📋 前回の入力内容があります</span>'
+      +'<button onclick="restoreFormDraft('+JSON.stringify(draft)+');this.parentElement.remove()" style="background:#2d5f8a;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600">復元する</button>'
+      +'<button onclick="localStorage.removeItem(\''+LS_KEY+'\');this.parentElement.remove()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px">削除</button>';
+    document.body.appendChild(bar);
+    setTimeout(function(){if(bar.parentElement)bar.remove();},10000);
+  }catch(e){}
+});
+// Auto-save on step change (hook into nextStep)
+var _origNextStep=window.nextStep;
+window.nextStep=function(){
+  saveFormDraft();
+  if(_origNextStep)_origNextStep.apply(this,arguments);
+};
+
+// ─── 1. Passport OCR (Tesseract.js + MRZ parse) ───
+function loadTesseract(cb){
+  if(window.Tesseract){cb();return;}
+  var s=document.createElement('script');
+  s.src='https://unpkg.com/tesseract.js@5/dist/tesseract.min.js';
+  s.onload=cb;s.onerror=function(){cb(null);};
+  document.head.appendChild(s);
+}
+
+function parseMRZ(text){
+  // Clean and find MRZ lines (44 chars, OCR-B)
+  var lines=text.split('\n').map(function(l){return l.toUpperCase().replace(/[^A-Z0-9<]/g,'').trim();}).filter(function(l){return l.length>=39;});
+  var line1=lines.find(function(l){return l.match(/^P[A-Z<]/);});
+  var line2=lines.find(function(l){return l.length>=44&&!l.match(/^P[A-Z<]/);});
+  if(!line1||!line2)return null;
+  while(line1.length<44)line1+='<';
+  while(line2.length<44)line2+='<';
+  // Line1: P<NATsurname<<givenname
+  var namePart=line1.substring(5,44);
+  var names=namePart.split('<<');
+  var surname=(names[0]||'').replace(/</g,' ').trim();
+  var givenName=(names[1]||'').replace(/</g,' ').trim();
+  var nationality=line1.substring(2,5).replace(/</g,'');
+  // Line2: passportNum check nationality DOB check sex expiry check ...
+  var passNum=line2.substring(0,9).replace(/</g,'');
+  var dobRaw=line2.substring(13,19);
+  var sex=line2.substring(20,21);
+  var expRaw=line2.substring(21,27);
+  function parseDateMRZ(raw,isFuture){
+    var yy=parseInt(raw.substring(0,2),10);
+    var mm=raw.substring(2,4);
+    var dd=raw.substring(4,6);
+    var year=((isFuture?(yy<50):(yy>30))?2000:1900)+yy;
+    return{year:year,mm:mm,dd:dd};
+  }
+  return{surname:surname,givenName:givenName,passNum:passNum,
+    nationality:nationality,dob:parseDateMRZ(dobRaw,false),
+    expiry:parseDateMRZ(expRaw,true),sex:sex};
+}
+
+function fillFromOCR(data){
+  if(!data){showOCRStatus('❌ MRZを読み取れませんでした。手動で入力してください。','#e74c3c');return;}
+  var filled=[];
+  function setVal(id,val){
+    if(!val)return;
+    var el=document.getElementById(id);
+    if(el&&!el.value){el.value=val;el.dispatchEvent(new Event('input'));filled.push(id);}
+  }
+  function setSelect(id,val){
+    if(!val)return;
+    var el=document.getElementById(id);
+    if(el&&!el.value){el.value=val;filled.push(id);}
+  }
+  setVal('surname',data.surname);
+  setVal('givenName',data.givenName);
+  setVal('passportNum',data.passNum);
+  if(data.dob){
+    setSelect('dobYear',String(data.dob.year));
+    setSelect('dobMonth',String(parseInt(data.dob.mm,10)));
+    setSelect('dobDay',String(parseInt(data.dob.dd,10)));
+  }
+  if(data.expiry){
+    setSelect('passExpYear',String(data.expiry.year));
+    setSelect('passExpMonth',String(parseInt(data.expiry.mm,10)));
+    setSelect('passExpDay',String(parseInt(data.expiry.dd,10)));
+  }
+  if(data.sex==='M'){var el=document.getElementById('genderMale');if(el)el.checked=true;}
+  else if(data.sex==='F'){var el=document.getElementById('genderFemale');if(el)el.checked=true;}
+  showOCRStatus('✅ '+filled.length+'項目を自動入力しました！内容を確認してください。','#27ae60');
+}
+
+function showOCRStatus(msg,color){
+  var el=document.getElementById('ocrStatus');
+  if(el){el.textContent=msg;el.style.color=color;el.style.display='block';}
+}
+
+async function runPassportOCR(file){
+  showOCRStatus('🔍 パスポートを読み取り中...','#2d5f8a');
+  var ocrBtn=document.getElementById('ocrBtn');
+  if(ocrBtn){ocrBtn.disabled=true;ocrBtn.textContent='読み取り中...';}
+  loadTesseract(async function(ok){
+    if(!window.Tesseract){showOCRStatus('❌ OCRの読み込みに失敗しました','#e74c3c');return;}
+    try{
+      // Crop bottom 30% for MRZ
+      var img=new Image();
+      var url=URL.createObjectURL(file);
+      img.onload=async function(){
+        var canvas=document.createElement('canvas');
+        var mrzH=Math.round(img.height*0.3);
+        canvas.width=img.width;canvas.height=mrzH;
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,img.height-mrzH,img.width,mrzH,0,0,canvas.width,canvas.height);
+        // Enhance contrast
+        ctx.filter='contrast(2) brightness(1.2)';
+        ctx.drawImage(canvas,0,0);
+        ctx.filter='none';
+        URL.revokeObjectURL(url);
+        var worker=await Tesseract.createWorker('eng',1,{logger:function(){}});
+        await worker.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<'});
+        var result=await worker.recognize(canvas);
+        await worker.terminate();
+        var parsed=parseMRZ(result.data.text);
+        fillFromOCR(parsed);
+        if(ocrBtn){ocrBtn.disabled=false;ocrBtn.textContent='📷 再読み取り';}
+      };
+      img.src=url;
+    }catch(e){
+      showOCRStatus('❌ OCRエラー: '+e.message,'#e74c3c');
+      if(ocrBtn){ocrBtn.disabled=false;ocrBtn.textContent='📷 パスポートを読み取る';}
+    }
+  });
+}
+
+// ─── 4. Smart suggest for email domains ───
+(function(){
+  var domains=['gmail.com','yahoo.co.jp','icloud.com','outlook.com','hotmail.com','docomo.ne.jp','ezweb.ne.jp','softbank.ne.jp'];
+  ['email1','email2'].forEach(function(id){
+    var el=document.getElementById(id);
+    var sug=document.getElementById('emailSuggest'+id.slice(-1));
+    if(!el||!sug)return;
+    el.addEventListener('input',function(){
+      var val=el.value;
+      var at=val.indexOf('@');
+      if(at<0){sug.innerHTML='';return;}
+      var typed=val.substring(at+1);
+      var matches=domains.filter(function(d){return d.startsWith(typed)&&d!==typed;});
+      sug.innerHTML=matches.slice(0,4).map(function(d){
+        return '<div class="email-suggest-item" onclick="document.getElementById(\''+id+'\').value=\''+val.substring(0,at+1)+d+'\';document.getElementById(\'emailSuggest'+id.slice(-1)+'\').innerHTML=\'\'">'
+          +val.substring(0,at+1)+'<strong>'+d+'</strong></div>';
+      }).join('');
+    });
+    document.addEventListener('click',function(e){if(e.target!==el)sug.innerHTML='';});
+  });
+})();
 
 // ===== PHASE 3: QR + WebRTC =====
 let pcPeer=null,pcConn=null,peerExpireTimer=null;
