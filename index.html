@@ -79,6 +79,12 @@
     .upload-box:hover{border-color:#2d5f8a}
     .upload-box .upload-text{color:#888;font-size:14px}
     .upload-box input[type="file"]{display:none}
+    .upload-cam-btn,.upload-file-btn{flex:1;padding:14px 12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+    .upload-cam-btn{background:#2d5f8a;color:#fff}
+    .upload-cam-btn:hover{background:#1a3a5c}
+    .upload-file-btn{background:#f0f2f5;color:#333;border:1px solid #d0d5dd}
+    .upload-file-btn:hover{background:#e8eaed}
+    @media(max-width:768px){.upload-btns-sp{display:flex!important}.upload-btns-pc{display:none!important}}
     .btn-row{display:flex;gap:12px;margin-top:32px}
     .btn-back{flex:1;padding:14px;background:#f0f2f5;color:#1a3a5c;border:2px solid #d0d5dd;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
     .btn-back:hover{background:#e8ecf0}
@@ -246,18 +252,46 @@
   <div class="card">
     <div class="section-header" id="secPassport"><span class="section-title">パスポート情報</span><button type="button" class="help-btn" onclick="showModal('helpPassport')">？</button></div>
     <div class="form-group"><label>パスポートのアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpPassportUpload')">？</button></label>
-      <div class="upload-box" onclick="document.getElementById('passportFile').click()"><span class="upload-text">画像を選択してください</span><input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif"></div>
+      <div id="passportUploadArea">
+        <div class="upload-btns-sp" style="display:none;gap:8px;margin-bottom:8px">
+          <button type="button" class="upload-cam-btn" onclick="triggerCamera('passport')">📷 カメラで撮影</button>
+          <button type="button" class="upload-file-btn" onclick="triggerFile('passport')">📁 ファイルを選択</button>
+        </div>
+        <div class="upload-btns-pc" style="display:none">
+          <div class="upload-box" onclick="triggerFile('passport')"><span class="upload-text">画像を選択してください</span></div>
+        </div>
+        <input type="file" id="passportFile" accept=".jpg,.jpeg,.png,.gif" style="display:none">
+        <input type="file" id="passportCamera" accept="image/*" capture="environment" style="display:none">
+      </div>
       <div class="hint">※パスポートの顔写真ページ（機械読み取り部分を含む）全体が映っている画像をアップロードしてください。</div>
       <div id="passportFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
-      <img id="passportPreview" style="display:none;max-width:300px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd;margin-top:8px">
+      <div id="passportPreviewWrap" style="display:none;margin-top:8px">
+        <img id="passportPreview" style="max-width:300px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd">
+        <div id="passportProcessInfo" style="font-size:11px;color:#888;margin-top:4px"></div>
+        <button type="button" onclick="resetUpload('passport')" style="margin-top:6px;font-size:12px;color:#e74c3c;background:none;border:1px solid #e74c3c;border-radius:4px;padding:3px 10px;cursor:pointer">再アップロード</button>
+      </div>
       <div class="error" id="errPassportFile">ファイルサイズが上限の10MBを超えています</div>
     </div>
     <div class="form-group"><label>顔写真のアップロード <span class="required">必須</span> <button type="button" class="help-btn" style="display:inline-flex;width:22px;height:22px;font-size:12px;vertical-align:middle" onclick="showModal('helpSelfieUpload')">？</button></label>
-      <div class="upload-box" onclick="document.getElementById('selfieFile').click()"><span class="upload-text">写真を選択してください</span><input type="file" id="selfieFile" accept=".jpg,.jpeg,.png"></div>
+      <div id="selfieUploadArea">
+        <div class="upload-btns-sp" style="display:none;gap:8px;margin-bottom:8px">
+          <button type="button" class="upload-cam-btn" onclick="triggerCamera('selfie')">📷 カメラで撮影</button>
+          <button type="button" class="upload-file-btn" onclick="triggerFile('selfie')">📁 ファイルを選択</button>
+        </div>
+        <div class="upload-btns-pc" style="display:none">
+          <div class="upload-box" onclick="triggerFile('selfie')"><span class="upload-text">写真を選択してください</span></div>
+        </div>
+        <input type="file" id="selfieFile" accept=".jpg,.jpeg,.png" style="display:none">
+        <input type="file" id="selfieCamera" accept="image/*" capture="user" style="display:none">
+      </div>
       <div class="hint">※肩から頭部までが写っている写真をアップロードしてください。</div>
       <div class="hint" style="color:#e74c3c">※パスポートの顔写真は使用できません。</div>
       <div id="selfieFileName" class="hint" style="color:#2d5f8a;font-weight:600"></div>
-      <img id="selfiePreview" style="display:none;max-width:200px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd;margin-top:8px">
+      <div id="selfiePreviewWrap" style="display:none;margin-top:8px">
+        <img id="selfiePreview" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid #d0d5dd">
+        <div id="selfieProcessInfo" style="font-size:11px;color:#888;margin-top:4px"></div>
+        <button type="button" onclick="resetUpload('selfie')" style="margin-top:6px;font-size:12px;color:#e74c3c;background:none;border:1px solid #e74c3c;border-radius:4px;padding:3px 10px;cursor:pointer">再アップロード</button>
+      </div>
       <div class="error" id="errSelfieFile">ファイルサイズが上限の10MBを超えています</div>
       <div class="error" id="errSelfieType">jpeg、pngファイルのみアップロード可能です</div>
     </div>
@@ -1417,47 +1451,99 @@ $('unit').addEventListener('input',function(){
   this.value=toHalf(this.value).replace(/[^a-zA-Z0-9.,':;\-\/]/g,'').toUpperCase().replace(/\s/g,'').slice(0,10);
 });
 
-// ===== FILE UPLOADS (10MB max) =====
-function setupFileUpload(inputId,nameId,errId,previewId){
-  $(inputId).addEventListener('change',function(){
-    const file=this.files[0];
-    const prev=previewId?$(previewId):null;
-    if(file&&file.size>10*1024*1024){
-      showErr(errId,true);$(nameId).textContent='';this.value='';
-      if(prev){prev.style.display='none';prev.src=''}
-    }else{
-      showErr(errId,false);
-      $(nameId).textContent=file?'✓ '+file.name:'';
-      if(prev&&file){prev.src=URL.createObjectURL(file);prev.style.display='block'}
-      else if(prev){prev.style.display='none';prev.src=''}
+// ===== SP/PC DETECTION & UPLOAD =====
+const isMobile=/Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// Show correct upload UI
+document.querySelectorAll('.upload-btns-sp').forEach(el=>{if(isMobile)el.style.display='flex'});
+document.querySelectorAll('.upload-btns-pc').forEach(el=>{if(!isMobile)el.style.display='block'});
+
+function triggerCamera(type){$(type+'Camera').click()}
+function triggerFile(type){$(type+'File').click()}
+
+// Processed image data store
+const processedImages={passport:null,selfie:null};
+
+// Image processor: center-crop square → 600×600 → JPEG → ≤2MB
+function processImage(file,type,callback){
+  const img=new Image();
+  img.onload=function(){
+    const origW=img.width,origH=img.height;
+    // Center crop to square
+    const size=Math.min(origW,origH);
+    const sx=(origW-size)/2, sy=(origH-size)/2;
+    // Draw to 600×600 canvas
+    const canvas=document.createElement('canvas');
+    canvas.width=600;canvas.height=600;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,sx,sy,size,size,0,0,600,600);
+    // Compress to JPEG ≤2MB, start at quality 0.92
+    let quality=0.92;
+    function tryCompress(){
+      canvas.toBlob(function(blob){
+        if(blob.size>2*1024*1024 && quality>0.1){
+          quality-=0.05;
+          tryCompress();
+        }else{
+          const info='JPEG 600×600 / '+Math.round(blob.size/1024)+'KB'+(quality<0.92?' (圧縮率: '+Math.round(quality*100)+'%)':'');
+          callback(blob,info,origW,origH);
+        }
+      },'image/jpeg',quality);
     }
+    tryCompress();
+  };
+  img.onerror=function(){callback(null,'画像の読み込みに失敗しました')};
+  img.src=URL.createObjectURL(file);
+}
+
+function handleUpload(file,type){
+  const nameEl=$(type+'FileName');
+  const errEl=$('err'+type.charAt(0).toUpperCase()+type.slice(1)+'File');
+  const previewWrap=$(type+'PreviewWrap');
+  const previewImg=$(type+'Preview');
+  const infoEl=$(type+'ProcessInfo');
+  const uploadArea=$(type+'UploadArea');
+  showErr(errEl.id,false);
+  if(type==='selfie')showErr('errSelfieType',false);
+
+  if(!file){nameEl.textContent='';previewWrap.style.display='none';processedImages[type]=null;uploadArea.style.display='';return}
+
+  // Selfie: only jpeg/png
+  if(type==='selfie'){
+    const valid=['image/jpeg','image/png'];
+    if(!valid.includes(file.type)){showErr('errSelfieType',true);nameEl.textContent='';return}
+  }
+  // Size check (10MB raw)
+  if(file.size>10*1024*1024){showErr(errEl.id,true);nameEl.textContent='';return}
+
+  nameEl.textContent='⏳ 画像を処理中...';
+  processImage(file,type,function(blob,info,origW,origH){
+    if(!blob){nameEl.textContent='❌ 処理失敗';return}
+    processedImages[type]=blob;
+    const url=URL.createObjectURL(blob);
+    previewImg.src=url;
+    previewWrap.style.display='block';
+    uploadArea.style.display='none';
+    nameEl.textContent='✓ '+file.name;
+    infoEl.textContent='元画像: '+origW+'×'+origH+'px → '+info;
   });
 }
-setupFileUpload('passportFile','passportFileName','errPassportFile','passportPreview');
-// Selfie: jpeg/png only, 240KB max
-$('selfieFile').addEventListener('change',function(){
-  const file=this.files[0];
-  showErr('errSelfieFile',false);showErr('errSelfieType',false);
-  if(file){
-    const validTypes=['image/jpeg','image/png'];
-    if(!validTypes.includes(file.type)){
-      showErr('errSelfieType',true);$('selfieFileName').textContent='';this.value='';return;
-    }
-    if(file.size>10*1024*1024){
-      showErr('errSelfieFile',true);$('selfieFileName').textContent='';this.value='';return;
-    }
-    // Resolution check (600-2400px)
-    const img=new Image();
-    img.onload=function(){
-      if(img.width<600||img.height<600||img.width>2400||img.height>2400){
-        $('errSelfieFile').textContent='画像の解像度は600px〜2400pxの範囲にしてください（現在: '+img.width+'×'+img.height+'px）';
-        showErr('errSelfieFile',true);
-      }
-    };
-    img.src=URL.createObjectURL(file);
-    $('selfieFileName').textContent='✓ '+file.name;
-    $('selfiePreview').src=URL.createObjectURL(file);$('selfiePreview').style.display='block';
-  }else{$('selfieFileName').textContent='';$('selfiePreview').style.display='none';$('selfiePreview').src=''}
+
+function resetUpload(type){
+  $(type+'File').value='';
+  if($(type+'Camera'))$(type+'Camera').value='';
+  $(type+'FileName').textContent='';
+  $(type+'PreviewWrap').style.display='none';
+  $(type+'UploadArea').style.display='';
+  $(type+'ProcessInfo').textContent='';
+  processedImages[type]=null;
+}
+
+// Wire up change events for both file and camera inputs
+['passport','selfie'].forEach(function(type){
+  [type+'File',type+'Camera'].forEach(function(inputId){
+    var el=$(inputId);
+    if(el)el.addEventListener('change',function(){handleUpload(this.files[0],type)});
+  });
 });
 
 // ===== PASSPORT NUMBER (country-specific regex) =====
@@ -1725,9 +1811,9 @@ function buildConfirmation(){
 
   // Passport images
   const ppImg=$('passportPreview'),cpImg=$('confirmPassportImg');
-  if(ppImg&&ppImg.src&&ppImg.style.display!=='none'){cpImg.src=ppImg.src;cpImg.style.display='block'}else{cpImg.style.display='none'}
+  if(ppImg&&ppImg.src&&$('passportPreviewWrap').style.display!=='none'){cpImg.src=ppImg.src;cpImg.style.display='block'}else{cpImg.style.display='none'}
   const sfImg=$('selfiePreview'),csImg=$('confirmSelfieImg');
-  if(sfImg&&sfImg.src&&sfImg.style.display!=='none'){csImg.src=sfImg.src;csImg.style.display='block'}else{csImg.style.display='none'}
+  if(sfImg&&sfImg.src&&$('selfiePreviewWrap').style.display!=='none'){csImg.src=sfImg.src;csImg.style.display='block'}else{csImg.style.display='none'}
   // Passport
   clear('confirmPassport');const cp=$('confirmPassport');
   row(cp,'パスポート番号',v('passportNum'));
