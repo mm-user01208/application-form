@@ -1697,7 +1697,14 @@ function startCamLoop(){
   async function loop(ts){
     camRaf=requestAnimationFrame(loop);
     if(!video.videoWidth)return;
-    canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+    // Sync canvas pixel size to CSS display size to prevent circle distortion
+    const dispW=canvas.clientWidth||window.innerWidth;
+    const dispH=canvas.clientHeight||window.innerHeight;
+    if(canvas.width!==dispW||canvas.height!==dispH){
+      canvas.width=dispW;canvas.height=dispH;
+      canvas.style.width=dispW+'px';canvas.style.height=dispH+'px';
+    }
+    ctx.setTransform(1,0,0,1,0,0);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     const cx=canvas.width/2,cy=canvas.height/2;
     drawHumanGuide(ctx,canvas.width,canvas.height);
@@ -1927,10 +1934,15 @@ function startCamLoop(){
   async function loop(ts){
     camRaf=requestAnimationFrame(loop);
     if(!video.videoWidth||!camStream)return;
-    canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+    const dispW2=canvas.clientWidth||window.innerWidth;
+    const dispH2=canvas.clientHeight||window.innerHeight;
+    if(canvas.width!==dispW2||canvas.height!==dispH2){
+      canvas.width=dispW2;canvas.height=dispH2;
+      canvas.style.width=dispW2+'px';canvas.style.height=dispH2+'px';
+    }
+    ctx.setTransform(1,0,0,1,0,0);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     const cx=canvas.width/2,cy=canvas.height/2;
-    const cond_color=undefined; // updated after evaluation
     drawHumanGuide(ctx,canvas.width,canvas.height);
     // Brightness
     const tmpC=document.createElement('canvas');tmpC.width=60;tmpC.height=60;
