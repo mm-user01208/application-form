@@ -1670,7 +1670,8 @@ function startCamStream(){
       // SP mode fallback: trigger native file/camera input
       if(window.spTransferConn){
         document.getElementById('spStatus').textContent='⚠️ カメラを起動できませんでした。下のボタンから写真を選んでください。';
-        document.getElementById('spFallbackBtn').style.display='block';
+        const fb=document.getElementById('spFallbackBtn');
+        if(fb){fb.disabled=false;fb.style.opacity='1';}
         return;
       }
       // Normal mode fallback
@@ -2705,16 +2706,23 @@ document.addEventListener('DOMContentLoaded',function(){
   loadPeerJS(function(){
     const spPeer=new Peer({debug:0});
 
+    // Timeout: enable buttons after 10s even if connection is slow
+    setTimeout(function(){
+      const sb=document.getElementById('spShootBtn');
+      const fb=document.getElementById('spFallbackBtn');
+      if(sb&&sb.disabled){sb.disabled=false;sb.style.opacity='1';}
+      if(fb&&fb.disabled){fb.disabled=false;fb.style.opacity='1';}
+    },10000);
+
     spPeer.on('open',function(){
       const conn=spPeer.connect(peerId,{reliable:true,serialization:'binary'});
 
       conn.on('open',function(){
         document.getElementById('spStatus').textContent='✅ 接続完了！下のボタンで撮影してください';
-        spShootBtn.style.opacity='1';
-        spShootBtn.disabled=false;
-        // Store conn for useCapture() to send
+        spShootBtn.style.opacity='1';spShootBtn.disabled=false;
+        const fb=document.getElementById('spFallbackBtn');
+        if(fb){fb.style.opacity='1';fb.disabled=false;}
         window.spTransferConn=conn;
-        // Update camera "use" button label
         const useBtn=document.getElementById('camUseBtn');
         if(useBtn)useBtn.textContent='📤 この写真をPCに送信する';
       });
@@ -2785,10 +2793,10 @@ document.addEventListener('DOMContentLoaded',function(){
     <div style="font-size:17px;font-weight:700;color:#1a3a5c;margin-bottom:8px">顔写真をPCに送信</div>
     <div id="spStatus" style="font-size:13px;color:#555;margin-bottom:20px;min-height:36px">接続中...</div>
     <img id="spPreview" style="display:none;max-width:140px;max-height:140px;border-radius:8px;border:1px solid #d0d5dd;margin-bottom:16px">
-    <button id="spShootBtn" disabled onclick="openCameraModal()" style="width:100%;padding:14px;background:#1a3a5c;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;opacity:0.5">📷 写真を撮影して送信</button>
+    <button id="spShootBtn" disabled onclick="openCameraModal()" style="width:100%;padding:14px;background:#1a3a5c;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;opacity:0.5">📷 ガイド付きカメラで撮影</button>
     <input type="file" id="spCameraInput" accept="image/*" capture="user" style="display:none">
-    <!-- Fallback: shown if getUserMedia fails -->
-    <button id="spFallbackBtn" style="display:none;margin-top:10px;width:100%;padding:12px;background:#f3f4f6;color:#333;border:1px solid #d0d5dd;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer" onclick="document.getElementById('spCameraInput').click()">📁 写真を選んで送信（カメラ起動できない場合）</button>
+    <!-- Always visible fallback -->
+    <button id="spFallbackBtn" disabled style="margin-top:10px;width:100%;padding:12px;background:#f3f4f6;color:#333;border:1px solid #d0d5dd;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;opacity:0.5" onclick="document.getElementById('spCameraInput').click()">📁 カメラアプリで撮影して送信</button>
     <div id="spQualityResult" style="display:none;margin-top:14px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:12px;color:#333"></div>
   </div>
 </div>
