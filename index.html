@@ -1924,6 +1924,15 @@ function startCamLoop(){
   camRaf=requestAnimationFrame(loop);
 }
 
+// ガイド楕円のパラメータ（drawHumanGuideと共有）
+function getGuideOval(vw,vh){
+  const rx=Math.min(vw,vh)*0.36;
+  const ry=rx*1.38; // 縦長（パスポート写真比率）
+  const cx=vw/2;
+  const cy=vh*0.44;
+  return{cx,cy,rx,ry};
+}
+
 function evaluateConditions(face,bright,vw,vh){
   const issues=[];
   let allOk=true;
@@ -1935,75 +1944,87 @@ function evaluateConditions(face,bright,vw,vh){
   if(face){
     const fb=face.boundingBox;
     const fcx=fb.x+fb.width/2,fcy=fb.y+fb.height/2;
-    const dx=Math.abs(fcx-vw/2)/(vw/2),dy=Math.abs(fcy-vh/2)/(vh/2);
-    if(dx>0.2||dy>0.2){issues.push({key:'pos',msg:'😐 顔を中央に合わせてください'});allOk=false}
-    const ratio=fb.height/vh;
-    if(ratio<0.4){issues.push({key:'size',msg:'🔍 もう少し近づいてください'});allOk=false}
-    else if(ratio>0.75){issues.push({key:'size',msg:'↩️ 少し離れてください'});allOk=false}
+    const oval=getGuideOval(vw,vh);
+    // 顔の中心がガイド楕円の中央上部に収まるか（顔は楕円の上70%に位置する想定）
+    const targetCY=oval.cy-oval.ry*0.10; // 楕円中心より少し上
+    const dx=Math.abs(fcx-oval.cx)/(oval.rx);
+    const dy=Math.abs(fcy-targetCY)/(oval.ry*0.6);
+    if(dx>0.45||dy>0.45){issues.push({key:'pos',msg:'😐 顔を枠の中央に合わせてください'});allOk=false}
+    // 顔の高さが楕円高さ(ry*2)の65〜85%を占めるとOK（パスポート写真比率）
+    const ratio=fb.height/(oval.ry*2);
+    if(ratio<0.55){issues.push({key:'size',msg:'🔍 もう少し近づいてください'});allOk=false}
+    else if(ratio>0.90){issues.push({key:'size',msg:'↩️ 少し離れてください'});allOk=false}
   }
-  // FaceDetector非対応時: 明るさOKだけで allOk=true（顔判定スキップ）
   const hasFaceDetector=!!camFaceDetector;
-  if(!face&&hasFaceDetector)allOk=false; // 対応ブラウザで顔未検出はNG
-  // 非対応時は顔チェックなし → brightOkのみで判定済み
+  if(!face&&hasFaceDetector)allOk=false;
   const message=issues.length>0?issues[0].msg:
-    (face?'✅ 撮影できます！':hasFaceDetector?'😐 顔をガイドに合わせてください':'✅ 撮影できます！');
+    (face?'✅ 撮影できます！':hasFaceDetector?'😐 顔を枠の中に合わせてください':'✅ 撮影できます！');
   return{allOk,message,issues,brightOk};
 }
 
-// ===== Human silhouette guide (single connected path) =====
+// ===== パスポート写真ガイド（楕円フレーム型：顔〜肩上のみ） =====
 function drawHumanGuide(ctx,vw,vh,borderColor){
-  const cx=vw/2;
-  // Head — perfect circle (arc only, no ellipse, no scale)
-  const headR=Math.min(vw,vh)*0.22;
-  const headCY=vh*0.26;
-  const chinY=headCY+headR;
-  // Shoulder width tied to head radius — natural human proportion (~2x head width)
-  const shW=headR*2.0;
-  const shY=headCY+headR*2.0;
-  const botY=vh;
+  const oval=getGuideOval(vw,vh);
+  const{cx,cy,rx,ry}=oval;
+  const K=0.5523; // ベジェ近似係数
 
-  // 1. Dark overlay
-  ctx.fillStyle='rgba(0,0,0,0.50)';
+  // 楕円パスを描画するサブ関数
+  function ovalPath(){
+    ctx.beginPath();
+    ctx.moveTo(cx,cy-ry);
+    ctx.bezierCurveTo(cx+K*rx,cy-ry, cx+rx,cy-K*ry, cx+rx,cy);
+    ctx.bezierCurveTo(cx+rx,cy+K*ry, cx+K*rx,cy+ry, cx,cy+ry);
+    ctx.bezierCurveTo(cx-K*rx,cy+ry, cx-rx,cy+K*ry, cx-rx,cy);
+    ctx.bezierCurveTo(cx-rx,cy-K*ry, cx-K*rx,cy-ry, cx,cy-ry);
+    ctx.closePath();
+  }
+
+  // 1. 全体を暗くする
+  ctx.fillStyle='rgba(0,0,0,0.58)';
   ctx.fillRect(0,0,vw,vh);
 
-  // 2. Combined path: head circle + body with outward-expanding shoulder curves
-  ctx.beginPath();
-  // Head circle
-  ctx.arc(cx,headCY,headR,0,Math.PI*2);
-  // Body — left side: curves outward (control points pushed outside)
-  ctx.moveTo(cx-headR*0.4,chinY);
-  ctx.bezierCurveTo(
-    cx-headR*1.8, headCY+headR*0.9,  // CP1: outside left
-    cx-headR*2.0, headCY+headR*1.4,  // CP2: further outside
-    cx-shW,       shY                 // end: shoulder edge
-  );
-  ctx.lineTo(cx-shW,botY);
-  ctx.lineTo(cx+shW,botY);
-  ctx.lineTo(cx+shW,shY);
-  // Right side: mirror
-  ctx.bezierCurveTo(
-    cx+headR*2.0, headCY+headR*1.4,  // CP1: outside right
-    cx+headR*1.8, headCY+headR*0.9,  // CP2
-    cx+headR*0.4, chinY               // end: right chin
-  );
-  ctx.closePath();
-
-  // 3. Cut out silhouette
+  // 2. 楕円内を切り抜いてクリア（顔エリアを明るく）
   ctx.globalCompositeOperation='destination-out';
   ctx.fillStyle='rgba(0,0,0,1)';
+  ovalPath();
   ctx.fill();
 
-  // 4. Border
   ctx.globalCompositeOperation='source-over';
-  const bc=borderColor||'rgba(255,255,255,0.85)';
-  ctx.strokeStyle=bc;ctx.lineWidth=3;ctx.lineJoin='round';
-  ctx.beginPath();ctx.arc(cx,headCY,headR,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(cx-headR*0.4,chinY);
-  ctx.bezierCurveTo(cx-headR*1.8,headCY+headR*0.9,cx-headR*2.0,headCY+headR*1.4,cx-shW,shY);
-  ctx.moveTo(cx+headR*0.4,chinY);
-  ctx.bezierCurveTo(cx+headR*1.8,headCY+headR*0.9,cx+headR*2.0,headCY+headR*1.4,cx+shW,shY);
+
+  // 3. 楕円ボーダー（白〜緑）
+  const bc=borderColor||'rgba(255,255,255,0.92)';
+  ctx.strokeStyle=bc;
+  ctx.lineWidth=3;
+  ctx.lineJoin='round';
+  ovalPath();
   ctx.stroke();
+
+  // 4. 肩ラインのヒント（楕円下端に淡いダッシュ線）
+  const shY=cy+ry*0.82;
+  const shW=rx*0.78;
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,0.38)';
+  ctx.lineWidth=2;
+  ctx.setLineDash([5,5]);
+  // 左肩
+  ctx.beginPath();
+  ctx.moveTo(cx-shW*0.25,shY);
+  ctx.bezierCurveTo(cx-shW*0.55,shY+8, cx-shW*0.85,shY+2, cx-shW,shY-8);
+  ctx.stroke();
+  // 右肩
+  ctx.beginPath();
+  ctx.moveTo(cx+shW*0.25,shY);
+  ctx.bezierCurveTo(cx+shW*0.55,shY+8, cx+shW*0.85,shY+2, cx+shW,shY-8);
+  ctx.stroke();
+  ctx.restore();
+
+  // 5. 補助テキスト（楕円下に）
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.60)';
+  ctx.font=`${Math.round(Math.min(vw,vh)*0.033)}px sans-serif`;
+  ctx.textAlign='center';
+  ctx.fillText('顔を枠内に合わせてください',cx,cy+ry+Math.round(Math.min(vw,vh)*0.055));
+  ctx.restore();
 }
 
 function drawFeedback(ctx,conditions,face,vw,vh,cx,cy,ow,oh){
