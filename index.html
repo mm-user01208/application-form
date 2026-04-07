@@ -1926,12 +1926,12 @@ function startCamLoop(){
 
 // 人型ガイドパラメータ（頭部正円＋肩）
 function getGuideParams(vw,vh){
-  const headR=vw*0.32;              // 頭円半径（画面幅の64%を直径に）
+  const headR=vw*0.38;              // 頭円半径（画面幅の76%を直径に・20%拡大）
   const cx=vw/2;
-  const headCY=vh*0.32;             // 頭円中心Y（画面中央よりやや上）
+  const headCY=vh*0.30;             // 頭円中心Y（画面中央よりやや上）
   const chinY=headCY+headR;         // 顎Y
-  const shW=headR*1.8;              // 肩の半幅（自然な肩幅）
-  const shY=headCY+headR*2.1;       // 肩ラインY（胸上までカバー）
+  const shW=headR*1.85;             // 肩の半幅
+  const shY=headCY+headR*2.4;       // 肩ラインY（深め）
   return{cx,headCY,headR,chinY,shW,shY};
 }
 
@@ -1970,39 +1970,38 @@ function evaluateConditions(face,bright,vw,vh){
 function drawHumanGuide(ctx,vw,vh,borderColor){
   const{cx,headCY,headR}=getGuideParams(vw,vh);
 
-  // 首付け根：頭部円の下部左右（ネック幅 = headR * 0.30）
-  const neckHalf=headR*0.30;
-  const neckDrop=Math.sqrt(headR*headR-neckHalf*neckHalf); // 円中心からの距離
-  // arc()内でのネック角度（canvas座標：0=右, 時計回り）
-  const rNeckAng=Math.atan2(neckDrop,neckHalf);   // 右ネック角 ≈72°
-  const lNeckAng=Math.PI-rNeckAng;               // 左ネック角 ≈108°
+  // 首付け根：円底部から滑らかに広がる（ネック幅 = headR * 0.40）
+  const neckHalf=headR*0.40;
+  const neckDrop=Math.sqrt(headR*headR-neckHalf*neckHalf);
+  const rNeckAng=Math.atan2(neckDrop,neckHalf);
+  const lNeckAng=Math.PI-rNeckAng;
 
-  // 肩パラメータ（自然な肩幅・胸上までカバー）
-  const shW=headR*1.8;                          // 肩半幅（自然な幅）
-  const shBotEdge=headCY+headR*2.0;             // 肩端のY（胸上まで下げる）
-  const shBotMid=headCY+headR*2.2;              // 肩底の最下点
+  // 肩パラメータ（半楕円状・自然な人体シルエット）
+  const shW=headR*1.85;                         // 肩半幅
+  const shBotEdge=headCY+headR*2.2;             // 肩端Y（肩の高さ）
+  const shBotMid=headCY+headR*2.55;             // 肩底の最下点（深め・胸上まで）
 
   // 単一パスを生成する内部関数（cutout・borderで共通使用）
   function silhouettePath(){
     ctx.beginPath();
     // ① 頭部：arc()で右ネックから反時計回りに左ネックへ（頭頂を通過）
     ctx.arc(cx,headCY,headR,rNeckAng,lNeckAng,true);
-    // ② 左ネック → 左肩（外側へ広がるベジェ）
+    // ② 左ネック → 左肩（首から自然に広がるベジェ）
     ctx.bezierCurveTo(
-      cx-headR*1.25, headCY+headR*1.0,
-      cx-headR*1.65, headCY+headR*1.55,
-      cx-shW,        shBotEdge
+      cx-headR*0.90, headCY+headR*1.10,  // 首直下・まだ細い
+      cx-headR*1.60, headCY+headR*1.70,  // 肩の膨らみ手前
+      cx-shW,        shBotEdge           // 肩先端
     );
-    // ③ 肩底：左端 → 中央 → 右端（緩やかなカーブ）
+    // ③ 肩底：半楕円状に丸みを持たせた曲線
     ctx.bezierCurveTo(
-      cx-shW*0.55, shBotMid,
-      cx+shW*0.55, shBotMid,
-      cx+shW,      shBotEdge
+      cx-shW*0.65, shBotMid,             // 左肩底カーブ
+      cx+shW*0.65, shBotMid,             // 右肩底カーブ
+      cx+shW,      shBotEdge             // 右肩先端
     );
     // ④ 右肩 → 右ネック（左右対称）
     ctx.bezierCurveTo(
-      cx+headR*1.65, headCY+headR*1.55,
-      cx+headR*1.25, headCY+headR*1.0,
+      cx+headR*1.60, headCY+headR*1.70,
+      cx+headR*0.90, headCY+headR*1.10,
       cx+neckHalf,   headCY+neckDrop
     );
     ctx.closePath();
@@ -2034,7 +2033,7 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   ctx.fillStyle='rgba(255,255,255,0.58)';
   ctx.font=`${Math.round(headR*0.44)}px sans-serif`;
   ctx.textAlign='center';
-  ctx.fillText('顔を円の中に合わせてください',cx,shBotMid+Math.round(headR*0.50));
+  ctx.fillText('顔を円の中に合わせてください',cx,shBotMid+Math.round(headR*0.40));
   ctx.restore();
 }
 
