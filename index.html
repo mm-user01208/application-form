@@ -1926,12 +1926,12 @@ function startCamLoop(){
 
 // 人型ガイドパラメータ（頭部正円＋肩）
 function getGuideParams(vw,vh){
-  const headR=vw*0.38;              // 頭円半径（画面幅の76%を直径に・20%拡大）
+  const headR=vw*0.38;              // 頭円半径（画面幅の76%を直径に）
   const cx=vw/2;
-  const headCY=vh*0.30;             // 頭円中心Y（画面中央よりやや上）
+  const headCY=vh*0.38;             // 頭円中心Y（上部40%付近）
   const chinY=headCY+headR;         // 顎Y
   const shW=headR*1.85;             // 肩の半幅
-  const shY=headCY+headR*2.4;       // 肩ラインY（深め）
+  const shY=headCY+headR*2.35;      // 肩ラインY
   return{cx,headCY,headR,chinY,shW,shY};
 }
 
@@ -1976,10 +1976,10 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   const rNeckAng=Math.atan2(neckDrop,neckHalf);
   const lNeckAng=Math.PI-rNeckAng;
 
-  // 肩パラメータ（半楕円状・自然な人体シルエット）
+  // 肩パラメータ（画面下15〜25%上に肩底が来るよう配置）
   const shW=headR*1.85;                         // 肩半幅
-  const shBotEdge=headCY+headR*2.2;             // 肩端Y（肩の高さ）
-  const shBotMid=headCY+headR*2.55;             // 肩底の最下点（深め・胸上まで）
+  const shBotEdge=headCY+headR*2.1;             // 肩端Y
+  const shBotMid=headCY+headR*2.4;              // 肩底（画面下約20%上に相当）
 
   // 単一パスを生成する内部関数（cutout・borderで共通使用）
   function silhouettePath(){
@@ -2033,7 +2033,7 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   ctx.fillStyle='rgba(255,255,255,0.58)';
   ctx.font=`${Math.round(headR*0.44)}px sans-serif`;
   ctx.textAlign='center';
-  ctx.fillText('顔を円の中に合わせてください',cx,shBotMid+Math.round(headR*0.40));
+  ctx.fillText('顔をガイドに合わせてください',cx,shBotMid+Math.round(headR*0.38));
   ctx.restore();
 }
 
