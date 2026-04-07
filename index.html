@@ -1926,12 +1926,12 @@ function startCamLoop(){
 
 // 人型ガイドパラメータ（頭部正円＋肩）
 function getGuideParams(vw,vh){
-  const headR=Math.min(vw,vh)*0.22; // 頭円半径（arc()のみ）
+  const headR=Math.min(vw,vh)*0.28; // 頭円半径（1.27倍に拡大）
   const cx=vw/2;
-  const headCY=vh*0.31;             // 頭円中心Y（上部寄り）
+  const headCY=vh*0.30;             // 頭円中心Y（少し上寄り）
   const chinY=headCY+headR;         // 顎Y
-  const shW=headR*2.3;              // 肩の半幅（頭より少し広い）
-  const shY=headCY+headR*1.9;       // 肩ラインY（肩の底辺）
+  const shW=headR*1.9;              // 肩の半幅（やや縮小）
+  const shY=headCY+headR*1.85;      // 肩ラインY
   return{cx,headCY,headR,chinY,shW,shY};
 }
 
@@ -1974,10 +1974,10 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   const rNeckAng=Math.atan2(neckDrop,neckHalf);   // 右ネック角 ≈72°
   const lNeckAng=Math.PI-rNeckAng;               // 左ネック角 ≈108°
 
-  // 肩パラメータ
-  const shW=headR*2.2;                          // 肩半幅
-  const shBotEdge=headCY+headR*1.75;            // 肩端のY
-  const shBotMid=headCY+headR*1.95;             // 肩底の最下点（緩やかカーブ用）
+  // 肩パラメータ（横幅縮小・縦長バランス調整）
+  const shW=headR*1.9;                          // 肩半幅（縮小）
+  const shBotEdge=headCY+headR*1.65;            // 肩端のY（少し下げる）
+  const shBotMid=headCY+headR*1.80;             // 肩底の最下点
 
   // 単一パスを生成する内部関数（cutout・borderで共通使用）
   function silhouettePath(){
@@ -1986,9 +1986,9 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
     ctx.arc(cx,headCY,headR,rNeckAng,lNeckAng,true);
     // ② 左ネック → 左肩（外側へ広がるベジェ）
     ctx.bezierCurveTo(
-      cx-headR*1.6, headCY+headR*1.05,
-      cx-headR*2.05,headCY+headR*1.55,
-      cx-shW,       shBotEdge
+      cx-headR*1.35, headCY+headR*0.95,
+      cx-headR*1.75, headCY+headR*1.40,
+      cx-shW,        shBotEdge
     );
     // ③ 肩底：左端 → 中央 → 右端（緩やかなカーブ、直線なし）
     ctx.bezierCurveTo(
@@ -1998,9 +1998,9 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
     );
     // ④ 右肩 → 右ネック（左右対称）
     ctx.bezierCurveTo(
-      cx+headR*2.05,headCY+headR*1.55,
-      cx+headR*1.6, headCY+headR*1.05,
-      cx+neckHalf,  headCY+neckDrop
+      cx+headR*1.75, headCY+headR*1.40,
+      cx+headR*1.35, headCY+headR*0.95,
+      cx+neckHalf,   headCY+neckDrop
     );
     ctx.closePath();
   }
