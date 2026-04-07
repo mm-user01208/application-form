@@ -1963,67 +1963,75 @@ function evaluateConditions(face,bright,vw,vh){
   return{allOk,message,issues,brightOk};
 }
 
-// ===== 人型シルエットガイド（頭部正円＋肩・胴体なし） =====
+// ===== 人型シルエットガイド（単一連続パス：頭部arc + 肩bezier） =====
 function drawHumanGuide(ctx,vw,vh,borderColor){
-  const{cx,headCY,headR,chinY,shW,shY}=getGuideParams(vw,vh);
+  const{cx,headCY,headR}=getGuideParams(vw,vh);
+
+  // 首付け根：頭部円の下部左右（ネック幅 = headR * 0.30）
+  const neckHalf=headR*0.30;
+  const neckDrop=Math.sqrt(headR*headR-neckHalf*neckHalf); // 円中心からの距離
+  // arc()内でのネック角度（canvas座標：0=右, 時計回り）
+  const rNeckAng=Math.atan2(neckDrop,neckHalf);   // 右ネック角 ≈72°
+  const lNeckAng=Math.PI-rNeckAng;               // 左ネック角 ≈108°
+
+  // 肩パラメータ
+  const shW=headR*2.2;                          // 肩半幅
+  const shBotEdge=headCY+headR*1.75;            // 肩端のY
+  const shBotMid=headCY+headR*1.95;             // 肩底の最下点（緩やかカーブ用）
+
+  // 単一パスを生成する内部関数（cutout・borderで共通使用）
+  function silhouettePath(){
+    ctx.beginPath();
+    // ① 頭部：arc()で右ネックから反時計回りに左ネックへ（頭頂を通過）
+    ctx.arc(cx,headCY,headR,rNeckAng,lNeckAng,true);
+    // ② 左ネック → 左肩（外側へ広がるベジェ）
+    ctx.bezierCurveTo(
+      cx-headR*1.6, headCY+headR*1.05,
+      cx-headR*2.05,headCY+headR*1.55,
+      cx-shW,       shBotEdge
+    );
+    // ③ 肩底：左端 → 中央 → 右端（緩やかなカーブ、直線なし）
+    ctx.bezierCurveTo(
+      cx-shW*0.55, shBotMid,
+      cx+shW*0.55, shBotMid,
+      cx+shW,      shBotEdge
+    );
+    // ④ 右肩 → 右ネック（左右対称）
+    ctx.bezierCurveTo(
+      cx+headR*2.05,headCY+headR*1.55,
+      cx+headR*1.6, headCY+headR*1.05,
+      cx+neckHalf,  headCY+neckDrop
+    );
+    ctx.closePath();
+  }
 
   // 1. 全体を暗くする
   ctx.fillStyle='rgba(0,0,0,0.58)';
   ctx.fillRect(0,0,vw,vh);
 
+  // 2. シルエット内を切り抜き（明るく）
   ctx.globalCompositeOperation='destination-out';
   ctx.fillStyle='rgba(0,0,0,1)';
-
-  // 2a. 頭部：正円（arc()のみ・ellipse/scale禁止）
-  ctx.beginPath();
-  ctx.arc(cx,headCY,headR,0,Math.PI*2);
-  ctx.fill();
-
-  // 2b. 肩エリア（頭の下〜肩ラインまで）：頭部円と重なるよう上端を顎より高めに設定
-  ctx.beginPath();
-  ctx.moveTo(cx-headR*0.38,chinY-headR*0.25);       // 左ネック（頭部円内から開始）
-  ctx.bezierCurveTo(
-    cx-headR*1.7, headCY+headR*1.0,                 // 左：外側へ広がる
-    cx-headR*2.1, headCY+headR*1.5,                 // さらに外側
-    cx-shW, shY                                      // 左肩端
-  );
-  ctx.lineTo(cx+shW,shY);                            // 肩底辺（横一直線）
-  ctx.bezierCurveTo(
-    cx+headR*2.1, headCY+headR*1.5,
-    cx+headR*1.7, headCY+headR*1.0,
-    cx+headR*0.38, chinY-headR*0.25                  // 右ネック
-  );
-  ctx.closePath();
+  silhouettePath();
   ctx.fill();
 
   ctx.globalCompositeOperation='source-over';
 
-  // 3. ボーダー描画
+  // 3. 同一パスでボーダーを描画
   const bc=borderColor||'rgba(255,255,255,0.90)';
   ctx.strokeStyle=bc;
   ctx.lineWidth=3;
   ctx.lineJoin='round';
   ctx.lineCap='round';
-
-  // 頭部円ボーダー
-  ctx.beginPath();
-  ctx.arc(cx,headCY,headR,0,Math.PI*2);
+  silhouettePath();
   ctx.stroke();
 
-  // 肩ラインボーダー（左肩曲線 → 水平 → 右肩曲線）
-  ctx.beginPath();
-  ctx.moveTo(cx-headR*0.38,chinY-headR*0.25);
-  ctx.bezierCurveTo(cx-headR*1.7,headCY+headR*1.0, cx-headR*2.1,headCY+headR*1.5, cx-shW,shY);
-  ctx.lineTo(cx+shW,shY);
-  ctx.bezierCurveTo(cx+headR*2.1,headCY+headR*1.5, cx+headR*1.7,headCY+headR*1.0, cx+headR*0.38,chinY-headR*0.25);
-  ctx.stroke();
-
-  // 4. 補助テキスト（肩ラインの下に）
+  // 4. 補助テキスト
   ctx.save();
-  ctx.fillStyle='rgba(255,255,255,0.60)';
-  ctx.font=`${Math.round(headR*0.45)}px sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.58)';
+  ctx.font=`${Math.round(headR*0.44)}px sans-serif`;
   ctx.textAlign='center';
-  ctx.fillText('顔と肩をガイドに合わせてください',cx,shY+Math.round(headR*0.55));
+  ctx.fillText('顔と肩をガイドに合わせてください',cx,shBotMid+Math.round(headR*0.58));
   ctx.restore();
 }
 
