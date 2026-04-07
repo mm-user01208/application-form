@@ -1926,7 +1926,7 @@ function startCamLoop(){
 
 // 人型ガイドパラメータ（頭部正円＋肩）
 function getGuideParams(vw,vh){
-  const headR=vw*0.38;              // 頭円半径（画面幅の76%を直径に）
+  const headR=vw*0.42;              // 頭円半径（少し大きめ）
   const cx=vw/2;
   const headCY=vh*0.38;             // 頭円中心Y（上部40%付近）
   const chinY=headCY+headR;         // 顎Y
@@ -1976,28 +1976,26 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   const rNeckAng=Math.atan2(neckDrop,neckHalf);
   const lNeckAng=Math.PI-rNeckAng;
 
-  // 肩パラメータ（画面下15〜25%上に肩底が来るよう配置）
+  // 肩パラメータ
   const shW=headR*1.85;                         // 肩半幅
-  const shBotEdge=headCY+headR*2.1;             // 肩端Y
-  const shBotMid=headCY+headR*2.4;              // 肩底（画面下約20%上に相当）
+  const shBotEdge=headCY+headR*2.1;             // 肩先端Y
 
   // 単一パスを生成する内部関数（cutout・borderで共通使用）
+  // ※肩下は画面下端まで延ばして横線を消す
   function silhouettePath(){
     ctx.beginPath();
     // ① 頭部：arc()で右ネックから反時計回りに左ネックへ（頭頂を通過）
     ctx.arc(cx,headCY,headR,rNeckAng,lNeckAng,true);
     // ② 左ネック → 左肩（首から自然に広がるベジェ）
     ctx.bezierCurveTo(
-      cx-headR*0.90, headCY+headR*1.10,  // 首直下・まだ細い
-      cx-headR*1.60, headCY+headR*1.70,  // 肩の膨らみ手前
-      cx-shW,        shBotEdge           // 肩先端
+      cx-headR*0.90, headCY+headR*1.10,
+      cx-headR*1.60, headCY+headR*1.70,
+      cx-shW,        shBotEdge
     );
-    // ③ 肩底：半楕円状に丸みを持たせた曲線
-    ctx.bezierCurveTo(
-      cx-shW*0.65, shBotMid,             // 左肩底カーブ
-      cx+shW*0.65, shBotMid,             // 右肩底カーブ
-      cx+shW,      shBotEdge             // 右肩先端
-    );
+    // ③ 肩先端からキャンバス下端へ（横線なし）
+    ctx.lineTo(cx-shW, vh);
+    ctx.lineTo(cx+shW, vh);
+    ctx.lineTo(cx+shW, shBotEdge);
     // ④ 右肩 → 右ネック（左右対称）
     ctx.bezierCurveTo(
       cx+headR*1.60, headCY+headR*1.70,
@@ -2031,9 +2029,9 @@ function drawHumanGuide(ctx,vw,vh,borderColor){
   // 4. 補助テキスト
   ctx.save();
   ctx.fillStyle='rgba(255,255,255,0.58)';
-  ctx.font=`${Math.round(headR*0.44)}px sans-serif`;
+  ctx.font=`${Math.round(headR*0.26)}px sans-serif`;
   ctx.textAlign='center';
-  ctx.fillText('顔をガイドに合わせてください',cx,shBotMid+Math.round(headR*0.38));
+  ctx.fillText('顔をガイドに合わせてください',cx,shBotEdge+Math.round(headR*0.35));
   ctx.restore();
 }
 
